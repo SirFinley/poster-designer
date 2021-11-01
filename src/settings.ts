@@ -36,6 +36,7 @@ export default class Settings {
         this.bottomMarginInput = document.getElementById("bottom-margin") as HTMLInputElement;
 
         this.initializeEventListeners();
+        this.populateInputOptions();
     }
 
     initializeEventListeners() {
@@ -129,32 +130,32 @@ export default class Settings {
     }
 
     populateInputOptions() {
-        // fill dropdown options
+        const addSizeOption = (option: SizeOptions) => {
+            let elem = document.createElement('option');
+            elem.value = option;
+            elem.text = sizeOptionsDisplayMap[option];
+            this.sizeInput.appendChild(elem);
+        }
+
+        for (let key of Object.keys(sizeOptionsDisplayMap) as Array<keyof typeof sizeOptionsDisplayMap>) {
+            addSizeOption(key);
+        }
     }
 
     readSettingsFromUrl(urlStr: string) {
         let url = new URL(urlStr);
 
         // TODO - validate orientation and size are set, display warning if they are not
-        // TODO - map from etsy variation id to option
-        const sizeMap: Record<string, SizeOptions> = {
-            "18x24": "18x24",
-            "24x36": "24x36",
-        }
-
-        const orientationMap: Record<string, OrientationOptions> = {
-            "landscape": "landscape",
-            "portrait": "portrait",
-        }
+        // TODO: etsy - map from etsy variation id to option
         let orientation = url.searchParams.get('orientation');
         let size = url.searchParams.get('size');
 
         if (orientation) {
-            this.orientation = orientationMap[orientation];
+            this.orientation = orientationOptionsEtsyUrlMap[orientation];
             this.orientationInput.value = this.orientation;
         }
         if (size) {
-            this.size = sizeMap[size];
+            this.size = sizeOptionsEtsyUrlMap[size];
             this.sizeInput.value = this.size;
         }
     }
@@ -173,17 +174,38 @@ export default class Settings {
         let width = parseFloat(this.size.split('x')[0]);
         let height = parseFloat(this.size.split('x')[1]);
 
-        if (this.orientation == 'landscape') {
-            return height / width;
+        if (this.orientation == 'portrait') {
+            return width / height;
         }
         else {
-            return width / height;
+            return height / width;
         }
     }
 }
 
 export type OrientationOptions = "landscape" | "portrait";
-export type SizeOptions = "8.5x11" | "11x17" | "18x24" | "24x36";
+// TODO: etsy - replace keys with etsy variation id
+const orientationOptionsEtsyUrlMap: Record<string, OrientationOptions> = {
+    'landscape': 'landscape',
+    'portrait': 'portrait',
+}
+
+export type SizeOptions = keyof typeof sizeOptionsDisplayMap;
+const sizeOptionsDisplayMap = {
+    '8.5x11': '8.5"x11"',
+    '11x17': '11"x17"',
+    '18x24': '18"x24"',
+    '24x36': '24"x36"',
+}
+
+// TODO: etsy - replace keys with etsy variation id
+const sizeOptionsEtsyUrlMap: Record<string, SizeOptions> = {
+    '8.5x11': '8.5x11',
+    '11x17': '11x17',
+    '18x24': '18x24',
+    '24x36': '24x36',
+}
+
 interface RealPosterDimensions {
     width: number,
     height: number,
