@@ -40,7 +40,6 @@ export default class Overlay {
         </defs>  
         <rect width="${dimensions.canvasWidth}" height="${dimensions.canvasHeight}" fill="${fill}" mask="url(%23hole)"/>
         </svg>`;
-        console.log(this.canvas);
         fabric.Image.fromURL(svg, (img: fabric.Image) => {
             img.set({
                 width: dimensions.canvasWidth,

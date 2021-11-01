@@ -32,7 +32,6 @@ export default class PosterImage {
     imageAspectRatio: number;
 
     fitImage() {
-        console.log('fit image');
         let dims = this.settings.getVirtualDimensions(this.canvas);
 
         if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas
@@ -55,7 +54,6 @@ export default class PosterImage {
     }
 
     fillImage() {
-        console.log('fill image');
         let dims = this.settings.getVirtualDimensions(this.canvas);
 
         if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas

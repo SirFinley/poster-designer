@@ -45,8 +45,6 @@ export default class Settings {
         this.leftMarginInput.addEventListener('input', onMarginInput);
         this.rightMarginInput.addEventListener('input', onMarginInput);
         function onMarginInput(this: HTMLInputElement, e: Event) {
-            console.log(this.id);
-
             let value = parseInt(this.value);
             if (this.id === 'left-margin') {
                 self.leftMargin = value;
