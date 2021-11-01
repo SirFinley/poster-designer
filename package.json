@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "serve": "parcel ./cropper.html",
+    "build": "parcel build ./cropper.html"
+  },
+  "devDependencies": {
+    "typescript": "^4.4.4"
+  },
+  "dependencies": {
+    "@types/fabric": "^4.5.4",
+    "esbuild": "^0.13.12",
+    "fabric": "^4.6.0",
+    "parcel": "^2.0.0"
+  }
+}
