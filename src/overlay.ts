@@ -1,5 +1,6 @@
 import { fabric } from "fabric";
 import Settings from "./settings";
+import VirtualDimensions from './virtualDimensions';
 
 export default class Overlay {
     constructor(canvas: fabric.Canvas, settings: Settings) {
@@ -28,46 +29,27 @@ export default class Overlay {
 
         this.clearOverlay();
 
-        let canvasWidth = this.canvas.width!;
-        let canvasHeight = this.canvas.height!;
-        let canvasAspectRatio = canvasWidth / canvasHeight;
-        let posterAspectRatio = this.settings.getAspectRatio();
+        let dimensions = this.settings.getVirtualDimensions(this.canvas);
 
-        let posterWidth;
-        let posterHeight;
-
-        const overlayMargin = 0.9;
-        if (posterAspectRatio >= canvasAspectRatio) { // poster wider than canvas
-            posterWidth = overlayMargin * canvasWidth;
-            posterHeight = posterWidth / posterAspectRatio;
-        }
-        else { // poster taller than canvas
-            posterHeight = overlayMargin * canvasHeight;
-            posterWidth = posterAspectRatio * posterHeight;
-        }
-
-        let horizontalMargin = (canvasWidth - posterWidth) / 2;
-        let verticalMargin = (canvasHeight - posterHeight) / 2;
-
-        let svg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${canvasWidth}" height="${canvasHeight}">
+        let svg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${dimensions.canvasWidth}" height="${dimensions.canvasHeight}">
         <defs>
             <mask id="hole">
-                <rect width="${canvasWidth}" height="${canvasHeight}" fill="white"/>      
-                <rect x="${horizontalMargin}" y="${verticalMargin}" width="${posterWidth}" height="${posterHeight}" fill="black"/>    
+                <rect width="${dimensions.canvasWidth}" height="${dimensions.canvasHeight}" fill="white"/>      
+                <rect x="${dimensions.canvasHorizontalMargin}" y="${dimensions.canvasVerticalMargin}" width="${dimensions.posterWidth}" height="${dimensions.posterHeight}" fill="black"/>    
             </mask>  
         </defs>  
-        <rect width="${canvasWidth}" height="${canvasHeight}" fill="${fill}" mask="url(%23hole)"/>
+        <rect width="${dimensions.canvasWidth}" height="${dimensions.canvasHeight}" fill="${fill}" mask="url(%23hole)"/>
         </svg>`;
         console.log(this.canvas);
         fabric.Image.fromURL(svg, (img: fabric.Image) => {
             img.set({
-                width: canvasWidth,
-                height: canvasHeight,
+                width: dimensions.canvasWidth,
+                height: dimensions.canvasHeight,
                 top: 0,
                 left: 0,
                 opacity: opacity,
             });
-            this.canvas.setOverlayImage(img, this.canvas.renderAll.bind(this.canvas));     
+            this.canvas.setOverlayImage(img, () => this.canvas.renderAll());
         });
     }
 

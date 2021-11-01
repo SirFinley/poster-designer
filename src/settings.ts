@@ -1,3 +1,5 @@
+import VirtualDimensions from "./virtualDimensions";
+
 export default class Settings {
     orientation: OrientationOptions;
     size: SizeOptions;
@@ -24,7 +26,7 @@ export default class Settings {
         this.rightMargin = 0;
         this.topMargin = 0;
         this.bottomMargin = 0;
-        this.onOverlayChanged = () => {};
+        this.onOverlayChanged = () => { };
 
         this.orientationInput = document.getElementById("orientation-input") as HTMLInputElement;
         this.sizeInput = document.getElementById("size-input") as HTMLInputElement;
@@ -36,7 +38,7 @@ export default class Settings {
         this.initializeEventListeners();
     }
 
-    initializeEventListeners(){
+    initializeEventListeners() {
         let self = this;
 
         this.leftMarginInput.addEventListener('input', onMarginInput);
@@ -45,16 +47,16 @@ export default class Settings {
             console.log(this.id);
 
             let value = parseInt(this.value);
-            if (this.id === 'left-margin'){
+            if (this.id === 'left-margin') {
                 self.leftMargin = value;
             }
-            else if (this.id === 'right-margin'){
+            else if (this.id === 'right-margin') {
                 self.rightMargin = value;
             }
-            else if (this.id === 'top-margin'){
+            else if (this.id === 'top-margin') {
                 self.topMargin = value;
             }
-            else if (this.id === 'bottom-margin'){
+            else if (this.id === 'bottom-margin') {
                 self.bottomMargin = value;
             }
         }
@@ -70,6 +72,60 @@ export default class Settings {
             self.orientation = this.value as OrientationOptions;
             self.onOverlayChanged();
         }
+    }
+
+    getVirtualDimensions(canvas: fabric.Canvas): VirtualDimensions {
+        let canvasWidth = canvas.width!;
+        let canvasHeight = canvas.height!;
+        let canvasAspectRatio = canvasWidth / canvasHeight;
+        let posterAspectRatio = this.getAspectRatio();
+
+        let posterWidth;
+        let posterHeight;
+
+        const overlayMargin = 0.9;
+        if (posterAspectRatio >= canvasAspectRatio) { // poster wider than canvas
+            posterWidth = overlayMargin * canvasWidth;
+            posterHeight = posterWidth / posterAspectRatio;
+        }
+        else { // poster taller than canvas
+            posterHeight = overlayMargin * canvasHeight;
+            posterWidth = posterAspectRatio * posterHeight;
+        }
+
+        let canvasHorizontalMargin = (canvasWidth - posterWidth) / 2;
+        let canvasVerticalMargin = (canvasHeight - posterHeight) / 2;
+
+        let posterLeft = canvasHorizontalMargin;
+        let posterRight = canvasHorizontalMargin + posterWidth;
+        let posterTop = canvasVerticalMargin;
+        let posterBottom = canvasVerticalMargin + posterHeight;
+
+        let realPosterDimensions = this.getRealPosterDimensions();
+        let inchesPerPixel = realPosterDimensions.width / posterWidth;
+        let posterLeftMargin = this.leftMargin / inchesPerPixel;
+        let posterRightMargin = this.rightMargin / inchesPerPixel;
+        let posterTopMargin = this.topMargin / inchesPerPixel;
+        let posterBottomMargin = this.bottomMargin / inchesPerPixel;
+
+        return {
+            canvasWidth,
+            canvasHeight,
+            canvasAspectRatio,
+            canvasHorizontalMargin,
+            canvasVerticalMargin,
+            posterAspectRatio,
+            posterWidth,
+            posterHeight,
+            posterLeft,
+            posterRight,
+            posterTop,
+            posterBottom,
+            posterLeftMargin,
+            posterRightMargin,
+            posterTopMargin,
+            posterBottomMargin,
+        };
     }
 
     populateInputOptions() {
@@ -103,11 +159,21 @@ export default class Settings {
         }
     }
 
+    getRealPosterDimensions(): RealPosterDimensions {
+        let width = parseFloat(this.size.split('x')[0]);
+        let height = parseFloat(this.size.split('x')[1]);
+
+        return {
+            width,
+            height
+        };
+    }
+
     getAspectRatio(): number {
         let width = parseFloat(this.size.split('x')[0]);
         let height = parseFloat(this.size.split('x')[1]);
 
-        if (this.orientation == 'landscape'){
+        if (this.orientation == 'landscape') {
             return height / width;
         }
         else {
@@ -118,3 +184,7 @@ export default class Settings {
 
 export type OrientationOptions = "landscape" | "portrait";
 export type SizeOptions = "8.5x11" | "11x17" | "18x24" | "24x36";
+interface RealPosterDimensions {
+    width: number,
+    height: number,
+}
