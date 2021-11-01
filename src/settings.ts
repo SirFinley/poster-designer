@@ -59,6 +59,12 @@ export default class Settings {
             }
         }
 
+        this.sizeInput.addEventListener('change', onSizeInput);
+        function onSizeInput(this: HTMLInputElement, e: Event) {
+            self.size = this.value as SizeOptions;
+            self.onOverlayChanged();
+        }
+
         this.orientationInput.addEventListener('change', onOrientationInput);
         function onOrientationInput(this: HTMLInputElement, e: Event) {
             self.orientation = this.value as OrientationOptions;
