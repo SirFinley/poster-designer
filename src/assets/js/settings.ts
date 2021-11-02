@@ -19,7 +19,6 @@ export default class Settings {
     onOverlayChanged: () => void;
 
     constructor() {
-        (window as any).mySettings = this; // TODO: remove this
         this.orientation = 'landscape';
         this.size = '24x36';
         this.leftMargin = 0;
@@ -74,8 +73,8 @@ export default class Settings {
     }
 
     getVirtualDimensions(canvas: fabric.Canvas): VirtualDimensions {
-        let canvasWidth = canvas.width!;
-        let canvasHeight = canvas.height!;
+        let canvasWidth = canvas.getWidth();
+        let canvasHeight = canvas.getHeight();
         let canvasAspectRatio = canvasWidth / canvasHeight;
         let posterAspectRatio = this.getAspectRatio();
 
