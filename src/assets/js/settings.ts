@@ -41,8 +41,12 @@ export default class Settings {
     initializeEventListeners() {
         let self = this;
 
+        // margins
         this.leftMarginInput.addEventListener('input', onMarginInput);
         this.rightMarginInput.addEventListener('input', onMarginInput);
+        this.topMarginInput.addEventListener('input', onMarginInput);
+        this.bottomMarginInput.addEventListener('input', onMarginInput);
+
         function onMarginInput(this: HTMLInputElement, e: Event) {
             let value = parseInt(this.value);
             if (this.id === 'left-margin') {
@@ -59,12 +63,14 @@ export default class Settings {
             }
         }
 
+        // size
         this.sizeInput.addEventListener('change', onSizeInput);
         function onSizeInput(this: HTMLInputElement, e: Event) {
             self.size = this.value as SizeOptions;
             self.onOverlayChanged();
         }
 
+        // orientation
         this.orientationInput.addEventListener('change', onOrientationInput);
         function onOrientationInput(this: HTMLInputElement, e: Event) {
             self.orientation = this.value as OrientationOptions;

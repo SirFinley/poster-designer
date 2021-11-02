@@ -6,30 +6,54 @@ export default class PosterImage {
         this.canvas = canvas;
         this.settings = settings;
 
+        this.imageInput = document.getElementById("photo-input") as HTMLInputElement;
+        this.imageInput.onchange = (e: Event) => this.onImageUpload(e);
         document.getElementById("btn-fit-image")!.onclick = () => this.fitImage();
         document.getElementById("btn-fill-image")!.onclick = () => this.fillImage();
 
-        // TODO: load image from uploaded url
-        // let imgUrl = '';
-        // fabric.Image.fromURL(imgUrl, (oImg) => {
-        //     this.canvas.add(oImg);
-        // });
-        this.image = new fabric.Image(document.getElementById('cm-img') as HTMLImageElement);
-        this.imageAspectRatio = this.image.width! / this.image.height!;
-        this.image.setControlsVisibility({
+        let image = new fabric.Image(document.getElementById('cm-img') as HTMLImageElement);
+        this.setNewImage(image);
+    }
+
+    canvas: fabric.Canvas;
+    settings: Settings;
+    image: fabric.Image | null;
+    imageAspectRatio: number;
+    imageInput: HTMLInputElement;
+
+    setNewImage(image: fabric.Image){
+        image.setControlsVisibility({
             mb: false,
             ml: false,
             mr: false,
             mt: false
         });
 
-        this.canvas.add(this.image);
+        this.canvas.remove(this.image);
+        this.image = image;
+        this.imageAspectRatio = this.image.width! / this.image.height!;
+
+        this.fitImage();
+        this.canvas.add(image);
+        this.canvas.renderAll();
     }
 
-    canvas: fabric.Canvas;
-    settings: Settings;
-    image: fabric.Image;
-    imageAspectRatio: number;
+    onImageUpload(e: Event) {
+        // TODO: start upload to server in background
+        let reader = new FileReader();
+
+        reader.onload = (event) => {
+            let imgElem = document.getElementById("img-preview") as HTMLImageElement;
+            imgElem.src = event.target.result as string;
+            imgElem.onload = () => {
+                var image = new fabric.Image(imgElem);
+                this.setNewImage(image);
+            }
+        }
+        
+        let target = e.target as HTMLInputElement;
+        reader.readAsDataURL(target.files[0]);
+    }
 
     fitImage() {
         let dims = this.settings.getVirtualDimensions(this.canvas);

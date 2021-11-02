@@ -4,6 +4,7 @@ import Settings from './settings';
 import PosterImage from './image';
 
 const canvas = new fabric.Canvas('fabric-canvas');
+
 let settings = new Settings();
 // TODO: read settings from document.referrer
 // readSettingsFromUrl(document.referrer);
@@ -12,7 +13,10 @@ settings.readSettingsFromUrl(window.location.toString());
 let overlay = new Overlay(canvas, settings);
 let image = new PosterImage(canvas, settings);
 
-docReady(resizeCanvas);
+docReady(() => {
+    resizeCanvas();
+    image.fitImage();
+});
 
 window.onresize = resizeCanvas;
 function resizeCanvas() {
@@ -40,7 +44,7 @@ function docReady(fn) {
     } else {
         document.addEventListener("DOMContentLoaded", fn);
     }
-} 
+}
 
 // TODO: remove
 (window as any).canvas = canvas; // TODO: remove this
