@@ -15,23 +15,24 @@
             <div class="flex-grow flex-1 self-stretch">
                 <canvas id="canvas" width="640" height="480"></canvas>
             </div>
-            
+
             <!-- settings -->
             <div class="flex-none flex flex-col gap-2 max-w-sm">
                 <h2 class="font-bold text-lg">Settings</h2>
                 <!-- size -->
                 <div class="">
-                    <label class="" for="size-input">Size</label>
-                    <div class="shadow-md h-12">
-                        <select class="w-full max-w-full pl-3 h-full" id="size-input">
+                    <label class="text-sm" for="size-input">Size</label>
+                    <div class="h-12">
+                        <select class="rounded-md shadow-md w-full pl-3 h-full border-2 border-gray-50" id="size-input">
                         </select>
                     </div>
                 </div>
                 <!-- orientation -->
                 <div class="">
                     <label class="text-sm" for="orientation-input">Orientation</label>
-                    <div class="shadow-md h-12">
-                        <select class="w-full max-w-full pl-3 h-full" id="orientation-input">
+                    <div class="h-12">
+                        <select class="rounded-md shadow-md w-full pl-3 h-full border-2 border-gray-50"
+                            id="orientation-input">
                             <option value="landscape">Landscape</option>
                             <option value="portrait">Portrait</option>
                         </select>
@@ -39,30 +40,30 @@
                 </div>
                 <!-- margins -->
                 <div class="py-4 flex flex-row w-full flex-wrap place-content-between gap-y-4 overflow-auto">
-                  <div class="">
-                      <label class="text-sm" for="left-margin">Left Margin (inches)</label>
-                      <div class="shadow-md border-1">
-                          <input type="number" id="left-margin" class="" placeholder="0">
-                      </div>
-                  </div>
-                  <div class="">
-                      <label class="text-sm" for="right-margin">Right Margin (inches)</label>
-                      <div class="shadow-md">
-                          <input type="number" id="right-margin" class="" placeholder="0">
-                      </div>
-                  </div>
-                  <div class="">
-                      <label class="text-sm" for="top-margin">Top Margin (inches)</label>
-                      <div class="shadow-md">
-                          <input type="number" id="top-margin" class="" placeholder="0">
-                      </div>
-                  </div>
-                  <div class="">
-                      <label class="text-sm" for="bottom-margin">Bottom Margin (inches)</label>
-                      <div class="shadow-md">
-                          <input type="number" id="bottom-margin" class="" placeholder="0">
-                      </div>
-                  </div>
+                    <div class="">
+                        <label class="text-sm" for="left-margin">Left Margin (inches)</label>
+                        <div class="shadow-md border-1">
+                            <input type="number" id="left-margin" class="" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="">
+                        <label class="text-sm" for="right-margin">Right Margin (inches)</label>
+                        <div class="shadow-md">
+                            <input type="number" id="right-margin" class="" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="">
+                        <label class="text-sm" for="top-margin">Top Margin (inches)</label>
+                        <div class="shadow-md">
+                            <input type="number" id="top-margin" class="" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="">
+                        <label class="text-sm" for="bottom-margin">Bottom Margin (inches)</label>
+                        <div class="shadow-md">
+                            <input type="number" id="bottom-margin" class="" placeholder="0">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- fit/fill image -->
