@@ -9,52 +9,75 @@
         <div class="">
             <h1>Poster Designer</h1>
         </div>
-
-        <div class="">
-            <div class="">
-                <h2>Settings</h2>
+        <div class="flex min-h-full p-8 gap-4">
+            <!-- settings -->
+            <div class="flex-none flex flex-col gap-2 max-w-sm">
+                <h2 class="font-bold text-lg">Settings</h2>
+                <!-- size -->
                 <div class="">
                     <label class="" for="size-input">Size</label>
-                    <select class="" id="size-input">
-                    </select>
+                    <div class="shadow-md h-12">
+                        <select class="w-full max-w-full pl-3 h-full" id="size-input">
+                        </select>
+                    </div>
                 </div>
+                <!-- orientation -->
                 <div class="">
-                    <label class="" for="orientation-input">Orientation</label>
-                    <select class="" id="orientation-input">
-                        <option value="landscape">Landscape</option>
-                        <option value="portrait">Portrait</option>
-                    </select>
+                    <label class="text-sm" for="orientation-input">Orientation</label>
+                    <div class="shadow-md h-12">
+                        <select class="w-full max-w-full pl-3 h-full" id="orientation-input">
+                            <option value="landscape">Landscape</option>
+                            <option value="portrait">Portrait</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="">
-                    <span class="">Left margin</span>
-                    <input type="number" id="left-margin" class="" placeholder="0">
-                </div>
-                <div class="">
-                    <span class="">Right margin</span>
-                    <input type="number" id="right-margin" class="" placeholder="0">
-                </div>
-                <div class="">
-                    <span class="">Top margin</span>
-                    <input type="number" id="top-margin" class="" placeholder="0">
-                </div>
-                <div class="">
-                    <span class="">Bottom margin</span>
-                    <input type="number" id="bottom-margin" class="" placeholder="0">
+                <!-- margins -->
+                <div class="py-4 flex flex-row w-full flex-wrap place-content-between gap-y-4 overflow-auto">
+                  <div class="">
+                      <label class="text-sm" for="left-margin">Left Margin (inches)</label>
+                      <div class="shadow-md border-1">
+                          <input type="number" id="left-margin" class="" placeholder="0">
+                      </div>
+                  </div>
+                  <div class="">
+                      <label class="text-sm" for="right-margin">Right Margin (inches)</label>
+                      <div class="shadow-md">
+                          <input type="number" id="right-margin" class="" placeholder="0">
+                      </div>
+                  </div>
+                  <div class="">
+                      <label class="text-sm" for="top-margin">Top Margin (inches)</label>
+                      <div class="shadow-md">
+                          <input type="number" id="top-margin" class="" placeholder="0">
+                      </div>
+                  </div>
+                  <div class="">
+                      <label class="text-sm" for="bottom-margin">Bottom Margin (inches)</label>
+                      <div class="shadow-md">
+                          <input type="number" id="bottom-margin" class="" placeholder="0">
+                      </div>
+                  </div>
                 </div>
 
-                <button id="btn-fit-image" class="p-2 rounded bg-blue-500 hover:bg-blue-600 transition">Fit Image</button>
-                <button id="btn-fill-image" class="">Fill Image</button>
+                <!-- fit/fill image -->
+                <button id="btn-fit-image"
+                    class="p-2 rounded text-white bg-blue-500 hover:bg-blue-600 transition font-bold">Fit
+                    Image</button>
+                <button id="btn-fill-image"
+                    class="p-2 rounded text-white bg-blue-500 hover:bg-blue-600 transition font-bold">Fill
+                    Image</button>
             </div>
 
-            <div class="">
+            <!-- canvas -->
+            <div class="flex-grow flex-1 self-stretch">
                 <canvas id="canvas" width="640" height="480"></canvas>
             </div>
         </div>
 
     </div>
-<!-- TODO: remove this vvv -->
-    <img src="assets/img/cm.jpg" id="cm-img" hidden> 
-<!-- TODO: remove this ^^^-->
+    <!-- TODO: remove this vvv -->
+    <img src="assets/img/cm.jpg" id="cm-img" hidden>
+    <!-- TODO: remove this ^^^-->
     <script src="assets/js/poster.ts" type="module"></script>
 </body>
 
