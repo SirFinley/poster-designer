@@ -26,7 +26,8 @@ export default class PosterImage {
             mb: false,
             ml: false,
             mr: false,
-            mt: false
+            mt: false,
+            mtr: false,
         });
 
         this.canvas.remove(this.image);
