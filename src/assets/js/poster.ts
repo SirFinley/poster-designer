@@ -3,6 +3,10 @@ import Overlay from './overlay';
 import Settings from './settings';
 import PosterImage from './image';
 
+const canvasElem = document.getElementById('canvas') as HTMLCanvasElement;
+canvasElem.width = canvasElem.parentElement.offsetWidth;
+canvasElem.height = canvasElem.parentElement.offsetHeight;
+
 const canvas = new fabric.Canvas('canvas');
 let settings = new Settings();
 // TODO: read settings from document.referrer
