@@ -21,7 +21,7 @@ export default class PosterImage {
     imageAspectRatio: number;
     imageInput: HTMLInputElement;
 
-    setNewImage(image: fabric.Image){
+    setNewImage(image: fabric.Image) {
         image.setControlsVisibility({
             mb: false,
             ml: false,
@@ -32,10 +32,36 @@ export default class PosterImage {
         this.canvas.remove(this.image);
         this.image = image;
         this.imageAspectRatio = this.image.width! / this.image.height!;
+        this.image.on('moving', (e) => this.updateMargins());
+        this.image.on('scaling', (e) => this.updateMargins());
 
         this.fitImage();
         this.canvas.add(image);
         this.canvas.renderAll();
+    }
+
+    updateMargins() {
+        if (!this.image) {
+            return;
+        }
+
+        let realDims = this.settings.getRealPosterDimensions();
+        let vdims = this.settings.getVirtualDimensions(this.canvas);
+
+        let inchesPerPixel = realDims.width / vdims.posterWidth;
+
+        let leftOffset = this.image.left! - vdims.posterLeft;
+        let rightOffset = vdims.posterRight - (this.image.left! + this.image.getScaledWidth());
+
+        let topOffset = this.image.top! - vdims.posterTop;
+        let bottomOffset = vdims.posterBottom - (this.image.top! + this.image.getScaledHeight());
+
+        let realLeftMargin = leftOffset * inchesPerPixel;
+        let realRightMargin = rightOffset * inchesPerPixel;
+        let realTopMargin = topOffset * inchesPerPixel;
+        let realBottomMargin = bottomOffset * inchesPerPixel;
+
+        this.settings.setMargins(realLeftMargin, realRightMargin, realTopMargin, realBottomMargin);
     }
 
     onImageUpload(e: Event) {
@@ -50,7 +76,7 @@ export default class PosterImage {
                 this.setNewImage(image);
             }
         }
-        
+
         let target = e.target as HTMLInputElement;
         reader.readAsDataURL(target.files[0]);
     }
@@ -65,8 +91,8 @@ export default class PosterImage {
             this.scaleToHeight(dims.posterHeight);
         }
 
-        let scaledImageWidth = this.image.width! * this.image.scaleX!;
-        let scaledImageHeight = this.image.height! * this.image.scaleY!;
+        let scaledImageWidth = this.image.getScaledWidth();
+        let scaledImageHeight = this.image.getScaledHeight();
         let imageHorizontalMargin = (dims.posterWidth - scaledImageWidth) / 2;
         let imageVerticalMargin = (dims.posterHeight - scaledImageHeight) / 2;
 
@@ -75,6 +101,7 @@ export default class PosterImage {
             top: dims.posterTop + imageVerticalMargin,
         });
         this.canvas.renderAll();
+        this.updateMargins();
     }
 
     fillImage() {
@@ -87,8 +114,8 @@ export default class PosterImage {
             this.scaleToWidth(dims.posterWidth);
         }
 
-        let scaledImageWidth = this.image.width! * this.image.scaleX!;
-        let scaledImageHeight = this.image.height! * this.image.scaleY!;
+        let scaledImageWidth = this.image.getScaledWidth();
+        let scaledImageHeight = this.image.getScaledHeight();
         let imageHorizontalMargin = (dims.posterWidth - scaledImageWidth) / 2;
         let imageVerticalMargin = (dims.posterHeight - scaledImageHeight) / 2;
 
@@ -97,6 +124,7 @@ export default class PosterImage {
             top: dims.posterTop + imageVerticalMargin,
         });
         this.canvas.renderAll();
+        this.updateMargins();
     }
 
     scaleToWidth(width: number) {

@@ -184,6 +184,32 @@ export default class Settings {
             return height / width;
         }
     }
+
+    setMargins(left: number, right: number, top: number, bottom: number) {
+        function round(x:number, step:number){
+            let div = 1 / step;
+            return Math.round(x * div) / div;
+        }
+
+        const step = 0.001;
+        left = round(left, 0.001);
+        right = round(right, 0.001);
+        top = round(top, 0.001);
+        bottom = round(bottom, 0.001);
+
+        this.leftMargin = left;
+        this.leftMarginInput.value = '' + left;
+
+        this.rightMargin = right;
+        this.rightMarginInput.value = '' + right;
+
+        this.topMargin = top;
+        this.topMarginInput.value = '' + top;
+
+        this.bottomMargin = bottom;
+        this.bottomMarginInput.value = '' + bottom;
+
+    }
 }
 
 export type OrientationOptions = "landscape" | "portrait";

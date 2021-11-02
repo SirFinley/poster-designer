@@ -46,25 +46,25 @@
                     <div class="">
                         <label class="text-sm" for="left-margin">Left Margin (inches)</label>
                         <div class="shadow-md border-1">
-                            <input type="number" id="left-margin" class="" placeholder="0">
+                            <input type="number" id="left-margin" step="0.001" class="" placeholder="0">
                         </div>
                     </div>
                     <div class="">
                         <label class="text-sm" for="right-margin">Right Margin (inches)</label>
                         <div class="shadow-md">
-                            <input type="number" id="right-margin" class="" placeholder="0">
+                            <input type="number" id="right-margin" step="0.001" class="" placeholder="0">
                         </div>
                     </div>
                     <div class="">
                         <label class="text-sm" for="top-margin">Top Margin (inches)</label>
                         <div class="shadow-md">
-                            <input type="number" id="top-margin" class="" placeholder="0">
+                            <input type="number" id="top-margin" step="0.001" class="" placeholder="0">
                         </div>
                     </div>
                     <div class="">
                         <label class="text-sm" for="bottom-margin">Bottom Margin (inches)</label>
                         <div class="shadow-md">
-                            <input type="number" id="bottom-margin" class="" placeholder="0">
+                            <input type="number" id="bottom-margin" step="0.001" class="" placeholder="0">
                         </div>
                     </div>
                 </div>
@@ -80,7 +80,7 @@
 
                 <!-- image -->
                 <input type="file" id="photo-input" accept="image/*" />
-                <img src="#" id="img-preview" alt="" class="">
+                <img src="#" id="img-preview" alt="" class="" hidden>
             </div>
         </div>
 
