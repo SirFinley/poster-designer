@@ -45,24 +45,26 @@
                 </div>
 
                 <!-- borders -->
-                <div class="py-4 flex flex-row w-full flex-wrap place-content-between gap-y-4 overflow-auto">
+                <div class="py-4 flex flex-col w-full flex-wrap place-content-between gap-y-4 overflow-auto">
                     <div class="">
                         <label class="text-sm" for="side-border">Side Border (inches)</label>
                         <div class="shadow-md border-1">
-                            <input type="number" id="side-border" step="0.125" min="0" class="" placeholder="0">
+                            <input type="number" id="side-border" step="0.125" min="0" max="30" class="w-full"
+                                placeholder="0">
                         </div>
                     </div>
                     <div class="">
                         <label class="text-sm" for="vertical-border">Top/Bottom Border (inches)</label>
                         <div class="shadow-md">
-                            <input type="number" id="vertical-border" step="0.125" min="0" class="" placeholder="0">
+                            <input type="number" id="vertical-border" step="0.125" min="0" max="30" class="w-full"
+                                placeholder="0">
                         </div>
                     </div>
                 </div>
 
                 <!-- margins -->
                 <!-- <div class="py-4 flex flex-row w-full flex-wrap place-content-between gap-y-4 overflow-auto" > -->
-                <div class="hidden" >
+                <div class="hidden">
                     <div class="">
                         <label class="text-sm" for="left-margin">Left Margin (inches)</label>
                         <div class="shadow-md border-1">
@@ -99,8 +101,13 @@
 
 
                 <!-- image -->
-                <input type="file" id="photo-input" accept="image/*" />
-                <img src="#" id="img-preview" alt="" class="" hidden>
+                <div id="drop-area">
+                    <form>
+                        <p>Drag and drop your poster image here!</p>
+                        <input type="file" id="photo-input" accept="image/*" />
+                        <img src="#" id="img-preview" alt="" class="" hidden>
+                    </form>
+                </div>
             </div>
         </div>
 

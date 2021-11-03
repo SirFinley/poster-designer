@@ -47,7 +47,14 @@ export default class Settings extends EventTarget {
         this.bottomMarginInput = document.getElementById("bottom-margin") as HTMLInputElement;
 
         this.initializeEventListeners();
-        this.populateInputOptions();
+        this.populateSizeInputOptions();
+        this.setInputConstraints();
+    }
+
+    setInputConstraints() {
+        let size = this.getRealPosterDimensions();
+        this.sideBorderInput.max = (size.width / 2 - 0.125).toFixed(2);
+        this.verticalBorderInput.max = (size.height / 2 - 0.125).toFixed(2);
     }
 
     initializeEventListeners() {
@@ -95,9 +102,7 @@ export default class Settings extends EventTarget {
             self.size = this.value as SizeOptions;
             self.onOverlayChanged();
 
-            let size = self.getRealPosterDimensions();
-            self.sideBorderInput.max = (size.width / 2).toFixed(2);
-            self.verticalBorderInput.max = (size.height / 2).toFixed(2);
+            self.setInputConstraints();
         }
 
         // orientation
@@ -108,6 +113,7 @@ export default class Settings extends EventTarget {
         }
     }
 
+    // events
     onOverlayChanged() {
         this.triggerEvent('overlayChanged');
     }
@@ -116,11 +122,11 @@ export default class Settings extends EventTarget {
         this.triggerEvent('borderChanged');
     }
 
-    subscribe(type: SettingEvents, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean){
+    subscribe(type: SettingEvents, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean) {
         this.addEventListener(type, callback, options);
     }
 
-    triggerEvent(type: SettingEvents){
+    triggerEvent(type: SettingEvents) {
         this.dispatchEvent(new Event(type));
     }
 
@@ -198,7 +204,7 @@ export default class Settings extends EventTarget {
         };
     }
 
-    populateInputOptions() {
+    populateSizeInputOptions() {
         const addSizeOption = (option: SizeOptions) => {
             let elem = document.createElement('option');
             elem.value = option;
@@ -227,6 +233,8 @@ export default class Settings extends EventTarget {
             this.size = sizeOptionsEtsyUrlMap[size];
             this.sizeInput.value = this.size;
         }
+
+        this.setInputConstraints();
     }
 
     getRealPosterDimensions(): RealPosterDimensions {

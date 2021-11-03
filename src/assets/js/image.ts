@@ -6,20 +6,65 @@ export default class PosterImage {
         this.canvas = canvas;
         this.settings = settings;
 
-        this.imageInput = document.getElementById("photo-input") as HTMLInputElement;
-        this.imageInput.onchange = (e: Event) => this.onImageUpload(e);
-        document.getElementById("btn-fit-image")!.onclick = () => this.fitImageToBorders();
-        document.getElementById("btn-fill-image")!.onclick = () => this.fillImage();
+        this.setupEventListeners();
 
+        // TODO: remove this - load test image on start
         let image = new fabric.Image(document.getElementById('cm-img') as HTMLImageElement);
         this.setNewImage(image);
+        // TODO: remove this - load test image on start
     }
 
     canvas: fabric.Canvas;
     settings: Settings;
     image: fabric.Image | null;
     imageAspectRatio: number;
-    imageInput: HTMLInputElement;
+
+    setupEventListeners() {
+        // drag and drop upload
+        let dropArea = document.getElementById("drop-area") as HTMLElement;
+        let imageInput = document.getElementById("photo-input") as HTMLInputElement;
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        })
+
+        function preventDefaults(e) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        })
+
+        dropArea.addEventListener('drop', (e) => {
+            let dt = e.dataTransfer;
+            let file = dt.files[0];
+            imageInput.files = dt.files;
+            this.handleFile(file);
+        });
+
+        function highlight(e) {
+            dropArea.classList.add('highlight')
+        }
+
+        function unhighlight(e) {
+            dropArea.classList.remove('highlight')
+        }
+
+        imageInput.addEventListener('change', (e: Event) => {
+            let target = e.target as HTMLInputElement;
+            this.handleFile(target.files[0]);
+        });
+
+        // fit buttons
+        document.getElementById("btn-fit-image")!.onclick = () => this.fitImageToBorders();
+        document.getElementById("btn-fill-image")!.onclick = () => this.fillImage();
+    }
 
     setNewImage(image: fabric.Image) {
         image.setControlsVisibility({
@@ -69,7 +114,7 @@ export default class PosterImage {
         this.settings.setMargins(realLeftMargin, realRightMargin, realTopMargin, realBottomMargin);
     }
 
-    onImageUpload(e: Event) {
+    handleFile(file: File) {
         // TODO: start upload to server in background
         let reader = new FileReader();
 
@@ -82,8 +127,7 @@ export default class PosterImage {
             }
         }
 
-        let target = e.target as HTMLInputElement;
-        reader.readAsDataURL(target.files[0]);
+        reader.readAsDataURL(file);
     }
 
     fitImageToBorders() {
@@ -101,8 +145,6 @@ export default class PosterImage {
         let imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
         let imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
 
-        console.log(dims);
-
         this.image.set({
             left: dims.posterLeftBorder + imageLeftOffset,
             top: dims.posterTopBorder + imageTopOffset,
@@ -110,7 +152,7 @@ export default class PosterImage {
         this.canvas.renderAll();
         this.updateMargins();
     }
-    
+
     fitImageToCanvas() {
         let dims = this.settings.getVirtualDimensions(this.canvas);
 

@@ -20,8 +20,6 @@ docReady(() => {
 
 window.onresize = resizeCanvas;
 function resizeCanvas() {
-    console.log('resized!');
-
     let canvasParent = document.getElementById('fabric-canvas-wrapper');
     let floatingCanvasParent = document.getElementById('floating-canvas-container');
     floatingCanvasParent.style.position = 'absolute';
