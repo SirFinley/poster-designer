@@ -186,31 +186,35 @@ export default class Settings {
     }
 
     setMargins(left: number, right: number, top: number, bottom: number) {
-        function round(x:number, step:number){
-            let div = 1 / step;
-            return Math.round(x * div) / div;
+        function round(x: number, multiple: number) {
+            return Math.round(x / multiple) * multiple;
         }
 
-        const step = 0.001;
-        left = round(left, 0.001);
-        right = round(right, 0.001);
-        top = round(top, 0.001);
-        bottom = round(bottom, 0.001);
+        left = round(left, SIZE_STEP);
+        right = round(right, SIZE_STEP);
+        top = round(top, SIZE_STEP);
+        bottom = round(bottom, SIZE_STEP);
 
         this.leftMargin = left;
-        this.leftMarginInput.value = '' + left;
+        this.leftMarginInput.value = left.toFixed(2);
+        this.leftMarginInput.step = SIZE_STEP.toString();
 
         this.rightMargin = right;
-        this.rightMarginInput.value = '' + right;
+        this.rightMarginInput.value = right.toFixed(2);
+        this.rightMarginInput.step = SIZE_STEP.toString();
 
         this.topMargin = top;
-        this.topMarginInput.value = '' + top;
+        this.topMarginInput.value = top.toFixed(2);
+        this.topMarginInput.step = SIZE_STEP.toString();
 
         this.bottomMargin = bottom;
-        this.bottomMarginInput.value = '' + bottom;
+        this.bottomMarginInput.value = bottom.toFixed(2);
+        this.bottomMarginInput.step = SIZE_STEP.toString();
 
     }
 }
+
+const SIZE_STEP = 0.05;
 
 export type OrientationOptions = "landscape" | "portrait";
 // TODO: etsy - replace keys with etsy variation id
@@ -225,7 +229,7 @@ const sizeOptionsDisplayMap = {
     '11x17': '11"x17"',
     '18x24': '18"x24"',
     '24x36': '24"x36"',
-}
+};
 
 // TODO: etsy - replace keys with etsy variation id
 const sizeOptionsEtsyUrlMap: Record<string, SizeOptions> = {
@@ -233,9 +237,16 @@ const sizeOptionsEtsyUrlMap: Record<string, SizeOptions> = {
     '11x17': '11x17',
     '18x24': '18x24',
     '24x36': '24x36',
-}
+};
 
 interface RealPosterDimensions {
     width: number,
     height: number,
 }
+
+// validation
+(function validateSizeOptions() {
+    if (Object.keys(sizeOptionsEtsyUrlMap).length !== Object.keys(sizeOptionsDisplayMap).length) {
+        console.error('etsy size options mismatch');
+    }
+})();
