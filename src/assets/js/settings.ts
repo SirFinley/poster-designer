@@ -1,8 +1,11 @@
 import VirtualDimensions from "./virtualDimensions";
 
-export default class Settings {
+export default class Settings extends EventTarget {
     orientation: OrientationOptions;
     size: SizeOptions;
+
+    sideBorder: number;
+    verticalBorder: number;
 
     leftMargin: number;
     rightMargin: number;
@@ -11,24 +14,33 @@ export default class Settings {
 
     orientationInput: HTMLInputElement;
     sizeInput: HTMLInputElement;
+
+    sideBorderInput: HTMLInputElement;
+    verticalBorderInput: HTMLInputElement;
+
     leftMarginInput: HTMLInputElement;
     rightMarginInput: HTMLInputElement;
     topMarginInput: HTMLInputElement;
     bottomMarginInput: HTMLInputElement;
 
-    onOverlayChanged: () => void;
-
     constructor() {
+        super();
+
         this.orientation = 'landscape';
         this.size = '24x36';
+        this.sideBorder = 0;
+        this.verticalBorder = 0;
         this.leftMargin = 0;
         this.rightMargin = 0;
         this.topMargin = 0;
         this.bottomMargin = 0;
-        this.onOverlayChanged = () => { };
 
         this.orientationInput = document.getElementById("orientation-input") as HTMLInputElement;
         this.sizeInput = document.getElementById("size-input") as HTMLInputElement;
+
+        this.sideBorderInput = document.getElementById("side-border") as HTMLInputElement;
+        this.verticalBorderInput = document.getElementById("vertical-border") as HTMLInputElement;
+
         this.leftMarginInput = document.getElementById("left-margin") as HTMLInputElement;
         this.rightMarginInput = document.getElementById("right-margin") as HTMLInputElement;
         this.topMarginInput = document.getElementById("top-margin") as HTMLInputElement;
@@ -41,6 +53,20 @@ export default class Settings {
     initializeEventListeners() {
         let self = this;
 
+        // borders
+        this.sideBorderInput.addEventListener('input', onBorderInput);
+        this.verticalBorderInput.addEventListener('input', onBorderInput);
+
+        function onBorderInput(this: HTMLInputElement, e: Event) {
+            let value = parseFloat(this.value);
+            if (this.id === 'side-border') {
+                self.sideBorder = value;
+            }
+            else if (this.id === 'vertical-border') {
+                self.verticalBorder = value;
+            }
+        }
+
         // margins
         this.leftMarginInput.addEventListener('input', onMarginInput);
         this.rightMarginInput.addEventListener('input', onMarginInput);
@@ -48,7 +74,7 @@ export default class Settings {
         this.bottomMarginInput.addEventListener('input', onMarginInput);
 
         function onMarginInput(this: HTMLInputElement, e: Event) {
-            let value = parseInt(this.value);
+            let value = parseFloat(this.value);
             if (this.id === 'left-margin') {
                 self.leftMargin = value;
             }
@@ -68,6 +94,10 @@ export default class Settings {
         function onSizeInput(this: HTMLInputElement, e: Event) {
             self.size = this.value as SizeOptions;
             self.onOverlayChanged();
+
+            let size = self.getRealPosterDimensions();
+            self.sideBorderInput.max = (size.width / 2).toFixed(2);
+            self.verticalBorderInput.max = (size.height / 2).toFixed(2);
         }
 
         // orientation
@@ -76,6 +106,22 @@ export default class Settings {
             self.orientation = this.value as OrientationOptions;
             self.onOverlayChanged();
         }
+    }
+
+    onOverlayChanged() {
+        this.triggerEvent('overlayChanged');
+    }
+
+    onBorderChanged() {
+        this.triggerEvent('borderChanged');
+    }
+
+    subscribe(type: SettingEvents, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean){
+        this.addEventListener(type, callback, options);
+    }
+
+    triggerEvent(type: SettingEvents){
+        this.dispatchEvent(new Event(type));
     }
 
     getVirtualDimensions(canvas: fabric.Canvas): VirtualDimensions {
@@ -107,6 +153,17 @@ export default class Settings {
 
         let realPosterDimensions = this.getRealPosterDimensions();
         let inchesPerPixel = realPosterDimensions.width / posterWidth;
+
+        let borderWidth = this.sideBorder / inchesPerPixel;
+        let borderHeight = this.verticalBorder / inchesPerPixel;
+        let posterLeftBorder = posterLeft + borderWidth;
+        let posterRightBorder = posterRight - borderWidth;
+        let posterTopBorder = posterTop + borderHeight;
+        let posterBottomBorder = posterBottom - borderHeight;
+        let posterInnerBorderWidth = posterRightBorder - posterLeftBorder;
+        let posterInnerBorderHeight = posterBottomBorder - posterTopBorder;
+        let borderInnerAspectRatio = posterInnerBorderWidth / posterInnerBorderHeight;
+
         let posterLeftMargin = this.leftMargin / inchesPerPixel;
         let posterRightMargin = this.rightMargin / inchesPerPixel;
         let posterTopMargin = this.topMargin / inchesPerPixel;
@@ -125,6 +182,15 @@ export default class Settings {
             posterRight,
             posterTop,
             posterBottom,
+            borderWidth,
+            borderHeight,
+            posterLeftBorder,
+            posterRightBorder,
+            posterTopBorder,
+            posterBottomBorder,
+            posterInnerBorderWidth,
+            posterInnerBorderHeight,
+            borderInnerAspectRatio,
             posterLeftMargin,
             posterRightMargin,
             posterTopMargin,
@@ -167,10 +233,18 @@ export default class Settings {
         let width = parseFloat(this.size.split('x')[0]);
         let height = parseFloat(this.size.split('x')[1]);
 
-        return {
-            width,
-            height
-        };
+        if (this.orientation == 'portrait') {
+            return {
+                width,
+                height,
+            };
+        }
+        else {
+            return {
+                width: height,
+                height: width,
+            };
+        }
     }
 
     getAspectRatio(): number {
@@ -213,6 +287,8 @@ export default class Settings {
 
     }
 }
+
+export type SettingEvents = 'overlayChanged' | 'borderChanged';
 
 const SIZE_STEP = 0.05;
 

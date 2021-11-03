@@ -15,7 +15,7 @@ let image = new PosterImage(canvas, settings);
 
 docReady(() => {
     resizeCanvas();
-    image.fitImage();
+    image.fitImageToBorders();
 });
 
 window.onresize = resizeCanvas;
@@ -49,3 +49,4 @@ function docReady(fn) {
 // TODO: remove
 (window as any).canvas = canvas; // TODO: remove this
 (window as any).mySettings = settings; // TODO: remove this
+(window as any).myImage = image; // TODO: remove this

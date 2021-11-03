@@ -22,6 +22,7 @@
             <!-- settings -->
             <div class="flex flex-col gap-2 max-w-sm">
                 <h2 class="font-bold text-lg">Settings</h2>
+
                 <!-- size -->
                 <div class="">
                     <label class="text-sm" for="size-input">Size</label>
@@ -30,6 +31,7 @@
                         </select>
                     </div>
                 </div>
+
                 <!-- orientation -->
                 <div class="">
                     <label class="text-sm" for="orientation-input">Orientation</label>
@@ -41,8 +43,26 @@
                         </select>
                     </div>
                 </div>
-                <!-- margins -->
+
+                <!-- borders -->
                 <div class="py-4 flex flex-row w-full flex-wrap place-content-between gap-y-4 overflow-auto">
+                    <div class="">
+                        <label class="text-sm" for="side-border">Side Border (inches)</label>
+                        <div class="shadow-md border-1">
+                            <input type="number" id="side-border" step="0.125" min="0" class="" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="">
+                        <label class="text-sm" for="vertical-border">Top/Bottom Border (inches)</label>
+                        <div class="shadow-md">
+                            <input type="number" id="vertical-border" step="0.125" min="0" class="" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- margins -->
+                <!-- <div class="py-4 flex flex-row w-full flex-wrap place-content-between gap-y-4 overflow-auto" > -->
+                <div class="hidden" >
                     <div class="">
                         <label class="text-sm" for="left-margin">Left Margin (inches)</label>
                         <div class="shadow-md border-1">

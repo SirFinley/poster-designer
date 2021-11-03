@@ -8,7 +8,7 @@ export default class PosterImage {
 
         this.imageInput = document.getElementById("photo-input") as HTMLInputElement;
         this.imageInput.onchange = (e: Event) => this.onImageUpload(e);
-        document.getElementById("btn-fit-image")!.onclick = () => this.fitImage();
+        document.getElementById("btn-fit-image")!.onclick = () => this.fitImageToBorders();
         document.getElementById("btn-fill-image")!.onclick = () => this.fillImage();
 
         let image = new fabric.Image(document.getElementById('cm-img') as HTMLImageElement);
@@ -30,13 +30,17 @@ export default class PosterImage {
             mtr: false,
         });
 
+        image.set({
+            centeredScaling: true,
+        })
+
         this.canvas.remove(this.image);
         this.image = image;
         this.imageAspectRatio = this.image.width! / this.image.height!;
         this.image.on('moving', (e) => this.updateMargins());
         this.image.on('scaling', (e) => this.updateMargins());
 
-        this.fitImage();
+        this.fitImageToBorders();
         this.canvas.add(image);
         this.canvas.renderAll();
     }
@@ -82,7 +86,32 @@ export default class PosterImage {
         reader.readAsDataURL(target.files[0]);
     }
 
-    fitImage() {
+    fitImageToBorders() {
+        let dims = this.settings.getVirtualDimensions(this.canvas);
+
+        if (this.imageAspectRatio >= dims.borderInnerAspectRatio) { // image wider than canvas
+            this.scaleToWidth(dims.posterInnerBorderWidth);
+        }
+        else { // image taller than poster
+            this.scaleToHeight(dims.posterInnerBorderHeight);
+        }
+
+        let scaledImageWidth = this.image.getScaledWidth();
+        let scaledImageHeight = this.image.getScaledHeight();
+        let imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
+        let imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
+
+        console.log(dims);
+
+        this.image.set({
+            left: dims.posterLeftBorder + imageLeftOffset,
+            top: dims.posterTopBorder + imageTopOffset,
+        });
+        this.canvas.renderAll();
+        this.updateMargins();
+    }
+    
+    fitImageToCanvas() {
         let dims = this.settings.getVirtualDimensions(this.canvas);
 
         if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas

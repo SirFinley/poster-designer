@@ -10,7 +10,7 @@ export default class Overlay {
         this.overlayPath = new fabric.Path();
 
         this.drawOverlay();
-        settings.onOverlayChanged = () => this.drawOverlay();
+        settings.subscribe('overlayChanged', () => this.drawOverlay());
     }
 
     canvas: fabric.Canvas;
