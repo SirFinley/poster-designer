@@ -1,4 +1,5 @@
 import { fabric } from 'fabric';
+import FastAverageColor from 'fast-average-color';
 import Settings from './settings';
 
 export default class PosterImage {
@@ -18,6 +19,7 @@ export default class PosterImage {
     settings: Settings;
     image: fabric.Image | null;
     imageAspectRatio: number;
+    imgElem: HTMLImageElement;
 
     setupEventListeners() {
         // drag and drop upload
@@ -124,10 +126,24 @@ export default class PosterImage {
             imgElem.onload = () => {
                 var image = new fabric.Image(imgElem);
                 this.setNewImage(image);
-            }
+            };
+            this.imgElem = imgElem;
         }
 
         reader.readAsDataURL(file);
+    }
+
+    getAverageColor() {
+        if (!this.imgElem) {
+            return this.canvas.backgroundColor;
+        }
+
+        let fac = new FastAverageColor();
+        return fac.getColor(this.imgElem, {
+            algorithm: 'dominant',
+            mode: 'speed',
+
+        }).hex;
     }
 
     fitImageToBorders() {
@@ -149,7 +165,11 @@ export default class PosterImage {
             left: dims.posterLeftBorder + imageLeftOffset,
             top: dims.posterTopBorder + imageTopOffset,
         });
+
+        let avgColor = this.getAverageColor();
+        this.canvas.setBackgroundColor(avgColor, null);
         this.canvas.renderAll();
+
         this.updateMargins();
     }
 

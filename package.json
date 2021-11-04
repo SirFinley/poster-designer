@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@types/fabric": "^4.5.4",
-    "fabric": "^4.6.0"
+    "fabric": "^4.6.0",
+    "fast-average-color": "^7.0.1"
   }
 }
