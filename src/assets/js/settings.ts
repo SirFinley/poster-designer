@@ -60,8 +60,8 @@ export default class Settings {
 
     setInputConstraints() {
         let size = this.getRealPosterDimensions();
-        this.sideBorderInput.max = (size.width / 2 - 0.125).toFixed(2);
-        this.verticalBorderInput.max = (size.height / 2 - 0.125).toFixed(2);
+        this.sideBorderInput.max = (size.width / 2 - 0.125).toFixed(3);
+        this.verticalBorderInput.max = (size.height / 2 - 0.125).toFixed(3);
     }
 
     initializeEventListeners() {
@@ -133,6 +133,7 @@ export default class Settings {
 
     setSideBorderInput(value: number) {
         value = value || 0;
+        value = Math.round(value / 0.125) * 0.125;
         value = clamp(value, parseFloat(this.sideBorderInput.min), parseFloat(this.sideBorderInput.max));
 
         this.sideBorder = value;
@@ -142,6 +143,7 @@ export default class Settings {
 
     setVerticalBorderInput(value: number) {
         value = value || 0;
+        value = Math.round(value / 0.125) * 0.125;
         value = clamp(value, parseFloat(this.verticalBorderInput.min), parseFloat(this.verticalBorderInput.max));
 
         this.verticalBorder = value;
@@ -200,6 +202,7 @@ export default class Settings {
             canvasAspectRatio,
             canvasHorizontalMargin,
             canvasVerticalMargin,
+            inchesPerPixel,
             posterAspectRatio,
             posterWidth,
             posterHeight,

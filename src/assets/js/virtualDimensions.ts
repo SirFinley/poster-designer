@@ -5,6 +5,8 @@ export default interface VirtualDimensions {
     canvasHorizontalMargin: number,
     canvasVerticalMargin: number,
 
+    inchesPerPixel: number
+
     posterAspectRatio: number,
     posterWidth: number,
     posterHeight: number,

@@ -48,12 +48,12 @@ export default class Border {
         function createLine(startX, startY, endX, endY, lineOptions?) {
             return new fabric.Line([startX, startY, endX, endY], {
                 strokeWidth: 1,
-                // stroke: 'black',
                 stroke: invertedBackgroundColor,
                 opacity: 0.8,
                 strokeDashArray: [6, 6],
-                selectable: false,
-                evented: false,
+                // selectable: false,
+                // evented: false,
+                padding: 5, // increase selectable area
                 ...lineOptions,
             });
         }
@@ -63,12 +63,41 @@ export default class Border {
         let topLine = createLine(0, dims.posterTopBorder, dims.canvasWidth, dims.posterTopBorder, { lockMovementX: true });
         let bottomLine = createLine(0, dims.posterBottomBorder, dims.canvasWidth, dims.posterBottomBorder, { lockMovementX: true });
 
+        leftLine.on('moving', (options) => {
+            let dx = options.transform.target.left - dims.posterLeft;
+            let inches = dx * dims.inchesPerPixel;
+            this.settings.setSideBorderInput(inches);
+            this.drawBorder();
+        })
+
+        rightLine.on('moving', (options) => {
+            let dx =  dims.posterRight - options.transform.target.left;
+            let inches = dx * dims.inchesPerPixel;
+            this.settings.setSideBorderInput(inches);
+            this.drawBorder();
+        })
+
+        topLine.on('moving', (options) => {
+            let dx = options.transform.target.top - dims.posterTop;
+            let inches = dx * dims.inchesPerPixel;
+            this.settings.setVerticalBorderInput(inches);
+            this.drawBorder();
+        })
+
+        bottomLine.on('moving', (options) => {
+            let dx =  dims.posterBottom - options.transform.target.top;
+            let inches = dx * dims.inchesPerPixel;
+            this.settings.setVerticalBorderInput(inches);
+            this.drawBorder();
+        })
+
         this.borderLines = [leftLine, rightLine, topLine, bottomLine];
         this.canvas.add(...this.borderLines);
+        this.borderLines.forEach(line => this.canvas.bringToFront(line));
         this.canvas.renderAll();
     }
 
-    getInvertedBackgroundColor(): string{
+    getInvertedBackgroundColor(): string | null {
         let color = this.canvas.backgroundColor;
         if (typeof color !== 'string') {
             return null;
