@@ -68,8 +68,9 @@ export default class PosterImage {
         });
 
         // fit buttons
-        document.getElementById("btn-fit-image")!.onclick = () => this.fitImageToBorders();
-        document.getElementById("btn-fill-image")!.onclick = () => this.fillImage();
+        document.getElementById("btn-fit-borders")!.onclick = () => this.fitImageToBorders();
+        document.getElementById("btn-fill-borders")!.onclick = () => this.fillBorders();
+        document.getElementById("btn-fill-poster")!.onclick = () => this.fillPoster();
     }
 
     setNewImage(image: fabric.Image) {
@@ -202,7 +203,30 @@ export default class PosterImage {
         this.updateMargins();
     }
 
-    fillImage() {
+    fillBorders() {
+        let dims = this.settings.getVirtualDimensions(this.canvas);
+
+        if (this.imageAspectRatio >= dims.borderInnerAspectRatio) { // image wider than canvas
+            this.scaleToHeight(dims.posterInnerBorderHeight);
+        }
+        else { // image taller than poster
+            this.scaleToWidth(dims.posterInnerBorderWidth);
+        }
+
+        let scaledImageWidth = this.image.getScaledWidth();
+        let scaledImageHeight = this.image.getScaledHeight();
+        let imageHorizontalMargin = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
+        let imageVerticalMargin = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
+
+        this.image.set({
+            left: dims.posterLeftBorder + imageHorizontalMargin,
+            top: dims.posterTopBorder + imageVerticalMargin,
+        });
+        this.canvas.renderAll();
+        this.updateMargins();
+    }
+
+    fillPoster() {
         let dims = this.settings.getVirtualDimensions(this.canvas);
 
         if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas
