@@ -1,6 +1,9 @@
+import PosterEventHub from "./posterEventHub";
 import VirtualDimensions from "./virtualDimensions";
 
-export default class Settings extends EventTarget {
+export default class Settings {
+    eventHub: PosterEventHub;
+
     orientation: OrientationOptions;
     size: SizeOptions;
 
@@ -23,8 +26,8 @@ export default class Settings extends EventTarget {
     topMarginInput: HTMLInputElement;
     bottomMarginInput: HTMLInputElement;
 
-    constructor() {
-        super();
+    constructor(eventHub: PosterEventHub) {
+        this.eventHub = eventHub;
 
         this.orientation = 'landscape';
         this.size = '24x36';
@@ -65,13 +68,15 @@ export default class Settings extends EventTarget {
         this.verticalBorderInput.addEventListener('input', onBorderInput);
 
         function onBorderInput(this: HTMLInputElement, e: Event) {
-            let value = parseFloat(this.value);
+            let value = parseFloat(this.value) || 0;
             if (this.id === 'side-border') {
                 self.sideBorder = value;
             }
             else if (this.id === 'vertical-border') {
                 self.verticalBorder = value;
             }
+
+            self.eventHub.triggerEvent('borderSettingChanged');
         }
 
         // margins
@@ -81,7 +86,7 @@ export default class Settings extends EventTarget {
         this.bottomMarginInput.addEventListener('input', onMarginInput);
 
         function onMarginInput(this: HTMLInputElement, e: Event) {
-            let value = parseFloat(this.value);
+            let value = parseFloat(this.value) || 0;
             if (this.id === 'left-margin') {
                 self.leftMargin = value;
             }
@@ -100,7 +105,7 @@ export default class Settings extends EventTarget {
         this.sizeInput.addEventListener('change', onSizeInput);
         function onSizeInput(this: HTMLInputElement, e: Event) {
             self.size = this.value as SizeOptions;
-            self.onOverlayChanged();
+            self.eventHub.triggerEvent('sizeSettingChanged');
 
             self.setInputConstraints();
         }
@@ -109,25 +114,8 @@ export default class Settings extends EventTarget {
         this.orientationInput.addEventListener('change', onOrientationInput);
         function onOrientationInput(this: HTMLInputElement, e: Event) {
             self.orientation = this.value as OrientationOptions;
-            self.onOverlayChanged();
+            self.eventHub.triggerEvent('orientationSettingChanged');
         }
-    }
-
-    // events
-    onOverlayChanged() {
-        this.triggerEvent('overlayChanged');
-    }
-
-    onBorderChanged() {
-        this.triggerEvent('borderChanged');
-    }
-
-    subscribe(type: SettingEvents, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean) {
-        this.addEventListener(type, callback, options);
-    }
-
-    triggerEvent(type: SettingEvents) {
-        this.dispatchEvent(new Event(type));
     }
 
     getVirtualDimensions(canvas: fabric.Canvas): VirtualDimensions {
@@ -296,8 +284,6 @@ export default class Settings extends EventTarget {
     }
 }
 
-export type SettingEvents = 'overlayChanged' | 'borderChanged';
-
 const SIZE_STEP = 0.05;
 
 export type OrientationOptions = "landscape" | "portrait";
@@ -311,7 +297,10 @@ export type SizeOptions = keyof typeof sizeOptionsDisplayMap;
 const sizeOptionsDisplayMap = {
     '8.5x11': '8.5"x11"',
     '11x17': '11"x17"',
-    '18x24': '18"x24"',
+    // '8x24': '8"x24"',       // 1:3
+    // '12x24': '12"x24"',     // 1:2
+    // '16x24': '16"x24"',     // 2:3
+    '18x24': '18"x24"',     // 3:4
     '24x36': '24"x36"',
 };
 
@@ -319,6 +308,9 @@ const sizeOptionsDisplayMap = {
 const sizeOptionsEtsyUrlMap: Record<string, SizeOptions> = {
     '8.5x11': '8.5x11',
     '11x17': '11x17',
+    // '8x24': '8x24',
+    // '12x24': '12x24',
+    // '16x24': '16x24',
     '18x24': '18x24',
     '24x36': '24x36',
 };

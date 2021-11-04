@@ -1,16 +1,17 @@
 import { fabric } from "fabric";
+import PosterEventHub from "./posterEventHub";
 import Settings from "./settings";
-import VirtualDimensions from './virtualDimensions';
 
 export default class Overlay {
-    constructor(canvas: fabric.Canvas, settings: Settings) {
+    constructor(canvas: fabric.Canvas, settings: Settings, eventHub: PosterEventHub) {
         this.canvas = canvas;
         this.settings = settings;
 
         this.overlayPath = new fabric.Path();
 
         this.drawOverlay();
-        settings.subscribe('overlayChanged', () => this.drawOverlay());
+        eventHub.subscribe('sizeSettingChanged', () => this.drawOverlay());
+        eventHub.subscribe('orientationSettingChanged', () => this.drawOverlay());
     }
 
     canvas: fabric.Canvas;
@@ -48,6 +49,7 @@ export default class Overlay {
                 left: 0,
                 opacity: opacity,
             });
+
             this.canvas.setOverlayImage(img, () => this.canvas.renderAll());
         });
     }

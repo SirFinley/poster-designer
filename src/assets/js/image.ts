@@ -1,11 +1,13 @@
 import { fabric } from 'fabric';
 import FastAverageColor from 'fast-average-color';
+import PosterEventHub from './posterEventHub';
 import Settings from './settings';
 
 export default class PosterImage {
-    constructor(canvas: fabric.Canvas, settings: Settings) {
+    constructor(canvas: fabric.Canvas, settings: Settings, eventHub: PosterEventHub) {
         this.canvas = canvas;
         this.settings = settings;
+        this.eventHub = eventHub;
 
         this.setupEventListeners();
 
@@ -17,6 +19,8 @@ export default class PosterImage {
 
     canvas: fabric.Canvas;
     settings: Settings;
+    eventHub: PosterEventHub;
+
     image: fabric.Image | null;
     imageAspectRatio: number;
     imgElem: HTMLImageElement;
@@ -90,6 +94,8 @@ export default class PosterImage {
         this.fitImageToBorders();
         this.canvas.add(image);
         this.canvas.renderAll();
+
+        this.eventHub.triggerEvent('imageChanged');
     }
 
     updateMargins() {

@@ -2,16 +2,20 @@ import { fabric } from "fabric";
 import Overlay from './overlay';
 import Settings from './settings';
 import PosterImage from './image';
+import Border from "./border";
+import PosterEventHub from "./posterEventHub";
 
 const canvas = new fabric.Canvas('fabric-canvas');
 
-let settings = new Settings();
+const eventHub = new PosterEventHub();
+const settings = new Settings(eventHub);
 // TODO: read settings from document.referrer
 // readSettingsFromUrl(document.referrer);
 settings.readSettingsFromUrl(window.location.toString());
 
-let overlay = new Overlay(canvas, settings);
-let image = new PosterImage(canvas, settings);
+const overlay = new Overlay(canvas, settings, eventHub);
+const image = new PosterImage(canvas, settings, eventHub);
+const border = new Border(canvas, settings, image, eventHub);
 
 docReady(() => {
     resizeCanvas();
@@ -31,6 +35,7 @@ function resizeCanvas() {
     canvas.setHeight(canvasParent.offsetHeight);
 
     overlay.drawOverlay();
+    border.setBorder();
     canvas.renderAll();
 }
 
