@@ -19,7 +19,9 @@ export default class Settings {
     sizeInput: HTMLInputElement;
 
     sideBorderInput: HTMLInputElement;
+    sideBorderValueDisplay: HTMLElement;
     verticalBorderInput: HTMLInputElement;
+    verticalBorderValueDisplay: HTMLElement;
 
     leftMarginInput: HTMLInputElement;
     rightMarginInput: HTMLInputElement;
@@ -42,7 +44,9 @@ export default class Settings {
         this.sizeInput = document.getElementById("size-input") as HTMLInputElement;
 
         this.sideBorderInput = document.getElementById("side-border") as HTMLInputElement;
+        this.sideBorderValueDisplay = document.getElementById("side-border-value") as HTMLElement;
         this.verticalBorderInput = document.getElementById("vertical-border") as HTMLInputElement;
+        this.verticalBorderValueDisplay = document.getElementById("vertical-border-value") as HTMLElement;
 
         this.leftMarginInput = document.getElementById("left-margin") as HTMLInputElement;
         this.rightMarginInput = document.getElementById("right-margin") as HTMLInputElement;
@@ -71,9 +75,11 @@ export default class Settings {
             let value = parseFloat(this.value) || 0;
             if (this.id === 'side-border') {
                 self.sideBorder = value;
+                self.sideBorderValueDisplay.innerText = `Side Border: ${value}"`;
             }
             else if (this.id === 'vertical-border') {
                 self.verticalBorder = value;
+                self.verticalBorderValueDisplay.innerText = `Top/Bottom Border: ${value}"`;
             }
 
             self.eventHub.triggerEvent('borderSettingChanged');
@@ -106,8 +112,6 @@ export default class Settings {
         function onSizeInput(this: HTMLInputElement, e: Event) {
             self.size = this.value as SizeOptions;
             self.eventHub.triggerEvent('sizeSettingChanged');
-
-            self.setInputConstraints();
         }
 
         // orientation
@@ -116,6 +120,33 @@ export default class Settings {
             self.orientation = this.value as OrientationOptions;
             self.eventHub.triggerEvent('orientationSettingChanged');
         }
+
+        // update border
+        this.eventHub.addEventListener('sizeSettingChanged', refreshBorderValues);
+        this.eventHub.addEventListener('orientationSettingChanged', refreshBorderValues);
+        function refreshBorderValues() {
+            self.setInputConstraints();
+            self.setSideBorderInput(self.sideBorder);
+            self.setVerticalBorderInput(self.verticalBorder);
+        }
+    }
+
+    setSideBorderInput(value: number) {
+        value = value || 0;
+        value = clamp(value, parseFloat(this.sideBorderInput.min), parseFloat(this.sideBorderInput.max));
+
+        this.sideBorder = value;
+        this.sideBorderInput.value = value.toString();
+        this.sideBorderValueDisplay.innerText = `Side Border: ${value}"`;
+    }
+
+    setVerticalBorderInput(value: number) {
+        value = value || 0;
+        value = clamp(value, parseFloat(this.verticalBorderInput.min), parseFloat(this.verticalBorderInput.max));
+
+        this.verticalBorder = value;
+        this.verticalBorderInput.value = value.toString();
+        this.verticalBorderValueDisplay.innerText = `Top/Bottom Border: ${value}"`;
     }
 
     getVirtualDimensions(canvas: fabric.Canvas): VirtualDimensions {
@@ -282,6 +313,12 @@ export default class Settings {
         this.bottomMarginInput.step = SIZE_STEP.toString();
 
     }
+}
+
+function clamp(value: number, min: number, max: number){
+    value = Math.max(min, value);
+    value = Math.min(max, value);
+    return value;
 }
 
 const SIZE_STEP = 0.05;
