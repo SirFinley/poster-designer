@@ -35,7 +35,7 @@ function resizeCanvas() {
     canvas.setHeight(canvasParent.offsetHeight);
 
     overlay.drawOverlay();
-    border.setBorder();
+    border.drawBorder();
     canvas.renderAll();
 }
 
