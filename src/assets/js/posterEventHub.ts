@@ -17,4 +17,5 @@ export type PosterEventType = 'sizeSettingChanged'
     | 'orientationSettingChanged'
     | 'borderSettingChanged'
     | 'imageChanged'
-    | 'colorChanged';
+    | 'colorChanged'
+    | 'imageScaled';

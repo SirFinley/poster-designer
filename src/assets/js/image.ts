@@ -72,6 +72,31 @@ export default class PosterImage {
         document.getElementById("btn-fit-borders")!.onclick = () => this.fitImageToBorders();
         document.getElementById("btn-fill-borders")!.onclick = () => this.fillBorders();
         document.getElementById("btn-fill-poster")!.onclick = () => this.fillPoster();
+
+        // image scaled
+        this.eventHub.subscribe('imageScaled', () => {
+            if (!this.image){
+                return;
+            }
+
+            let prevWidth = this.image.getScaledWidth();
+            let prevHeight = this.image.getScaledHeight();
+
+            let dims = this.settings.getVirtualDimensions();
+            let scale = this.settings.imageScaleValue;
+
+            this.scaleToWidth(dims.posterWidth * scale);
+
+            // keep centered on center point
+            let dx = (this.image.getScaledWidth() - prevWidth) / 2;
+            let dy = (this.image.getScaledHeight() - prevHeight) / 2;
+            this.image.set({
+                left: this.image.left! - dx,
+                top: this.image.top! - dy,
+            })
+
+            this.canvas.renderAll();
+        })
     }
 
     setNewImage(image: fabric.Image) {
@@ -277,6 +302,9 @@ export default class PosterImage {
         }
 
         this.image.scale(width / this.image.width!);
+
+        let dims = this.settings.getVirtualDimensions();
+        this.settings.setImageScale(this.image.getScaledWidth() / dims.posterWidth);
     }
 
     scaleToHeight(height: number) {
@@ -285,6 +313,9 @@ export default class PosterImage {
         }
 
         this.image.scale(height / this.image.height!);
+
+        let dims = this.settings.getVirtualDimensions();
+        this.settings.setImageScale(this.image.getScaledWidth() / dims.posterWidth);
     }
 
 }

@@ -27,6 +27,10 @@ export default class Settings {
     colorInput: HTMLInputElement;
     borderColor: string;
 
+    imageScaleInput: HTMLInputElement;
+    imageScaleValueDisplay: HTMLElement;
+    imageScaleValue: number;
+
     leftMarginInput: HTMLInputElement;
     rightMarginInput: HTMLInputElement;
     topMarginInput: HTMLInputElement;
@@ -45,6 +49,7 @@ export default class Settings {
         this.topMargin = 0;
         this.bottomMargin = 0;
         this.borderColor = '#ffffff';
+        this.imageScaleValue = 1;
 
         this.orientationInput = document.getElementById("orientation-input") as HTMLInputElement;
         this.sizeInput = document.getElementById("size-input") as HTMLInputElement;
@@ -54,6 +59,8 @@ export default class Settings {
         this.verticalBorderInput = document.getElementById("vertical-border") as HTMLInputElement;
         this.verticalBorderValueDisplay = document.getElementById("vertical-border-value") as HTMLElement;
         this.colorInput = document.getElementById("border-color") as HTMLInputElement;
+        this.imageScaleInput = document.getElementById("image-scale") as HTMLInputElement;
+        this.imageScaleValueDisplay = document.getElementById("image-scale-value") as HTMLInputElement;
 
         this.leftMarginInput = document.getElementById("left-margin") as HTMLInputElement;
         this.rightMarginInput = document.getElementById("right-margin") as HTMLInputElement;
@@ -77,7 +84,6 @@ export default class Settings {
         // borders
         this.sideBorderInput.addEventListener('input', onBorderInput);
         this.verticalBorderInput.addEventListener('input', onBorderInput);
-
         function onBorderInput(this: HTMLInputElement, e: Event) {
             let value = parseFloat(this.value) || 0;
             if (this.id === 'side-border') {
@@ -94,10 +100,18 @@ export default class Settings {
 
         // color
         this.colorInput.addEventListener('input', onBorderColorInput);
-
         function onBorderColorInput(this: HTMLInputElement, e: Event) {
             self.borderColor = this.value;
             self.eventHub.triggerEvent('colorChanged');
+        }
+
+        // image scale
+        this.imageScaleInput.addEventListener('input', onScaleImage);
+        function onScaleImage(this: HTMLInputElement, e: Event) {
+            let value = fromSliderScaleValue(this.value);
+            self.setImageScale(value);
+
+            self.eventHub.triggerEvent('imageScaled');
         }
 
         // margins
@@ -105,7 +119,6 @@ export default class Settings {
         this.rightMarginInput.addEventListener('input', onMarginInput);
         this.topMarginInput.addEventListener('input', onMarginInput);
         this.bottomMarginInput.addEventListener('input', onMarginInput);
-
         function onMarginInput(this: HTMLInputElement, e: Event) {
             let value = parseFloat(this.value) || 0;
             if (this.id === 'left-margin') {
@@ -309,6 +322,12 @@ export default class Settings {
         }
     }
 
+    setImageScale(value: number) {
+        value = value || 1;
+        this.imageScaleValue = value;
+        this.imageScaleInput.value = toSliderScaleValue(value);
+    }
+
     setMargins(left: number, right: number, top: number, bottom: number) {
         function round(x: number, multiple: number) {
             return Math.round(x / multiple) * multiple;
@@ -336,6 +355,18 @@ export default class Settings {
         this.bottomMarginInput.step = SIZE_STEP.toString();
 
     }
+}
+
+function fromSliderScaleValue(sliderValue: string): number{
+    let value = parseFloat(sliderValue) || 1;
+    value = Math.pow(2, value) - 1;
+    return value;
+}
+
+function toSliderScaleValue(value: number): string{
+    let sliderValue = value;
+    sliderValue = Math.log2(sliderValue + 1);
+    return sliderValue.toFixed(3);
 }
 
 function clamp(value: number, min: number, max: number) {
