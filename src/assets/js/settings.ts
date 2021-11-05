@@ -2,6 +2,7 @@ import PosterEventHub from "./posterEventHub";
 import VirtualDimensions from "./virtualDimensions";
 
 export default class Settings {
+    canvas: fabric.Canvas;
     eventHub: PosterEventHub;
 
     orientation: OrientationOptions;
@@ -28,7 +29,8 @@ export default class Settings {
     topMarginInput: HTMLInputElement;
     bottomMarginInput: HTMLInputElement;
 
-    constructor(eventHub: PosterEventHub) {
+    constructor(canvas: fabric.Canvas, eventHub: PosterEventHub) {
+        this.canvas = canvas;
         this.eventHub = eventHub;
 
         this.orientation = 'landscape';
@@ -151,9 +153,9 @@ export default class Settings {
         this.verticalBorderValueDisplay.innerText = `Top/Bottom Border: ${value}"`;
     }
 
-    getVirtualDimensions(canvas: fabric.Canvas): VirtualDimensions {
-        let canvasWidth = canvas.getWidth();
-        let canvasHeight = canvas.getHeight();
+    getVirtualDimensions(): VirtualDimensions {
+        let canvasWidth = this.canvas.getWidth();
+        let canvasHeight = this.canvas.getHeight();
         let canvasAspectRatio = canvasWidth / canvasHeight;
         let posterAspectRatio = this.getAspectRatio();
 
@@ -318,7 +320,7 @@ export default class Settings {
     }
 }
 
-function clamp(value: number, min: number, max: number){
+function clamp(value: number, min: number, max: number) {
     value = Math.max(min, value);
     value = Math.min(max, value);
     return value;

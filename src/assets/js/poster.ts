@@ -8,7 +8,7 @@ import PosterEventHub from "./posterEventHub";
 const canvas = new fabric.Canvas('fabric-canvas');
 
 const eventHub = new PosterEventHub();
-const settings = new Settings(eventHub);
+const settings = new Settings(canvas, eventHub);
 // TODO: read settings from document.referrer
 // readSettingsFromUrl(document.referrer);
 settings.readSettingsFromUrl(window.location.toString());
@@ -19,7 +19,7 @@ const border = new Border(canvas, settings, image, eventHub);
 
 docReady(() => {
     resizeCanvas();
-    image.fitImageToBorders();
+    setUpWelcomeText();
 });
 
 window.onresize = resizeCanvas;
@@ -47,6 +47,36 @@ function docReady(fn) {
     } else {
         document.addEventListener("DOMContentLoaded", fn);
     }
+}
+
+function setUpWelcomeText() {
+    // TODO: remove this - load test image on start
+    // let image = new fabric.Image(document.getElementById('cm-img') as HTMLImageElement);
+    // this.setNewImage(image);
+    // TODO: remove this - load test image on start
+
+    if (image.image) {
+        return;
+    }
+
+    let dims = settings.getVirtualDimensions();
+    let text = new fabric.Textbox('Drag and drop your image here or upload from the side menu', {
+        fill: 'black',
+        fontSize: 72,
+        left: dims.posterLeft,
+        top: dims.posterTop,
+        width: dims.posterWidth,
+        height: dims.posterHeight,
+        selectable: false,
+        evented: false,
+    });
+
+    canvas.add(text);
+    canvas.renderAll();
+
+    eventHub.subscribe('imageChanged', () => {
+        canvas.remove(text);
+    });
 }
 
 // TODO: remove

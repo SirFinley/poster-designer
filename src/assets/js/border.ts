@@ -23,7 +23,11 @@ export default class Border {
     borderLines: fabric.Line[];
 
     drawBorder() {
-        let dims = this.settings.getVirtualDimensions(this.canvas);
+        if (!this.posterImage.image) {
+            return;
+        }
+
+        let dims = this.settings.getVirtualDimensions();
 
         let innerPath = new fabric.Rect({
             left: dims.posterLeftBorder,
@@ -43,7 +47,8 @@ export default class Border {
         this.canvas.remove(...this.borderLines);
         this.borderLines = [];
 
-        let dims = this.settings.getVirtualDimensions(this.canvas);
+        let dims = this.settings.getVirtualDimensions();
+
         let invertedBackgroundColor = this.getInvertedBackgroundColor() || 'black';
         function createLine(startX, startY, endX, endY, lineOptions?) {
             return new fabric.Line([startX, startY, endX, endY], {
@@ -64,28 +69,32 @@ export default class Border {
         let bottomLine = createLine(0, dims.posterBottomBorder, dims.canvasWidth, dims.posterBottomBorder, { lockMovementX: true });
 
         leftLine.on('moving', (options) => {
-            let dx = options.transform.target.left - dims.posterLeft;
+            let target = (options.transform as any).target;
+            let dx = target.left - dims.posterLeft;
             let inches = dx * dims.inchesPerPixel;
             this.settings.setSideBorderInput(inches);
             this.drawBorder();
         })
 
         rightLine.on('moving', (options) => {
-            let dx =  dims.posterRight - options.transform.target.left;
+            let target = (options.transform as any).target;
+            let dx = dims.posterRight - target.left;
             let inches = dx * dims.inchesPerPixel;
             this.settings.setSideBorderInput(inches);
             this.drawBorder();
         })
 
         topLine.on('moving', (options) => {
-            let dx = options.transform.target.top - dims.posterTop;
+            let target = (options.transform as any).target;
+            let dx = target.top - dims.posterTop;
             let inches = dx * dims.inchesPerPixel;
             this.settings.setVerticalBorderInput(inches);
             this.drawBorder();
         })
 
         bottomLine.on('moving', (options) => {
-            let dx =  dims.posterBottom - options.transform.target.top;
+            let target = (options.transform as any).target;
+            let dx = dims.posterBottom - target.top;
             let inches = dx * dims.inchesPerPixel;
             this.settings.setVerticalBorderInput(inches);
             this.drawBorder();
@@ -103,11 +112,9 @@ export default class Border {
             return null;
         }
 
-        if (!color){
+        if (!color) {
             return null;
         }
-
-        console.log('color:'+color);
 
         function invertColor(hex) {
             if (hex.indexOf('#') === 0) {
@@ -127,7 +134,7 @@ export default class Border {
             // pad each with zeros and return
             return '#' + padZero(r) + padZero(g) + padZero(b);
         }
-        
+
         function padZero(str, len?) {
             len = len || 2;
             var zeros = new Array(len).join('0');

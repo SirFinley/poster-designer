@@ -6,13 +6,10 @@
 
 <body>
     <div id="floating-canvas-container">
-        <canvas id="fabric-canvas"></canvas>
+        <canvas id="fabric-canvas" class="drop-area"></canvas>
     </div>
 
     <div class="">
-        <div class="">
-            <h1>Poster Designer</h1>
-        </div>
         <div class="flex min-h-full p-8 gap-4">
 
             <!-- canvas -->
@@ -99,9 +96,9 @@
 
 
                 <!-- image -->
-                <div id="drop-area">
+                <div id="drop-area" class="drop-area">
                     <form>
-                        <p>Drag and drop your poster image here!</p>
+                        <p>Drag and drop your poster image here or in the editor</p>
                         <input type="file" id="photo-input" accept="image/*" />
                         <img src="#" id="img-preview" alt="" class="" hidden>
                     </form>

@@ -30,7 +30,7 @@ export default class Overlay {
 
         this.clearOverlay();
 
-        let dimensions = this.settings.getVirtualDimensions(this.canvas);
+        let dimensions = this.settings.getVirtualDimensions();
 
         let svg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${dimensions.canvasWidth}" height="${dimensions.canvasHeight}">
         <defs>

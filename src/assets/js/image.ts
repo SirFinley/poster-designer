@@ -10,11 +10,6 @@ export default class PosterImage {
         this.eventHub = eventHub;
 
         this.setupEventListeners();
-
-        // TODO: remove this - load test image on start
-        let image = new fabric.Image(document.getElementById('cm-img') as HTMLImageElement);
-        this.setNewImage(image);
-        // TODO: remove this - load test image on start
     }
 
     canvas: fabric.Canvas;
@@ -27,45 +22,47 @@ export default class PosterImage {
 
     setupEventListeners() {
         // drag and drop upload
-        let dropArea = document.getElementById("drop-area") as HTMLElement;
-        let imageInput = document.getElementById("photo-input") as HTMLInputElement;
+        let dropAreas = document.getElementsByClassName("drop-area") as HTMLCollectionOf<HTMLElement>;
+        for (let dropArea of dropAreas) {
+            let imageInput = document.getElementById("photo-input") as HTMLInputElement;
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, preventDefaults, false);
-        })
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            })
 
-        function preventDefaults(e) {
-            e.preventDefault()
-            e.stopPropagation()
+            function preventDefaults(e) {
+                e.preventDefault()
+                e.stopPropagation()
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            })
+
+            dropArea.addEventListener('drop', (e) => {
+                let dt = e.dataTransfer;
+                let file = dt.files[0];
+                imageInput.files = dt.files;
+                this.handleFile(file);
+            });
+
+            function highlight(e) {
+                dropArea.classList.add('highlight')
+            }
+
+            function unhighlight(e) {
+                dropArea.classList.remove('highlight')
+            }
+
+            imageInput.addEventListener('change', (e: Event) => {
+                let target = e.target as HTMLInputElement;
+                this.handleFile(target.files[0]);
+            });
         }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, unhighlight, false);
-        })
-
-        dropArea.addEventListener('drop', (e) => {
-            let dt = e.dataTransfer;
-            let file = dt.files[0];
-            imageInput.files = dt.files;
-            this.handleFile(file);
-        });
-
-        function highlight(e) {
-            dropArea.classList.add('highlight')
-        }
-
-        function unhighlight(e) {
-            dropArea.classList.remove('highlight')
-        }
-
-        imageInput.addEventListener('change', (e: Event) => {
-            let target = e.target as HTMLInputElement;
-            this.handleFile(target.files[0]);
-        });
 
         // fit buttons
         document.getElementById("btn-fit-borders")!.onclick = () => this.fitImageToBorders();
@@ -105,7 +102,7 @@ export default class PosterImage {
         }
 
         let realDims = this.settings.getRealPosterDimensions();
-        let vdims = this.settings.getVirtualDimensions(this.canvas);
+        let vdims = this.settings.getVirtualDimensions();
 
         let inchesPerPixel = realDims.width / vdims.posterWidth;
 
@@ -154,7 +151,7 @@ export default class PosterImage {
     }
 
     fitImageToBorders() {
-        let dims = this.settings.getVirtualDimensions(this.canvas);
+        let dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.borderInnerAspectRatio) { // image wider than canvas
             this.scaleToWidth(dims.posterInnerBorderWidth);
@@ -181,7 +178,7 @@ export default class PosterImage {
     }
 
     fitImageToCanvas() {
-        let dims = this.settings.getVirtualDimensions(this.canvas);
+        let dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas
             this.scaleToWidth(dims.posterWidth);
@@ -204,7 +201,7 @@ export default class PosterImage {
     }
 
     fillBorders() {
-        let dims = this.settings.getVirtualDimensions(this.canvas);
+        let dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.borderInnerAspectRatio) { // image wider than canvas
             this.scaleToHeight(dims.posterInnerBorderHeight);
@@ -227,7 +224,7 @@ export default class PosterImage {
     }
 
     fillPoster() {
-        let dims = this.settings.getVirtualDimensions(this.canvas);
+        let dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas
             this.scaleToHeight(dims.posterHeight);
