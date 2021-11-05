@@ -24,6 +24,9 @@ export default class Settings {
     verticalBorderInput: HTMLInputElement;
     verticalBorderValueDisplay: HTMLElement;
 
+    colorInput: HTMLInputElement;
+    borderColor: string;
+
     leftMarginInput: HTMLInputElement;
     rightMarginInput: HTMLInputElement;
     topMarginInput: HTMLInputElement;
@@ -41,6 +44,7 @@ export default class Settings {
         this.rightMargin = 0;
         this.topMargin = 0;
         this.bottomMargin = 0;
+        this.borderColor = '#ffffff';
 
         this.orientationInput = document.getElementById("orientation-input") as HTMLInputElement;
         this.sizeInput = document.getElementById("size-input") as HTMLInputElement;
@@ -49,6 +53,7 @@ export default class Settings {
         this.sideBorderValueDisplay = document.getElementById("side-border-value") as HTMLElement;
         this.verticalBorderInput = document.getElementById("vertical-border") as HTMLInputElement;
         this.verticalBorderValueDisplay = document.getElementById("vertical-border-value") as HTMLElement;
+        this.colorInput = document.getElementById("border-color") as HTMLInputElement;
 
         this.leftMarginInput = document.getElementById("left-margin") as HTMLInputElement;
         this.rightMarginInput = document.getElementById("right-margin") as HTMLInputElement;
@@ -85,6 +90,14 @@ export default class Settings {
             }
 
             self.eventHub.triggerEvent('borderSettingChanged');
+        }
+
+        // color
+        this.colorInput.addEventListener('input', onBorderColorInput);
+
+        function onBorderColorInput(this: HTMLInputElement, e: Event) {
+            self.borderColor = this.value;
+            self.eventHub.triggerEvent('colorChanged');
         }
 
         // margins
@@ -151,6 +164,11 @@ export default class Settings {
         this.verticalBorder = value;
         this.verticalBorderInput.value = value.toString();
         this.verticalBorderValueDisplay.innerText = `Top/Bottom Border: ${value}"`;
+    }
+
+    setBorderColor(color: string) {
+        this.borderColor = color;
+        this.colorInput.value = color;
     }
 
     getVirtualDimensions(): VirtualDimensions {

@@ -1,3 +1,4 @@
+const tinycolor = require('tinycolor2');
 import { fabric } from 'fabric';
 import PosterImage from './image';
 import PosterEventHub from './posterEventHub';
@@ -15,6 +16,10 @@ export default class Border {
         eventHub.subscribe('orientationSettingChanged', () => this.drawBorder());
         eventHub.subscribe('borderSettingChanged', () => this.drawBorder());
         eventHub.subscribe('imageChanged', () => this.drawBorder());
+        eventHub.subscribe('colorChanged', () => {
+            this.canvas.backgroundColor = this.settings.borderColor;
+            this.drawLines();
+        });
     }
 
     canvas: fabric.Canvas;
@@ -49,7 +54,7 @@ export default class Border {
 
         let dims = this.settings.getVirtualDimensions();
 
-        let invertedBackgroundColor = this.getInvertedBackgroundColor() || 'black';
+        let invertedBackgroundColor = this.getContrastingColor(this.settings.borderColor) || 'black';
         function createLine(points: number[], lineOptions?: fabric.ILineOptions) {
             return new fabric.Line(points, {
                 strokeWidth: 1,
@@ -106,42 +111,18 @@ export default class Border {
         this.canvas.renderAll();
     }
 
-    getInvertedBackgroundColor(): string | null {
-        let color = this.canvas.backgroundColor;
-        if (typeof color !== 'string') {
-            return null;
-        }
-
+    getContrastingColor(color: string): string | null {
         if (!color) {
             return null;
         }
 
-        function invertColor(hex: string) {
-            if (hex.indexOf('#') === 0) {
-                hex = hex.slice(1);
-            }
-            // convert 3-digit hex to 6-digits.
-            if (hex.length === 3) {
-                hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-            }
-            if (hex.length !== 6) {
-                throw new Error('Invalid HEX color.');
-            }
-            // invert color components
-            var r = (255 - parseInt(hex.slice(0, 2), 16)).toString(16),
-                g = (255 - parseInt(hex.slice(2, 4), 16)).toString(16),
-                b = (255 - parseInt(hex.slice(4, 6), 16)).toString(16);
-            // pad each with zeros and return
-            return '#' + padZero(r) + padZero(g) + padZero(b);
+        let bgColor = tinycolor(color);
+        if (bgColor.isDark()){
+            return bgColor.spin(180).lighten(75).toHexString();
         }
-
-        function padZero(str: string, len?: number) {
-            len = len || 2;
-            var zeros = new Array(len).join('0');
-            return (zeros + str).slice(-len);
+        else{
+            return bgColor.spin(180).darken(75).toHexString();
         }
-
-        return invertColor(color);
     }
 
 }

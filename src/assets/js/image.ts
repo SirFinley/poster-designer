@@ -99,7 +99,12 @@ export default class PosterImage {
         this.canvas.add(image);
         this.canvas.renderAll();
 
+        let avgColor = this.getAverageColor();
+        this.settings.setBorderColor(avgColor);
+        this.canvas.setBackgroundColor(avgColor, () => { });
+
         this.eventHub.triggerEvent('imageChanged');
+        this.eventHub.triggerEvent('colorChanged');
     }
 
     updateMargins() {
@@ -145,7 +150,7 @@ export default class PosterImage {
 
     getAverageColor() {
         if (!this.imgElem) {
-            return this.canvas.backgroundColor as string;
+            return this.settings.borderColor as string;
         }
 
         let fac = new FastAverageColor();
@@ -180,8 +185,6 @@ export default class PosterImage {
             top: dims.posterTopBorder + imageTopOffset,
         });
 
-        let avgColor = this.getAverageColor();
-        this.canvas.setBackgroundColor(avgColor, () => { });
         this.canvas.renderAll();
 
         this.updateMargins();

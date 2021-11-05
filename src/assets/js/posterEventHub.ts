@@ -13,4 +13,8 @@ export default class PosterEventHub extends EventTarget {
     }
 }
 
-export type PosterEventType = 'sizeSettingChanged' | 'orientationSettingChanged' | 'borderSettingChanged' | 'imageChanged';
+export type PosterEventType = 'sizeSettingChanged'
+    | 'orientationSettingChanged'
+    | 'borderSettingChanged'
+    | 'imageChanged'
+    | 'colorChanged';
