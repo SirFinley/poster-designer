@@ -24,8 +24,8 @@ docReady(() => {
 
 window.onresize = resizeCanvas;
 function resizeCanvas() {
-    let canvasParent = document.getElementById('fabric-canvas-wrapper');
-    let floatingCanvasParent = document.getElementById('floating-canvas-container');
+    let canvasParent = document.getElementById('fabric-canvas-wrapper')!;
+    let floatingCanvasParent = document.getElementById('floating-canvas-container')!;
     floatingCanvasParent.style.position = 'absolute';
     floatingCanvasParent.style.left = canvasParent.offsetLeft + 'px';
     floatingCanvasParent.style.top = canvasParent.offsetTop + 'px';
@@ -39,7 +39,7 @@ function resizeCanvas() {
     canvas.renderAll();
 }
 
-function docReady(fn) {
+function docReady(fn: () => void) {
     // see if DOM is already available
     if (document.readyState === "complete" || document.readyState === "interactive") {
         // call on next available tick

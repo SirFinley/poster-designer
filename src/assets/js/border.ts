@@ -50,8 +50,8 @@ export default class Border {
         let dims = this.settings.getVirtualDimensions();
 
         let invertedBackgroundColor = this.getInvertedBackgroundColor() || 'black';
-        function createLine(startX, startY, endX, endY, lineOptions?) {
-            return new fabric.Line([startX, startY, endX, endY], {
+        function createLine(points: number[], lineOptions?: fabric.ILineOptions) {
+            return new fabric.Line(points, {
                 strokeWidth: 1,
                 stroke: invertedBackgroundColor,
                 opacity: 0.8,
@@ -63,10 +63,10 @@ export default class Border {
             });
         }
 
-        let leftLine = createLine(dims.posterLeftBorder, 0, dims.posterLeftBorder, dims.canvasHeight, { lockMovementY: true });
-        let rightLine = createLine(dims.posterRightBorder, 0, dims.posterRightBorder, dims.canvasHeight, { lockMovementY: true });
-        let topLine = createLine(0, dims.posterTopBorder, dims.canvasWidth, dims.posterTopBorder, { lockMovementX: true });
-        let bottomLine = createLine(0, dims.posterBottomBorder, dims.canvasWidth, dims.posterBottomBorder, { lockMovementX: true });
+        let leftLine = createLine([dims.posterLeftBorder, 0, dims.posterLeftBorder, dims.canvasHeight], { lockMovementY: true });
+        let rightLine = createLine([dims.posterRightBorder, 0, dims.posterRightBorder, dims.canvasHeight], { lockMovementY: true });
+        let topLine = createLine([0, dims.posterTopBorder, dims.canvasWidth, dims.posterTopBorder], { lockMovementX: true });
+        let bottomLine = createLine([0, dims.posterBottomBorder, dims.canvasWidth, dims.posterBottomBorder], { lockMovementX: true });
 
         leftLine.on('moving', (options) => {
             let target = (options.transform as any).target;
@@ -116,7 +116,7 @@ export default class Border {
             return null;
         }
 
-        function invertColor(hex) {
+        function invertColor(hex: string) {
             if (hex.indexOf('#') === 0) {
                 hex = hex.slice(1);
             }
@@ -135,7 +135,7 @@ export default class Border {
             return '#' + padZero(r) + padZero(g) + padZero(b);
         }
 
-        function padZero(str, len?) {
+        function padZero(str: string, len?: number) {
             len = len || 2;
             var zeros = new Array(len).join('0');
             return (zeros + str).slice(-len);

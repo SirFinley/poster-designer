@@ -9,6 +9,10 @@ export default class PosterImage {
         this.settings = settings;
         this.eventHub = eventHub;
 
+        this.image = null;
+        this.imageAspectRatio = 0;
+        this.imgElem = null;
+
         this.setupEventListeners();
     }
 
@@ -18,7 +22,7 @@ export default class PosterImage {
 
     image: fabric.Image | null;
     imageAspectRatio: number;
-    imgElem: HTMLImageElement;
+    imgElem: HTMLImageElement | null;
 
     setupEventListeners() {
         // drag and drop upload
@@ -30,7 +34,7 @@ export default class PosterImage {
                 dropArea.addEventListener(eventName, preventDefaults, false);
             })
 
-            function preventDefaults(e) {
+            function preventDefaults(e: Event) {
                 e.preventDefault()
                 e.stopPropagation()
             }
@@ -44,23 +48,23 @@ export default class PosterImage {
             })
 
             dropArea.addEventListener('drop', (e) => {
-                let dt = e.dataTransfer;
+                let dt = e.dataTransfer!;
                 let file = dt.files[0];
                 imageInput.files = dt.files;
                 this.handleFile(file);
             });
 
-            function highlight(e) {
+            function highlight() {
                 dropArea.classList.add('highlight')
             }
 
-            function unhighlight(e) {
+            function unhighlight() {
                 dropArea.classList.remove('highlight')
             }
 
             imageInput.addEventListener('change', (e: Event) => {
                 let target = e.target as HTMLInputElement;
-                this.handleFile(target.files[0]);
+                this.handleFile(target.files![0]);
             });
         }
 
@@ -83,7 +87,9 @@ export default class PosterImage {
             centeredScaling: true,
         })
 
-        this.canvas.remove(this.image);
+        if (this.image) {
+            this.canvas.remove(this.image);
+        }
         this.image = image;
         this.imageAspectRatio = this.image.width! / this.image.height!;
         this.image.on('moving', (e) => this.updateMargins());
@@ -126,7 +132,7 @@ export default class PosterImage {
 
         reader.onload = (event) => {
             let imgElem = document.getElementById("img-preview") as HTMLImageElement;
-            imgElem.src = event.target.result as string;
+            imgElem.src = event.target!.result as string;
             imgElem.onload = () => {
                 var image = new fabric.Image(imgElem);
                 this.setNewImage(image);
@@ -139,7 +145,7 @@ export default class PosterImage {
 
     getAverageColor() {
         if (!this.imgElem) {
-            return this.canvas.backgroundColor;
+            return this.canvas.backgroundColor as string;
         }
 
         let fac = new FastAverageColor();
@@ -151,6 +157,10 @@ export default class PosterImage {
     }
 
     fitImageToBorders() {
+        if (!this.image) {
+            return;
+        }
+
         let dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.borderInnerAspectRatio) { // image wider than canvas
@@ -171,13 +181,17 @@ export default class PosterImage {
         });
 
         let avgColor = this.getAverageColor();
-        this.canvas.setBackgroundColor(avgColor, null);
+        this.canvas.setBackgroundColor(avgColor, () => { });
         this.canvas.renderAll();
 
         this.updateMargins();
     }
 
     fitImageToCanvas() {
+        if (!this.image) {
+            return;
+        }
+
         let dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas
@@ -201,6 +215,10 @@ export default class PosterImage {
     }
 
     fillBorders() {
+        if (!this.image) {
+            return;
+        }
+
         let dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.borderInnerAspectRatio) { // image wider than canvas
@@ -224,6 +242,10 @@ export default class PosterImage {
     }
 
     fillPoster() {
+        if (!this.image) {
+            return;
+        }
+
         let dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas
@@ -247,10 +269,18 @@ export default class PosterImage {
     }
 
     scaleToWidth(width: number) {
+        if (!this.image) {
+            return;
+        }
+
         this.image.scale(width / this.image.width!);
     }
 
     scaleToHeight(height: number) {
+        if (!this.image) {
+            return;
+        }
+
         this.image.scale(height / this.image.height!);
     }
 

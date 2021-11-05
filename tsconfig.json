@@ -1,6 +1,8 @@
 {
     "compilerOptions": {
         "sourceMap": false,
+        "module": "UMD",
+        "moduleResolution": "node",
         // "outFile": "dist/poster.js",
         "target": "es2015",
         "strict": true,
@@ -12,10 +14,10 @@
     },
     "compileOnSave": true,
     "include": [
-        "*.ts",
+        "src/**/*.ts",
     ],
     "exclude": [
-        "node_modules"
+        // "node_modules"
     ],
     "paths": {
         "*": [
