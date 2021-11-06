@@ -76,6 +76,19 @@ export default class Settings {
         let size = this.getRealPosterDimensions();
         this.sideBorderInput.max = (size.width / 2 - 0.125).toFixed(3);
         this.verticalBorderInput.max = (size.height / 2 - 0.125).toFixed(3);
+
+        let realDims = this.getRealPosterDimensions();
+        let maxSide = Math.max(realDims.width, realDims.height);
+        let maxWidth = this.sideBorderInput.parentElement!.offsetWidth;
+
+        if (realDims.width > realDims.height){
+            this.sideBorderInput.style.width = maxWidth + 'px';
+            this.verticalBorderInput.style.width = Math.ceil(realDims.height / maxSide * maxWidth) + 'px';
+        }
+        else{
+            this.verticalBorderInput.style.width = maxWidth + 'px';
+            this.sideBorderInput.style.width = Math.ceil(realDims.width / maxSide * maxWidth) + 'px';
+        }
     }
 
     initializeEventListeners() {
@@ -150,8 +163,8 @@ export default class Settings {
         }
 
         // update border
-        this.eventHub.addEventListener('sizeSettingChanged', refreshBorderValues);
-        this.eventHub.addEventListener('orientationSettingChanged', refreshBorderValues);
+        this.eventHub.subscribe('sizeSettingChanged', refreshBorderValues);
+        this.eventHub.subscribe('orientationSettingChanged', refreshBorderValues);
         function refreshBorderValues() {
             self.setInputConstraints();
             self.setSideBorderInput(self.sideBorder);
