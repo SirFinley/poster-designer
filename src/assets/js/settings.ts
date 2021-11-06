@@ -1,3 +1,6 @@
+import noUiSlider, { API } from 'nouislider';
+import 'nouislider/dist/nouislider.css';
+
 import PosterEventHub from "./posterEventHub";
 import VirtualDimensions from "./virtualDimensions";
 
@@ -19,9 +22,9 @@ export default class Settings {
     orientationInput: HTMLInputElement;
     sizeInput: HTMLInputElement;
 
-    sideBorderInput: HTMLInputElement;
+    sideBorderInput: NoUiSlider;
     sideBorderValueDisplay: HTMLElement;
-    verticalBorderInput: HTMLInputElement;
+    verticalBorderInput: NoUiSlider;
     verticalBorderValueDisplay: HTMLElement;
 
     colorInput: HTMLInputElement;
@@ -40,8 +43,8 @@ export default class Settings {
         this.canvas = canvas;
         this.eventHub = eventHub;
 
-        this.orientation = 'landscape';
-        this.size = '24x36';
+        this.orientation = 'portrait';
+        this.size = '8.5x11';
         this.sideBorder = 0;
         this.verticalBorder = 0;
         this.leftMargin = 0;
@@ -54,9 +57,10 @@ export default class Settings {
         this.orientationInput = document.getElementById("orientation-input") as HTMLInputElement;
         this.sizeInput = document.getElementById("size-input") as HTMLInputElement;
 
-        this.sideBorderInput = document.getElementById("side-border") as HTMLInputElement;
+        this.sideBorderInput = new NoUiSlider("side-border", 0, 10, 0);
         this.sideBorderValueDisplay = document.getElementById("side-border-value") as HTMLElement;
-        this.verticalBorderInput = document.getElementById("vertical-border") as HTMLInputElement;
+
+        this.verticalBorderInput = new NoUiSlider("vertical-border", 0, 10, 0);
         this.verticalBorderValueDisplay = document.getElementById("vertical-border-value") as HTMLElement;
         this.colorInput = document.getElementById("border-color") as HTMLInputElement;
         this.imageScaleInput = document.getElementById("image-scale") as HTMLInputElement;
@@ -74,20 +78,24 @@ export default class Settings {
 
     setInputConstraints() {
         let size = this.getRealPosterDimensions();
-        this.sideBorderInput.max = (size.width / 2 - 0.125).toFixed(3);
-        this.verticalBorderInput.max = (size.height / 2 - 0.125).toFixed(3);
+        let maxSideBorder = size.width / 2 - 0.125;
+        let maxVerticalBorder = size.height / 2 - 0.125;
 
-        let realDims = this.getRealPosterDimensions();
-        let maxSide = Math.max(realDims.width, realDims.height);
-        let maxWidth = this.sideBorderInput.parentElement!.offsetWidth;
+        this.sideBorderInput.setMax(maxSideBorder);
+        this.verticalBorderInput.setMax(maxVerticalBorder);
 
-        if (realDims.width > realDims.height){
-            this.sideBorderInput.style.width = maxWidth + 'px';
-            this.verticalBorderInput.style.width = Math.ceil(realDims.height / maxSide * maxWidth) + 'px';
+        let maxInches = Math.max(maxSideBorder, maxVerticalBorder);
+        let maxSliderWidth = document.getElementById('hidden-border')!.parentElement!.offsetWidth;
+
+        let pixelsPerInch = maxSliderWidth / maxInches;
+
+        if (maxSideBorder > maxVerticalBorder) {
+            this.sideBorderInput.setUiWidth(maxSliderWidth);
+            this.verticalBorderInput.setUiWidth(maxVerticalBorder * pixelsPerInch);
         }
-        else{
-            this.verticalBorderInput.style.width = maxWidth + 'px';
-            this.sideBorderInput.style.width = Math.ceil(realDims.width / maxSide * maxWidth) + 'px';
+        else {
+            this.verticalBorderInput.setUiWidth(maxSliderWidth);
+            this.sideBorderInput.setUiWidth(maxSideBorder * pixelsPerInch);
         }
     }
 
@@ -95,15 +103,15 @@ export default class Settings {
         let self = this;
 
         // borders
-        this.sideBorderInput.addEventListener('input', onBorderInput);
-        this.verticalBorderInput.addEventListener('input', onBorderInput);
-        function onBorderInput(this: HTMLInputElement, e: Event) {
-            let value = parseFloat(this.value) || 0;
-            if (this.id === 'side-border') {
+        this.sideBorderInput.slider.on('slide', onBorderInput);
+        this.verticalBorderInput.slider.on('slide', onBorderInput);
+        function onBorderInput(this: API) {
+            let value = parseFloat(this.get() as string);
+            if (this.target.id === 'side-border') {
                 self.sideBorder = value;
                 self.sideBorderValueDisplay.innerText = `Side Border: ${value}"`;
             }
-            else if (this.id === 'vertical-border') {
+            else if (this.target.id === 'vertical-border') {
                 self.verticalBorder = value;
                 self.verticalBorderValueDisplay.innerText = `Top/Bottom Border: ${value}"`;
             }
@@ -175,20 +183,20 @@ export default class Settings {
     setSideBorderInput(value: number) {
         value = value || 0;
         value = Math.round(value / 0.125) * 0.125;
-        value = clamp(value, parseFloat(this.sideBorderInput.min), parseFloat(this.sideBorderInput.max));
+        value = clamp(value, this.sideBorderInput.getMin(), this.sideBorderInput.getMax());
 
         this.sideBorder = value;
-        this.sideBorderInput.value = value.toString();
+        this.sideBorderInput.set(value);
         this.sideBorderValueDisplay.innerText = `Side Border: ${value}"`;
     }
 
     setVerticalBorderInput(value: number) {
         value = value || 0;
         value = Math.round(value / 0.125) * 0.125;
-        value = clamp(value, parseFloat(this.verticalBorderInput.min), parseFloat(this.verticalBorderInput.max));
+        value = clamp(value, this.verticalBorderInput.getMin(), this.verticalBorderInput.getMax());
 
         this.verticalBorder = value;
-        this.verticalBorderInput.value = value.toString();
+        this.verticalBorderInput.set(value);
         this.verticalBorderValueDisplay.innerText = `Top/Bottom Border: ${value}"`;
     }
 
@@ -370,13 +378,65 @@ export default class Settings {
     }
 }
 
-function fromSliderScaleValue(sliderValue: string): number{
+class NoUiSlider {
+    constructor(targetId: string, min: number, max: number, start: number) {
+        this.slider = noUiSlider.create(document.getElementById(targetId)!, {
+            start: [start],
+            step: 0.125,
+            range: {
+                'min': [min],
+                'max': [max],
+            },
+            format: {
+                to: function (value) {
+                    return value.toFixed(3);
+                },
+                from: function (value) {
+                    return parseFloat(value);
+                }
+            }
+        });
+    }
+
+    slider: API;
+
+    get(): number {
+        return this.slider.get() as number;
+    }
+
+    set(value: number) {
+        this.slider.set(value);
+    }
+
+    getMax(): number {
+        return this.slider.options.range.max.valueOf() as number;
+    }
+
+    getMin(): number {
+        return this.slider.options.range.min.valueOf() as number;
+    }
+
+    setMax(value: number) {
+        this.slider.updateOptions({
+            range: {
+                min: 0,
+                max: value,
+            },
+        }, false);
+    }
+
+    setUiWidth(width: number) {
+        this.slider.target.style.width = width + 'px';
+    }
+}
+
+function fromSliderScaleValue(sliderValue: string): number {
     let value = parseFloat(sliderValue) || 1;
     value = Math.pow(2, value) - 1;
     return value;
 }
 
-function toSliderScaleValue(value: number): string{
+function toSliderScaleValue(value: number): string {
     let sliderValue = value;
     sliderValue = Math.log2(sliderValue + 1);
     return sliderValue.toFixed(3);
