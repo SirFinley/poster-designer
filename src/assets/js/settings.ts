@@ -380,12 +380,13 @@ export default class Settings {
 class NoUiSlider {
     constructor(targetId: string, min: number, max: number, start: number) {
         this.slider = noUiSlider.create(document.getElementById(targetId)!, {
-            start: [start],
+            start: start,
             step: 0.125,
             range: {
-                'min': [min],
-                'max': [max],
+                'min': min,
+                'max': max,
             },
+            connect: 'lower',
             format: {
                 to: function (value) {
                     return value.toFixed(3);
@@ -393,7 +394,8 @@ class NoUiSlider {
                 from: function (value) {
                     return parseFloat(value);
                 }
-            }
+            },
+            animate: false,
         });
     }
 
