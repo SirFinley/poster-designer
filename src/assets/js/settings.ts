@@ -1,4 +1,4 @@
-import noUiSlider, { API } from 'nouislider';
+import noUiSlider, { API as NoUiAPI} from 'nouislider';
 import 'nouislider/dist/nouislider.css';
 
 import PosterEventHub from "./posterEventHub";
@@ -30,7 +30,7 @@ export default class Settings {
     colorInput: HTMLInputElement;
     borderColor: string;
 
-    imageScaleInput: HTMLInputElement;
+    imageScaleInput: NoUiSlider;
     imageScaleValueDisplay: HTMLElement;
     imageScaleValue: number;
 
@@ -57,13 +57,13 @@ export default class Settings {
         this.orientationInput = document.getElementById("orientation-input") as HTMLInputElement;
         this.sizeInput = document.getElementById("size-input") as HTMLInputElement;
 
-        this.sideBorderInput = new NoUiSlider("side-border", 0, 10, 0);
+        this.sideBorderInput = new NoUiSlider("side-border", 0, 10, 0, 0.125);
         this.sideBorderValueDisplay = document.getElementById("side-border-value") as HTMLElement;
 
-        this.verticalBorderInput = new NoUiSlider("vertical-border", 0, 10, 0);
+        this.verticalBorderInput = new NoUiSlider("vertical-border", 0, 10, 0, 0.125);
         this.verticalBorderValueDisplay = document.getElementById("vertical-border-value") as HTMLElement;
         this.colorInput = document.getElementById("border-color") as HTMLInputElement;
-        this.imageScaleInput = document.getElementById("image-scale") as HTMLInputElement;
+        this.imageScaleInput = new NoUiSlider("image-scale", 0, 3, 1, 0.001);
         this.imageScaleValueDisplay = document.getElementById("image-scale-value") as HTMLInputElement;
 
         this.leftMarginInput = document.getElementById("left-margin") as HTMLInputElement;
@@ -105,7 +105,7 @@ export default class Settings {
         // borders
         this.sideBorderInput.slider.on('slide', onBorderInput);
         this.verticalBorderInput.slider.on('slide', onBorderInput);
-        function onBorderInput(this: API) {
+        function onBorderInput(this: NoUiAPI) {
             let value = parseFloat(this.get() as string);
             if (this.target.id === 'side-border') {
                 self.sideBorder = value;
@@ -127,9 +127,9 @@ export default class Settings {
         }
 
         // image scale
-        this.imageScaleInput.addEventListener('input', onScaleImage);
-        function onScaleImage(this: HTMLInputElement, e: Event) {
-            let value = fromSliderScaleValue(this.value);
+        this.imageScaleInput.slider.on('slide', onScaleImage);
+        function onScaleImage(this: NoUiAPI) {
+            let value = fromSliderScaleValue(this.get() as string);
             self.setImageScale(value);
             self.eventHub.triggerEvent('imageScaled');
         }
@@ -345,7 +345,7 @@ export default class Settings {
     setImageScale(value: number) {
         value = value || 1;
         this.imageScaleValue = value;
-        this.imageScaleInput.value = toSliderScaleValue(value);
+        this.imageScaleInput.set(toSliderScaleValue(value));
     }
 
     setMargins(left: number, right: number, top: number, bottom: number) {
@@ -378,10 +378,10 @@ export default class Settings {
 }
 
 class NoUiSlider {
-    constructor(targetId: string, min: number, max: number, start: number) {
+    constructor(targetId: string, min: number, max: number, start: number, step: number) {
         this.slider = noUiSlider.create(document.getElementById(targetId)!, {
             start: start,
-            step: 0.125,
+            step: step,
             range: {
                 'min': min,
                 'max': max,
@@ -399,7 +399,7 @@ class NoUiSlider {
         });
     }
 
-    slider: API;
+    slider: NoUiAPI;
 
     get(): number {
         return this.slider.get() as number;
@@ -437,10 +437,9 @@ function fromSliderScaleValue(sliderValue: string): number {
     return value;
 }
 
-function toSliderScaleValue(value: number): string {
+function toSliderScaleValue(value: number): number {
     let sliderValue = value;
-    sliderValue = Math.log2(sliderValue + 1);
-    return sliderValue.toFixed(3);
+    return Math.log2(sliderValue + 1);
 }
 
 function clamp(value: number, min: number, max: number) {
