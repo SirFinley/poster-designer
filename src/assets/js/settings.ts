@@ -131,7 +131,6 @@ export default class Settings {
         function onScaleImage(this: HTMLInputElement, e: Event) {
             let value = fromSliderScaleValue(this.value);
             self.setImageScale(value);
-
             self.eventHub.triggerEvent('imageScaled');
         }
 

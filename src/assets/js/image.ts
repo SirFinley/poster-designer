@@ -75,7 +75,7 @@ export default class PosterImage {
 
         // image scaled
         this.eventHub.subscribe('imageScaled', () => {
-            if (!this.image){
+            if (!this.image) {
                 return;
             }
 
@@ -96,7 +96,10 @@ export default class PosterImage {
             })
 
             this.canvas.renderAll();
-        })
+        });
+
+        this.eventHub.subscribe('sizeSettingChanged', () => this.updateScaleSlider());
+        this.eventHub.subscribe('orientationSettingChanged', () => this.updateScaleSlider());
     }
 
     setNewImage(image: fabric.Image) {
@@ -118,7 +121,11 @@ export default class PosterImage {
         this.image = image;
         this.imageAspectRatio = this.image.width! / this.image.height!;
         this.image.on('moving', (e) => this.updateMargins());
-        this.image.on('scaling', (e) => this.updateMargins());
+        this.image.on('scaling', (e) => {
+            this.updateMargins();
+            this.updateScaleSlider();
+        });
+
 
         this.fitImageToBorders();
         this.canvas.add(image);
@@ -130,6 +137,15 @@ export default class PosterImage {
 
         this.eventHub.triggerEvent('imageChanged');
         this.eventHub.triggerEvent('colorChanged');
+    }
+
+    updateScaleSlider() {
+        if (!this.image){
+            return;
+        }
+
+        let scale = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
+        this.settings.setImageScale(scale);
     }
 
     updateMargins() {
@@ -211,34 +227,6 @@ export default class PosterImage {
         });
 
         this.canvas.renderAll();
-
-        this.updateMargins();
-    }
-
-    fitImageToCanvas() {
-        if (!this.image) {
-            return;
-        }
-
-        let dims = this.settings.getVirtualDimensions();
-
-        if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas
-            this.scaleToWidth(dims.posterWidth);
-        }
-        else { // image taller than poster
-            this.scaleToHeight(dims.posterHeight);
-        }
-
-        let scaledImageWidth = this.image.getScaledWidth();
-        let scaledImageHeight = this.image.getScaledHeight();
-        let imageHorizontalMargin = (dims.posterWidth - scaledImageWidth) / 2;
-        let imageVerticalMargin = (dims.posterHeight - scaledImageHeight) / 2;
-
-        this.image.set({
-            left: dims.posterLeft + imageHorizontalMargin,
-            top: dims.posterTop + imageVerticalMargin,
-        });
-        this.canvas.renderAll();
         this.updateMargins();
     }
 
@@ -302,9 +290,7 @@ export default class PosterImage {
         }
 
         this.image.scale(width / this.image.width!);
-
-        let dims = this.settings.getVirtualDimensions();
-        this.settings.setImageScale(this.image.getScaledWidth() / dims.posterWidth);
+        this.updateScaleSlider();
     }
 
     scaleToHeight(height: number) {
@@ -313,9 +299,7 @@ export default class PosterImage {
         }
 
         this.image.scale(height / this.image.height!);
-
-        let dims = this.settings.getVirtualDimensions();
-        this.settings.setImageScale(this.image.getScaledWidth() / dims.posterWidth);
+        this.updateScaleSlider();
     }
 
 }
