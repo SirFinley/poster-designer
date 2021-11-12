@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "api-test-upload-image-executor",
+    "name": "api-test-upload-image",
+    "region": "us-east-1"
+  },
+  "api": {
+    "id": "mit7reefi7",
+    "module": "bin/index"
+  }
+}
