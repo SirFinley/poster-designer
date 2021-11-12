@@ -2,7 +2,6 @@ import { fabric } from 'fabric';
 import FastAverageColor from 'fast-average-color';
 import PosterEventHub from './posterEventHub';
 import Settings from './settings';
-
 export default class PosterImage {
     constructor(canvas: fabric.Canvas, settings: Settings, eventHub: PosterEventHub) {
         this.canvas = canvas;
@@ -140,7 +139,7 @@ export default class PosterImage {
     }
 
     updateScaleSlider() {
-        if (!this.image){
+        if (!this.image) {
             return;
         }
 
@@ -173,7 +172,8 @@ export default class PosterImage {
     }
 
     handleFile(file: File) {
-        // TODO: start upload to server in background
+        new Upload().start(file);
+
         let reader = new FileReader();
 
         reader.onload = (event) => {
@@ -302,4 +302,69 @@ export default class PosterImage {
         this.updateScaleSlider();
     }
 
+}
+
+class Upload {
+    constructor() {
+        this.controller = new AbortController();
+        this.signal = this.controller.signal;
+    }
+
+    controller: AbortController;
+    signal: AbortSignal;
+
+    async start(file: File) {
+        const uploadUrl = await this.getPresignedUrl(file);
+        this.uploadFile(uploadUrl.uploadUrl, file);
+    }
+
+    async getPresignedUrl(file: File): Promise<GetUploadUrlResponse> {
+        const url = new URL('https://ot3uw7itn6.execute-api.us-east-1.amazonaws.com/latest');
+
+        let response = await fetch(url.toString(), {
+            method: 'GET',
+            signal: this.signal,
+        })
+            .then((response) => response.json())
+            .catch((err) => {
+                if (err.name === 'AbortError') {
+                    console.error('Fetch aborted')
+                } else {
+                    console.error('Error while getting upload url: ', err)
+                }
+            });
+
+        return response as GetUploadUrlResponse;
+    }
+
+    uploadFile(signedUrl: string, file: File) {
+        fetch(signedUrl, {
+            method: 'PUT',
+            body: file,
+            signal: this.signal,
+        })
+            .then((response) => {
+                return response.text();
+            })
+            .then((payload) => {
+                console.log(payload);
+            })
+            .catch((err) => {
+                if (err.name === 'AbortError') {
+                    console.error('Fetch aborted')
+                } else {
+                    console.error('Error while uploading: ', err)
+                }
+            });
+        // TODO: indicate progress
+    }
+
+    cancel() {
+        this.controller.abort();
+    }
+}
+
+interface GetUploadUrlResponse {
+    uploadUrl: string,
+    key: string,
 }
