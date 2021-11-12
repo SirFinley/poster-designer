@@ -172,6 +172,11 @@ export default class PosterImage {
     }
 
     handleFile(file: File) {
+        // not an image
+        if (!/image\//.test(file.type)) {
+            return;
+        }
+
         new Upload().start(file);
 
         let reader = new FileReader();
@@ -319,7 +324,10 @@ class Upload {
     }
 
     async getPresignedUrl(file: File): Promise<GetUploadUrlResponse> {
-        const url = new URL('https://ot3uw7itn6.execute-api.us-east-1.amazonaws.com/latest');
+        const url = new URL("https://ot3uw7itn6.execute-api.us-east-1.amazonaws.com/latest");
+        url.search = new URLSearchParams({
+            contentType: file.type,
+        }).toString();
 
         let response = await fetch(url.toString(), {
             method: 'GET',

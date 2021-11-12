@@ -15,14 +15,18 @@ const claudia_api_builder_1 = __importDefault(require("claudia-api-builder"));
 const aws_sdk_1 = require("aws-sdk");
 const crypto_1 = require("crypto");
 const api = new claudia_api_builder_1.default();
-api.get('/', (event) => stuff(event), {
+api.get('/', (event, context) => getUploadUrl(event, context), {
     success: { contentType: 'application/json' },
 });
 const URL_EXPIRATION_SECONDS = 5 * 60;
-function stuff(event) {
+function getUploadUrl(event, context) {
     return __awaiter(this, void 0, void 0, function* () {
-        const key = (0, crypto_1.randomUUID)();
-        const contentType = 'image/jpeg';
+        const contentType = event['queryString']['contentType'];
+        if (!/image\/.+/.test(contentType)) {
+            throw new Error('Invalid content type, must be an image');
+        }
+        const fileExt = contentType.split('/').pop();
+        const key = `${(0, crypto_1.randomUUID)()}.${fileExt}`;
         // Get signed URL from S3
         let s3 = new aws_sdk_1.S3();
         const s3Params = {
@@ -36,7 +40,8 @@ function stuff(event) {
         };
         const uploadUrl = yield s3.getSignedUrlPromise('putObject', s3Params);
         return {
-            event,
+            // event,
+            // context,
             uploadUrl,
             key,
         };

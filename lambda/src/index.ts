@@ -1,10 +1,11 @@
 import ApiBuilder from 'claudia-api-builder';
 import { S3 } from 'aws-sdk';
 import { randomUUID } from 'crypto';
+import { hasUncaughtExceptionCaptureCallback } from 'process';
 
 const api = new ApiBuilder();
 api.get('/', 
-	(event) => getUploadUrl(event),
+	(event, context) => getUploadUrl(event, context),
 	{
 		success: { contentType: 'application/json' },
 	}
@@ -13,10 +14,14 @@ api.get('/',
 export = api;
 
 const URL_EXPIRATION_SECONDS = 5 * 60;
-async function getUploadUrl(event) {
+async function getUploadUrl(event, context) {
+	const contentType = event['queryString']['contentType'];
+	if (! /image\/.+/.test(contentType)){
+		throw new Error('Invalid content type, must be an image');
+	}
 
-	const key = randomUUID();
-	const contentType = 'image/jpeg';
+	const fileExt = contentType.split('/').pop();
+	const key = `${randomUUID()}.${fileExt}`;
 
 	// Get signed URL from S3
 	let s3 = new S3();
@@ -34,7 +39,6 @@ async function getUploadUrl(event) {
 
 	const uploadUrl = await s3.getSignedUrlPromise('putObject', s3Params);
 	return {
-		event,
 		uploadUrl,
 		key,
 	};
