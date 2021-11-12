@@ -10,11 +10,17 @@
     "package.json"
   ],
   "scripts": {
-    "update": "tsc && claudia update --api-module bin/index --region us-east-1",
-    "create": "tsc && claudia create --api-module bin/index --region us-east-1",
-    "pack": "tsc && claudia pack --api-module bin/index --force"
+    "update": "tsc && claudia update --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json",
+    "create": "tsc && claudia create --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json",
+    "pack": "tsc && claudia pack --no-optional-dependencies --api-module bin/index --force"
   },
   "dependencies": {
     "claudia-api-builder": "^4.1.2"
+  },
+  "optionalDependencies": {
+    "aws-sdk": "^2.1027.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.7"
   }
 }
