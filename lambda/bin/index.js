@@ -15,7 +15,9 @@ const claudia_api_builder_1 = __importDefault(require("claudia-api-builder"));
 const aws_sdk_1 = require("aws-sdk");
 const crypto_1 = require("crypto");
 const api = new claudia_api_builder_1.default();
-api.get('/', (event) => stuff(event));
+api.get('/', (event) => stuff(event), {
+    success: { contentType: 'application/json' },
+});
 const URL_EXPIRATION_SECONDS = 5 * 60;
 function stuff(event) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -24,8 +26,7 @@ function stuff(event) {
         // Get signed URL from S3
         let s3 = new aws_sdk_1.S3();
         const s3Params = {
-            // Bucket: process.env.UploadBucket,
-            Bucket: 'visual-inkworks-dev',
+            Bucket: process.env.UploadBucket,
             Key: key,
             Expires: URL_EXPIRATION_SECONDS,
             ContentType: contentType,
@@ -34,11 +35,11 @@ function stuff(event) {
             // ACL: 'public-read'
         };
         const uploadUrl = yield s3.getSignedUrlPromise('putObject', s3Params);
-        return JSON.stringify({
+        return {
             event,
             uploadUrl,
             key,
-        });
+        };
     });
 }
 module.exports = api;

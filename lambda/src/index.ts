@@ -3,12 +3,17 @@ import { S3 } from 'aws-sdk';
 import { randomUUID } from 'crypto';
 
 const api = new ApiBuilder();
-api.get('/', (event) => stuff(event));
+api.get('/', 
+	(event) => getUploadUrl(event),
+	{
+		success: { contentType: 'application/json' },
+	}
+);
 
 export = api;
 
 const URL_EXPIRATION_SECONDS = 5 * 60;
-async function stuff(event) {
+async function getUploadUrl(event) {
 
 	const key = randomUUID();
 	const contentType = 'image/jpeg';
@@ -16,8 +21,7 @@ async function stuff(event) {
 	// Get signed URL from S3
 	let s3 = new S3();
 	const s3Params = {
-		// Bucket: process.env.UploadBucket,
-		Bucket: 'visual-inkworks-dev',
+		Bucket: process.env.UploadBucket,
 		Key: key,
 		Expires: URL_EXPIRATION_SECONDS,
 		ContentType: contentType,
@@ -29,9 +33,9 @@ async function stuff(event) {
 	}
 
 	const uploadUrl = await s3.getSignedUrlPromise('putObject', s3Params);
-	return JSON.stringify({
+	return {
 		event,
 		uploadUrl,
 		key,
-	});
+	};
 }

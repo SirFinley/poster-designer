@@ -10,8 +10,8 @@
     "package.json"
   ],
   "scripts": {
-    "update": "tsc && claudia update --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json",
-    "create": "tsc && claudia create --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json",
+    "update": "tsc && claudia update --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json --set-env-from-json env.json",
+    "create": "tsc && claudia create --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json --set-env-from-json env.json",
     "pack": "tsc && claudia pack --no-optional-dependencies --api-module bin/index --force"
   },
   "dependencies": {
