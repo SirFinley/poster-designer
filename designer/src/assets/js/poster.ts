@@ -3,6 +3,7 @@ import Overlay from './overlay';
 import Settings from './settings';
 import PosterImage from './image';
 import Border from "./border";
+import Render from './render';
 import PosterEventHub from "./posterEventHub";
 
 const canvas = new fabric.Canvas('fabric-canvas');
@@ -16,6 +17,7 @@ settings.readSettingsFromUrl(window.location.toString());
 const overlay = new Overlay(canvas, settings, eventHub);
 const image = new PosterImage(canvas, settings, eventHub);
 const border = new Border(canvas, settings, image, eventHub);
+const render = new Render(canvas, settings);
 
 docReady(() => {
     resizeCanvas();
@@ -83,3 +85,4 @@ function setUpWelcomeText() {
 (window as any).canvas = canvas; // TODO: remove this
 (window as any).mySettings = settings; // TODO: remove this
 (window as any).myImage = image; // TODO: remove this
+(window as any).render = render; // TODO: remove this
