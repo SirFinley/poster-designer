@@ -116,7 +116,18 @@
                     <form>
                         <p>Drag and drop your poster image here or in the editor</p>
                         <input type="file" id="photo-input" accept="image/*" />
-                        <img src="#" id="img-preview" alt="" class="" hidden>
+                        <div id="img-upload-card" class="p-4 flex hidden">
+                            <img src="#" id="img-preview" alt="" class="w-20 h-20 object-scale-down" >
+                            <div id="img-preview-spinner" class="flex justify-center items-center">
+                                <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-gray-900" ></div>
+                            </div>
+                            <div class="p-4">
+                                <label for="img-progress" id="img-progress-label"></label>
+                                <div>
+                                    <progress id="img-progress" value="0" max="100" class="inline-block"></progress>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
