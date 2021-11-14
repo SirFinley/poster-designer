@@ -13,12 +13,15 @@ export default class PosterImage {
         this.imageAspectRatio = 0;
         this.imgElem = null;
 
+        this.imageInput = document.getElementById("photo-input") as HTMLInputElement;
+
         this.setupEventListeners();
     }
 
     canvas: fabric.Canvas;
     settings: Settings;
     eventHub: PosterEventHub;
+    imageInput: HTMLInputElement;
 
     image: fabric.Image | null;
     imageAspectRatio: number;
@@ -28,8 +31,6 @@ export default class PosterImage {
         // drag and drop upload
         let dropAreas = document.getElementsByClassName("drop-area") as HTMLCollectionOf<HTMLElement>;
         for (let dropArea of dropAreas) {
-            let imageInput = document.getElementById("photo-input") as HTMLInputElement;
-
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 dropArea.addEventListener(eventName, preventDefaults, false);
             })
@@ -50,7 +51,7 @@ export default class PosterImage {
             dropArea.addEventListener('drop', (e) => {
                 let dt = e.dataTransfer!;
                 let file = dt.files[0];
-                imageInput.files = dt.files;
+                this.imageInput.files = dt.files;
                 this.handleFile(file);
             });
 
@@ -62,7 +63,7 @@ export default class PosterImage {
                 dropArea.classList.remove('highlight')
             }
 
-            imageInput.addEventListener('change', (e: Event) => {
+            this.imageInput.addEventListener('change', (e: Event) => {
                 let target = e.target as HTMLInputElement;
                 this.handleFile(target.files![0]);
             });
@@ -100,6 +101,8 @@ export default class PosterImage {
 
         this.eventHub.subscribe('sizeSettingChanged', () => this.updateScaleSlider());
         this.eventHub.subscribe('orientationSettingChanged', () => this.updateScaleSlider());
+        this.eventHub.subscribe('imageUploadCancelled', () => this.clearImage());
+        this.eventHub.subscribe('imageCleared', () => this.clearImage());
     }
 
     setNewImage(image: fabric.Image) {
@@ -182,7 +185,16 @@ export default class PosterImage {
 
         let reader = new FileReader();
 
+        this.eventHub.subscribe('imageUploadCancelled', abortReader);
+        this.eventHub.subscribe('imageCleared', abortReader);
+        function abortReader(){
+            reader.abort();
+        }
+
         reader.onload = (event) => {
+            this.eventHub.remove('imageUploadCancelled', abortReader);
+            this.eventHub.remove('imageCleared', abortReader);
+
             let imgElem = document.getElementById("img-preview") as HTMLImageElement;
             imgElem.src = event.target!.result as string;
             imgElem.onload = () => {
@@ -193,6 +205,17 @@ export default class PosterImage {
         }
 
         reader.readAsDataURL(file);
+    }
+
+    clearImage(){
+        if (this.image){
+            this.canvas.remove(this.image);
+            this.image = null;
+            this.canvas.backgroundColor = 'white';
+            this.canvas.renderAll();
+        }
+
+        this.imageInput.value = '';
     }
 
     getAverageColor() {

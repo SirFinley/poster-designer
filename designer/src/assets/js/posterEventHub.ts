@@ -1,15 +1,21 @@
-export default class PosterEventHub extends EventTarget {
+export default class PosterEventHub {
     constructor() {
-        super();
+        this.eventTarget = new EventTarget();
     }
+
+    eventTarget: EventTarget;
 
     // events
     subscribe(type: PosterEventType, callback: EventListenerOrEventListenerObject | null, options?: AddEventListenerOptions | boolean) {
-        this.addEventListener(type, callback, options);
+        this.eventTarget.addEventListener(type, callback, options);
     }
 
     triggerEvent(type: PosterEventType) {
-        this.dispatchEvent(new Event(type));
+        this.eventTarget.dispatchEvent(new Event(type));
+    }
+
+    remove(type: PosterEventType, callback: EventListenerOrEventListenerObject | null){
+        this.eventTarget.removeEventListener(type, callback);
     }
 }
 
@@ -20,4 +26,5 @@ export type PosterEventType = 'sizeSettingChanged'
     | 'colorChanged'
     | 'imageScaled'
     | 'imageUploaded'
-    | 'imageUploadCancelled';
+    | 'imageUploadCancelled'
+    | 'imageCleared';

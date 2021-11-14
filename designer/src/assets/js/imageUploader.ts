@@ -5,25 +5,34 @@ export default class ImageUploader {
     constructor(eventHub: PosterEventHub) {
         this.eventHub = eventHub;
 
-        this.imageUploadCard = document.getElementById("img-upload-card") as HTMLElement;
+        this.imageClearButton = document.getElementById("btn-clear-image") as HTMLButtonElement;
         this.imagePreviewElem = document.getElementById("img-preview") as HTMLImageElement;
         this.imagePreviewSpinnerElem = document.getElementById("img-preview-spinner") as HTMLElement;
+        this.imageUploadCard = document.getElementById("img-upload-card") as HTMLElement;
         this.progressElem = document.getElementById("img-progress") as HTMLProgressElement;
         this.progressLabelElem = document.getElementById("img-progress-label") as HTMLLabelElement;
         this.controller = new AbortController();
         this.signal = this.controller.signal;
 
         this.eventHub.subscribe('imageChanged', () => {
-            showElement(this.imagePreviewElem, true);
-            showElement(this.imagePreviewSpinnerElem, false);
+            showElement(this.imagePreviewElem);
+            hideElement(this.imagePreviewSpinnerElem);
+        })
+
+        this.imageClearButton.addEventListener('click', () => {
+            this.controller.abort();
+            hideElement(this.imageUploadCard);
+            
+            this.eventHub.triggerEvent('imageCleared');
         })
     }
 
     eventHub: PosterEventHub;
     controller: AbortController;
-    imageUploadCard: HTMLElement;
+    imageClearButton: HTMLButtonElement;
     imagePreviewElem: HTMLImageElement;
     imagePreviewSpinnerElem: HTMLElement;
+    imageUploadCard: HTMLElement;
     progressElem: HTMLProgressElement;
     progressLabelElem: HTMLLabelElement;
     signal: AbortSignal;
@@ -42,7 +51,7 @@ export default class ImageUploader {
             const uploadUrl = await this.getPresignedUrl(file);
             this.uploadFile(uploadUrl.uploadUrl, file);
         } catch (error) {
-            
+            // TODO: handle error
         }
     }
 
@@ -58,12 +67,11 @@ export default class ImageUploader {
         .catch((err) => {
             if (err.name === 'AbortError') {
                 console.error('Fetch aborted')
+                this.eventHub.triggerEvent('imageUploadCancelled');
             } else {
                 console.error('Error while getting upload url: ', err)
                 throw err;
             }
-
-            this.eventHub.triggerEvent('imageUploadCancelled');
         });
 
         if (!response) {
@@ -91,19 +99,18 @@ export default class ImageUploader {
         .catch((err) => {
             if (err.name === 'AbortError') {
                 console.error('Fetch aborted')
+                this.eventHub.triggerEvent('imageUploadCancelled');
             } else {
                 console.error('Error while getting upload url: ', err)
                 throw err;
             }
-
-            this.eventHub.triggerEvent('imageUploadCancelled');
         });
     }
 
     initializeProgress(){
-        showElement(this.imageUploadCard, true);
-        showElement(this.imagePreviewElem, false);
-        showElement(this.imagePreviewSpinnerElem, true);
+        showElement(this.imageUploadCard);
+        hideElement(this.imagePreviewElem);
+        showElement(this.imagePreviewSpinnerElem);
         this.updateProgress(0);
     }
     
@@ -123,13 +130,12 @@ export default class ImageUploader {
     }
 }
 
-function showElement(elem: HTMLElement, show: boolean) {
-    if (show) {
-        elem.classList.remove('hidden');
-    }
-    else{
-        elem.classList.add('hidden');
-    }
+function hideElement(elem: HTMLElement) {
+    elem.classList.add('hidden');
+}
+
+function showElement(elem: HTMLElement) {
+    elem.classList.remove('hidden');
 }
 interface GetUploadUrlResponse {
     uploadUrl: string,
