@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "api-save-poster-executor",
+    "name": "api-save-poster",
+    "region": "us-east-1"
+  },
+  "api": {
+    "id": "bqq1e7cavi",
+    "module": "bin/index"
+  }
+}
