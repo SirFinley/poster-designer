@@ -1,9 +1,10 @@
-import noUiSlider, { API as NoUiAPI } from 'nouislider';
+import { API as NoUiAPI } from 'nouislider';
 import 'nouislider/dist/nouislider.css';
 import '@fortawesome/fontawesome-free'
 
 import PosterEventHub from "./posterEventHub";
 import VirtualDimensions from "./virtualDimensions";
+import NoUiSlider from './noUiSlider';
 
 export default class Settings {
     canvas: fabric.Canvas;
@@ -14,16 +15,9 @@ export default class Settings {
 
     sideBorder: number;
     verticalBorder: number;
-    bordersLinked: boolean;
-    borderLockedValues: number[];
 
     orientationInput: HTMLInputElement;
     sizeInput: HTMLInputElement;
-
-    sideBorderInput: NoUiSlider;
-    sideBorderValueDisplay: HTMLElement;
-    verticalBorderInput: NoUiSlider;
-    verticalBorderValueDisplay: HTMLElement;
 
     colorInput: HTMLInputElement;
     borderColor: string;
@@ -40,86 +34,22 @@ export default class Settings {
         this.size = '8.5x11';
         this.sideBorder = 0;
         this.verticalBorder = 0;
-        this.bordersLinked = true;
-        this.borderLockedValues = [0, 0];
         this.borderColor = '#ffffff';
         this.imageScaleValue = 1;
 
         this.orientationInput = document.getElementById("orientation-input") as HTMLInputElement;
         this.sizeInput = document.getElementById("size-input") as HTMLInputElement;
 
-        this.sideBorderInput = new NoUiSlider("side-border", 0, 10, 0, 0.125);
-        this.sideBorderValueDisplay = document.getElementById("side-border-value") as HTMLElement;
-
-        this.verticalBorderInput = new NoUiSlider("vertical-border", 0, 10, 0, 0.125);
-        this.verticalBorderValueDisplay = document.getElementById("vertical-border-value") as HTMLElement;
         this.colorInput = document.getElementById("border-color") as HTMLInputElement;
         this.imageScaleInput = new NoUiSlider("image-scale", 0, 3, 1, 0.001);
         this.imageScaleValueDisplay = document.getElementById("image-scale-value") as HTMLInputElement;
 
         this.initializeEventListeners();
         this.populateSizeInputOptions();
-        this.setInputConstraints();
-    }
-
-    setInputConstraints() {
-        let size = this.getRealPosterDimensions();
-        let maxSideBorder = size.width / 2 - 0.125;
-        let maxVerticalBorder = size.height / 2 - 0.125;
-
-        this.sideBorderInput.setMax(maxSideBorder);
-        this.verticalBorderInput.setMax(maxVerticalBorder);
-
-        let maxInches = Math.max(maxSideBorder, maxVerticalBorder);
-        let maxSliderWidth = document.getElementById('hidden-border')!.offsetWidth;
-
-        let pixelsPerInch = maxSliderWidth / maxInches;
-
-        if (maxSideBorder > maxVerticalBorder) {
-            this.sideBorderInput.setUiWidth(maxSliderWidth);
-            this.verticalBorderInput.setUiWidth(maxVerticalBorder * pixelsPerInch);
-        }
-        else {
-            this.verticalBorderInput.setUiWidth(maxSliderWidth);
-            this.sideBorderInput.setUiWidth(maxSideBorder * pixelsPerInch);
-        }
     }
 
     initializeEventListeners() {
         let self = this;
-
-        // borders
-        this.sideBorderInput.slider.on('slide', () => {
-            let value = self.sideBorderInput.get();
-            self.updateSideBorder(value);
-            self.eventHub.triggerEvent('borderSettingChanged');
-        });
-        this.verticalBorderInput.slider.on('slide', (thing) => {
-            console.log(thing);
-            
-            let value = self.verticalBorderInput.get();
-            this.updateVerticalBorder(value);
-            self.eventHub.triggerEvent('borderSettingChanged');
-        });
-
-        // border link
-        let linkButtons = document.getElementsByClassName('btn-border-link');
-        for (let linkButton of linkButtons) {
-            (linkButton as HTMLButtonElement).addEventListener('click', () => {
-                this.bordersLinked = !this.bordersLinked;
-
-                for (let icon of document.getElementsByClassName('border-link')) {
-                    if (this.bordersLinked) {
-                        icon.classList.remove('fa-unlink');
-                        icon.classList.add('fa-link');
-                    }
-                    else {
-                        icon.classList.remove('fa-link');
-                        icon.classList.add('fa-unlink');
-                    }
-                }
-            });
-        }
 
         // color
         this.colorInput.addEventListener('input', onBorderColorInput);
@@ -149,58 +79,6 @@ export default class Settings {
             self.orientation = this.value as OrientationOptions;
             self.eventHub.triggerEvent('orientationSettingChanged');
         }
-
-        // update border
-        this.eventHub.subscribe('sizeSettingChanged', refreshBorderValues);
-        this.eventHub.subscribe('orientationSettingChanged', refreshBorderValues);
-        function refreshBorderValues() {
-            self.setInputConstraints();
-            self.setSideBorderInput(self.sideBorder);
-            self.setVerticalBorderInput(self.verticalBorder);
-        }
-    }
-
-    updateSideBorder(value: number) {
-        this.setSideBorderInput(value);
-        value = this.sideBorderInput.get();
-
-        this.crossUpdate(value, this.verticalBorderInput, (linkedValue) => this.setVerticalBorderInput(linkedValue));
-        this.setLockedValues();
-    }
-
-    updateVerticalBorder(value: number) {
-        this.setVerticalBorderInput(value);
-        value = this.verticalBorderInput.get();
-
-        this.crossUpdate(value, this.sideBorderInput, (linkedValue) => this.setSideBorderInput(linkedValue));
-        this.setLockedValues();
-    }
-
-    private setLockedValues() {
-        this.borderLockedValues = [
-            Number(this.sideBorderInput.get()),
-            Number(this.verticalBorderInput.get())
-        ];
-    }
-
-    private setSideBorderInput(value: number) {
-        value = value || 0;
-        value = Math.round(value / 0.125) * 0.125;
-        value = clamp(value, this.sideBorderInput.getMin(), this.sideBorderInput.getMax());
-
-        this.sideBorder = value;
-        this.sideBorderInput.set(value);
-        this.sideBorderValueDisplay.innerText = `Side Border: ${value}"`;
-    }
-
-    private setVerticalBorderInput(value: number) {
-        value = value || 0;
-        value = Math.round(value / 0.125) * 0.125;
-        value = clamp(value, this.verticalBorderInput.getMin(), this.verticalBorderInput.getMax());
-
-        this.verticalBorder = value;
-        this.verticalBorderInput.set(value);
-        this.verticalBorderValueDisplay.innerText = `Top/Bottom Border: ${value}"`;
     }
 
     setBorderColor(color: string) {
@@ -304,7 +182,8 @@ export default class Settings {
             this.sizeInput.value = this.size;
         }
 
-        this.setInputConstraints();
+        this.eventHub.triggerEvent('sizeSettingChanged');
+        this.eventHub.triggerEvent('orientationSettingChanged');
     }
 
     getRealPosterDimensions(): RealPosterDimensions {
@@ -342,83 +221,6 @@ export default class Settings {
         this.imageScaleValue = value;
         this.imageScaleInput.set(toSliderScaleValue(value));
     }
-
-    private crossUpdate(value: number, slider: NoUiSlider, callback: (_: number) => void) {
-
-        // If the sliders aren't interlocked, don't
-        // cross-update.
-        if (!this.bordersLinked) return;
-
-        // Select whether to increase or decrease
-        // the other slider value.
-        var a = this.sideBorderInput === slider ? 0 : 1;
-
-        // Invert a
-        var b = a ? 0 : 1;
-
-        // Offset the slider value.
-        value -= this.borderLockedValues[b] - this.borderLockedValues[a];
-        // console.log(this.borderLockedValues);
-
-        // Set the value
-        console.log(value);
-        slider.set(value);
-        callback(value);
-    }
-}
-
-class NoUiSlider {
-    constructor(targetId: string, min: number, max: number, start: number, step: number) {
-        this.slider = noUiSlider.create(document.getElementById(targetId)!, {
-            start: start,
-            step: step,
-            range: {
-                'min': min,
-                'max': max,
-            },
-            connect: 'lower',
-            format: {
-                to: function (value) {
-                    return value.toFixed(3);
-                },
-                from: function (value) {
-                    return parseFloat(value);
-                }
-            },
-            animate: false,
-        });
-    }
-
-    slider: NoUiAPI;
-
-    get(): number {
-        return this.slider.get() as number;
-    }
-
-    set(value: number) {
-        this.slider.set(value);
-    }
-
-    getMax(): number {
-        return this.slider.options.range.max.valueOf() as number;
-    }
-
-    getMin(): number {
-        return this.slider.options.range.min.valueOf() as number;
-    }
-
-    setMax(value: number) {
-        this.slider.updateOptions({
-            range: {
-                min: 0,
-                max: value,
-            },
-        }, false);
-    }
-
-    setUiWidth(width: number) {
-        this.slider.target.style.width = width + 'px';
-    }
 }
 
 function fromSliderScaleValue(sliderValue: string): number {
@@ -431,14 +233,6 @@ function toSliderScaleValue(value: number): number {
     let sliderValue = value;
     return Math.log2(sliderValue + 1);
 }
-
-function clamp(value: number, min: number, max: number) {
-    value = Math.max(min, value);
-    value = Math.min(max, value);
-    return value;
-}
-
-const SIZE_STEP = 0.05;
 
 export type OrientationOptions = "landscape" | "portrait";
 // TODO: etsy - replace keys with etsy variation id
