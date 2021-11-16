@@ -25,9 +25,4 @@ export default interface VirtualDimensions {
     posterTopBorder: number,
     posterBottomBorder: number,
     borderInnerAspectRatio: number,
-
-    posterLeftMargin: number,
-    posterRightMargin: number,
-    posterTopMargin: number,
-    posterBottomMargin: number,
 }

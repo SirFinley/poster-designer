@@ -123,9 +123,7 @@ export default class PosterImage {
         }
         this.image = image;
         this.imageAspectRatio = this.image.width! / this.image.height!;
-        this.image.on('moving', (e) => this.updateMargins());
         this.image.on('scaling', (e) => {
-            this.updateMargins();
             this.updateScaleSlider();
         });
 
@@ -149,30 +147,6 @@ export default class PosterImage {
 
         let scale = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
         this.settings.setImageScale(scale);
-    }
-
-    updateMargins() {
-        if (!this.image) {
-            return;
-        }
-
-        let realDims = this.settings.getRealPosterDimensions();
-        let vdims = this.settings.getVirtualDimensions();
-
-        let inchesPerPixel = realDims.width / vdims.posterWidth;
-
-        let leftOffset = this.image.left! - vdims.posterLeft;
-        let rightOffset = vdims.posterRight - (this.image.left! + this.image.getScaledWidth());
-
-        let topOffset = this.image.top! - vdims.posterTop;
-        let bottomOffset = vdims.posterBottom - (this.image.top! + this.image.getScaledHeight());
-
-        let realLeftMargin = leftOffset * inchesPerPixel;
-        let realRightMargin = rightOffset * inchesPerPixel;
-        let realTopMargin = topOffset * inchesPerPixel;
-        let realBottomMargin = bottomOffset * inchesPerPixel;
-
-        this.settings.setMargins(realLeftMargin, realRightMargin, realTopMargin, realBottomMargin);
     }
 
     handleFile(file: File) {
@@ -256,7 +230,6 @@ export default class PosterImage {
         });
 
         this.canvas.renderAll();
-        this.updateMargins();
     }
 
     fillBorders() {
@@ -283,7 +256,6 @@ export default class PosterImage {
             top: dims.posterTopBorder + imageVerticalMargin,
         });
         this.canvas.renderAll();
-        this.updateMargins();
     }
 
     fillPoster() {
@@ -310,7 +282,6 @@ export default class PosterImage {
             top: dims.posterTop + imageVerticalMargin,
         });
         this.canvas.renderAll();
-        this.updateMargins();
     }
 
     scaleToWidth(width: number) {

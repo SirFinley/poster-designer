@@ -14,11 +14,6 @@ export default class Settings {
     sideBorder: number;
     verticalBorder: number;
 
-    leftMargin: number;
-    rightMargin: number;
-    topMargin: number;
-    bottomMargin: number;
-
     orientationInput: HTMLInputElement;
     sizeInput: HTMLInputElement;
 
@@ -34,11 +29,6 @@ export default class Settings {
     imageScaleValueDisplay: HTMLElement;
     imageScaleValue: number;
 
-    leftMarginInput: HTMLInputElement;
-    rightMarginInput: HTMLInputElement;
-    topMarginInput: HTMLInputElement;
-    bottomMarginInput: HTMLInputElement;
-
     constructor(canvas: fabric.Canvas, eventHub: PosterEventHub) {
         this.canvas = canvas;
         this.eventHub = eventHub;
@@ -47,10 +37,6 @@ export default class Settings {
         this.size = '8.5x11';
         this.sideBorder = 0;
         this.verticalBorder = 0;
-        this.leftMargin = 0;
-        this.rightMargin = 0;
-        this.topMargin = 0;
-        this.bottomMargin = 0;
         this.borderColor = '#ffffff';
         this.imageScaleValue = 1;
 
@@ -65,11 +51,6 @@ export default class Settings {
         this.colorInput = document.getElementById("border-color") as HTMLInputElement;
         this.imageScaleInput = new NoUiSlider("image-scale", 0, 3, 1, 0.001);
         this.imageScaleValueDisplay = document.getElementById("image-scale-value") as HTMLInputElement;
-
-        this.leftMarginInput = document.getElementById("left-margin") as HTMLInputElement;
-        this.rightMarginInput = document.getElementById("right-margin") as HTMLInputElement;
-        this.topMarginInput = document.getElementById("top-margin") as HTMLInputElement;
-        this.bottomMarginInput = document.getElementById("bottom-margin") as HTMLInputElement;
 
         this.initializeEventListeners();
         this.populateSizeInputOptions();
@@ -132,27 +113,6 @@ export default class Settings {
             let value = fromSliderScaleValue(this.get() as string);
             self.setImageScale(value);
             self.eventHub.triggerEvent('imageScaled');
-        }
-
-        // margins
-        this.leftMarginInput.addEventListener('input', onMarginInput);
-        this.rightMarginInput.addEventListener('input', onMarginInput);
-        this.topMarginInput.addEventListener('input', onMarginInput);
-        this.bottomMarginInput.addEventListener('input', onMarginInput);
-        function onMarginInput(this: HTMLInputElement, e: Event) {
-            let value = parseFloat(this.value) || 0;
-            if (this.id === 'left-margin') {
-                self.leftMargin = value;
-            }
-            else if (this.id === 'right-margin') {
-                self.rightMargin = value;
-            }
-            else if (this.id === 'top-margin') {
-                self.topMargin = value;
-            }
-            else if (this.id === 'bottom-margin') {
-                self.bottomMargin = value;
-            }
         }
 
         // size
@@ -244,11 +204,6 @@ export default class Settings {
         let posterInnerBorderHeight = posterBottomBorder - posterTopBorder;
         let borderInnerAspectRatio = posterInnerBorderWidth / posterInnerBorderHeight;
 
-        let posterLeftMargin = this.leftMargin / inchesPerPixel;
-        let posterRightMargin = this.rightMargin / inchesPerPixel;
-        let posterTopMargin = this.topMargin / inchesPerPixel;
-        let posterBottomMargin = this.bottomMargin / inchesPerPixel;
-
         return {
             canvasWidth,
             canvasHeight,
@@ -272,10 +227,6 @@ export default class Settings {
             posterInnerBorderWidth,
             posterInnerBorderHeight,
             borderInnerAspectRatio,
-            posterLeftMargin,
-            posterRightMargin,
-            posterTopMargin,
-            posterBottomMargin,
         };
     }
 
@@ -346,34 +297,6 @@ export default class Settings {
         value = value || 1;
         this.imageScaleValue = value;
         this.imageScaleInput.set(toSliderScaleValue(value));
-    }
-
-    setMargins(left: number, right: number, top: number, bottom: number) {
-        function round(x: number, multiple: number) {
-            return Math.round(x / multiple) * multiple;
-        }
-
-        left = round(left, SIZE_STEP);
-        right = round(right, SIZE_STEP);
-        top = round(top, SIZE_STEP);
-        bottom = round(bottom, SIZE_STEP);
-
-        this.leftMargin = left;
-        this.leftMarginInput.value = left.toFixed(2);
-        this.leftMarginInput.step = SIZE_STEP.toString();
-
-        this.rightMargin = right;
-        this.rightMarginInput.value = right.toFixed(2);
-        this.rightMarginInput.step = SIZE_STEP.toString();
-
-        this.topMargin = top;
-        this.topMarginInput.value = top.toFixed(2);
-        this.topMarginInput.step = SIZE_STEP.toString();
-
-        this.bottomMargin = bottom;
-        this.bottomMarginInput.value = bottom.toFixed(2);
-        this.bottomMarginInput.step = SIZE_STEP.toString();
-
     }
 }
 
