@@ -2,6 +2,7 @@
 
 <head>
     <link rel="stylesheet" href="assets/css/index.css">
+    <script defer src="../node_modules/@fortawesome/fontawesome-free/js/solid.js"></script>
 </head>
 
 <body>
@@ -45,20 +46,23 @@
                 <div class="pt-4 flex flex-col flex-wrap place-content-between gap-y-4 overflow-auto">
                     <div class="">
                         <label id="vertical-border-value" class="text-sm" for="vertical-border">Top/Bottom Border: 0"</label>
-                        <div class="mx-2">
-                            <div id="vertical-border" class="noUiSlider slider-round"></div>
+                        <div class="flex">
+                            <button class="btn-border-link"> <i class="border-link fas fa-link"></i> </button>
+                            <div id="vertical-border" class="noUiSlider slider-round mx-3"></div>
                         </div>
                     </div>
                     <div class="">
                         <label id="side-border-value" class="text-sm" for="side-border">Side Border: 0"</label>
-                        <div class="mx-2">
-                            <div id="side-border" class="noUiSlider slider-round"></div>
+                        <div class="flex ">
+                            <button class="btn-border-link"> <i class="border-link fas fa-link"></i> </button>
+                            <div id="side-border" class="noUiSlider slider-round mx-3"></div>
                         </div>
                     </div>
-                    <div class="w-full">
+                    <div class="">
                         <!-- used to calculate width for border sliders -->
-                        <div class="mx-2">
-                            <div id="hidden-border" class="noUiSlider" hidden ></div>
+                        <div class="flex">
+                            <button hidden> <i class="border-link fas fa-link"></i> </button>
+                            <div id="hidden-border" class="noUiSlider mx-3 w-80" ></div>
                         </div>
                     </div>
                     <div class="">
@@ -69,6 +73,7 @@
                     </div>
                 </div>
 
+                <!-- image scale -->
                 <div class="w-full">
                     <label id="image-scale-value" class="text-sm" for="image-scale">Scale Image</label>
                     <div class="mx-2">

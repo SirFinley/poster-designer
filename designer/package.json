@@ -20,6 +20,7 @@
     "typescript": "^4.4.4"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
     "@types/fabric": "^4.5.4",
     "axios": "^0.24.0",
     "fabric": "^4.6.0",

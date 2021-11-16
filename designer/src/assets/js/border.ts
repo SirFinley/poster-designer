@@ -77,7 +77,7 @@ export default class Border {
             let target = (options.transform as any).target;
             let dx = target.left - dims.posterLeft;
             let inches = dx * dims.inchesPerPixel;
-            this.settings.setSideBorderInput(inches);
+            this.settings.updateSideBorder(inches);
             this.drawBorder();
         })
 
@@ -85,7 +85,7 @@ export default class Border {
             let target = (options.transform as any).target;
             let dx = dims.posterRight - target.left;
             let inches = dx * dims.inchesPerPixel;
-            this.settings.setSideBorderInput(inches);
+            this.settings.updateSideBorder(inches);
             this.drawBorder();
         })
 
@@ -93,7 +93,7 @@ export default class Border {
             let target = (options.transform as any).target;
             let dx = target.top - dims.posterTop;
             let inches = dx * dims.inchesPerPixel;
-            this.settings.setVerticalBorderInput(inches);
+            this.settings.updateVerticalBorder(inches);
             this.drawBorder();
         })
 
@@ -101,7 +101,7 @@ export default class Border {
             let target = (options.transform as any).target;
             let dx = dims.posterBottom - target.top;
             let inches = dx * dims.inchesPerPixel;
-            this.settings.setVerticalBorderInput(inches);
+            this.settings.updateVerticalBorder(inches);
             this.drawBorder();
         })
 
