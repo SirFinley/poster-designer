@@ -12,6 +12,7 @@ export default class PosterImage {
         this.image = null;
         this.imageAspectRatio = 0;
         this.imgElem = null;
+        this.imageUploader = new ImageUploader(this.settings, this.eventHub)
 
         this.imageInput = document.getElementById("photo-input") as HTMLInputElement;
 
@@ -22,6 +23,7 @@ export default class PosterImage {
     settings: Settings;
     eventHub: PosterEventHub;
     imageInput: HTMLInputElement;
+    imageUploader: ImageUploader;
 
     image: fabric.Image | null;
     imageAspectRatio: number;
@@ -73,6 +75,9 @@ export default class PosterImage {
         document.getElementById("btn-fit-borders")!.onclick = () => this.fitImageToBorders();
         document.getElementById("btn-fill-borders")!.onclick = () => this.fillBorders();
         document.getElementById("btn-fill-poster")!.onclick = () => this.fillPoster();
+        document.getElementById("btn-center-image")!.onclick = () => this.centerImage();
+        document.getElementById("btn-center-image-vertical")!.onclick = () => this.centerImageVertical();
+        document.getElementById("btn-center-image-horizontal")!.onclick = () => this.centerImageHorizontal();
 
         // image scaled
         this.eventHub.subscribe('imageScaled', () => {
@@ -140,6 +145,20 @@ export default class PosterImage {
         this.eventHub.triggerEvent('colorChanged');
     }
 
+    centerImage() {
+        // TODO - implement
+        throw new Error('Method not implemented.');
+    }
+
+    centerImageHorizontal() {
+        // TODO - implement
+        throw new Error('Method not implemented.');
+    }
+    centerImageVertical() {
+        // TODO - implement
+        throw new Error('Method not implemented.');
+    }
+
     updateScaleSlider() {
         if (!this.image) {
             return;
@@ -155,13 +174,13 @@ export default class PosterImage {
             return;
         }
 
-        new ImageUploader(this.eventHub).start(file);
+        this.imageUploader.start(file);
 
         let reader = new FileReader();
 
         this.eventHub.subscribe('imageUploadCancelled', abortReader);
         this.eventHub.subscribe('imageCleared', abortReader);
-        function abortReader(){
+        function abortReader() {
             reader.abort();
         }
 
@@ -181,8 +200,8 @@ export default class PosterImage {
         reader.readAsDataURL(file);
     }
 
-    clearImage(){
-        if (this.image){
+    clearImage() {
+        if (this.image) {
             this.canvas.remove(this.image);
             this.image = null;
             this.canvas.backgroundColor = 'white';

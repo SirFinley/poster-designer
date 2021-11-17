@@ -25,6 +25,7 @@ export default class Settings {
     imageScaleInput: NoUiSlider;
     imageScaleValueDisplay: HTMLElement;
     imageScaleValue: number;
+    originalImageKey: string | null;
 
     constructor(canvas: fabric.Canvas, eventHub: PosterEventHub) {
         this.canvas = canvas;
@@ -36,6 +37,7 @@ export default class Settings {
         this.verticalBorder = 0;
         this.borderColor = '#ffffff';
         this.imageScaleValue = 1;
+        this.originalImageKey = null;
 
         this.orientationInput = document.getElementById("orientation-input") as HTMLInputElement;
         this.sizeInput = document.getElementById("size-input") as HTMLInputElement;

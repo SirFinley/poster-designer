@@ -1,8 +1,12 @@
 import PosterEventHub from "./posterEventHub";
 import axios from 'axios';
+import Settings from "./settings";
 
 export default class ImageUploader {
-    constructor(eventHub: PosterEventHub) {
+    readonly apiUrl = "https://ot3uw7itn6.execute-api.us-east-1.amazonaws.com/latest";
+
+    constructor(settings: Settings, eventHub: PosterEventHub) {
+        this.settings = settings;
         this.eventHub = eventHub;
 
         this.imageClearButton = document.getElementById("btn-clear-image") as HTMLButtonElement;
@@ -20,13 +24,14 @@ export default class ImageUploader {
         })
 
         this.imageClearButton.addEventListener('click', () => {
-            this.controller.abort();
+            this.cancel();
             hideElement(this.imageUploadCard);
             
             this.eventHub.triggerEvent('imageCleared');
         })
     }
 
+    settings: Settings;
     eventHub: PosterEventHub;
     controller: AbortController;
     imageClearButton: HTMLButtonElement;
@@ -50,15 +55,14 @@ export default class ImageUploader {
             this.initializeProgress();
             const uploadUrl = await this.getPresignedUrl(file);
             this.uploadFile(uploadUrl.uploadUrl, file);
+            this.settings.originalImageKey = uploadUrl.key;
         } catch (error) {
             // TODO: handle error
         }
     }
 
-    async getPresignedUrl(file: File): Promise<GetUploadUrlResponse> {
-        const url = "https://ot3uw7itn6.execute-api.us-east-1.amazonaws.com/latest";
-
-        let response = await axios.get<GetUploadUrlResponse>(url, {
+    private async getPresignedUrl(file: File): Promise<GetUploadUrlResponse> {
+        let response = await axios.get<GetUploadUrlResponse>(this.apiUrl, {
             signal: this.signal,
             params: {
                 contentType: file.type,
@@ -81,10 +85,7 @@ export default class ImageUploader {
         return response.data;
     }
 
-    uploadFile(signedUrl: string, file: File) {
-        // let data = new FormData();
-        // data.append('file', file);
-
+    private uploadFile(signedUrl: string, file: File) {
         axios.put(signedUrl, file, {
             method: 'PUT',
             signal: this.signal,
@@ -107,14 +108,14 @@ export default class ImageUploader {
         });
     }
 
-    initializeProgress(){
+    private initializeProgress(){
         showElement(this.imageUploadCard);
         hideElement(this.imagePreviewElem);
         showElement(this.imagePreviewSpinnerElem);
         this.updateProgress(0);
     }
     
-    updateProgress(percent: number){
+    private updateProgress(percent: number){
         if (percent < 100){
             this.progressLabelElem.innerText = `Uploading... ${percent}%`
         }
@@ -125,7 +126,7 @@ export default class ImageUploader {
         this.progressElem.value = percent;
     }
 
-    cancel() {
+    private cancel() {
         this.controller.abort();
     }
 }

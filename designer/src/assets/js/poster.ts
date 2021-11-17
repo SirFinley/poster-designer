@@ -5,6 +5,7 @@ import PosterImage from './image';
 import Border from "./border";
 import Render from './render';
 import PosterEventHub from "./posterEventHub";
+import PosterUploader from "./posterUploader";
 
 const canvas = new fabric.Canvas('fabric-canvas');
 
@@ -18,6 +19,7 @@ const overlay = new Overlay(canvas, settings, eventHub);
 const image = new PosterImage(canvas, settings, eventHub);
 const border = new Border(canvas, settings, image, eventHub);
 const render = new Render(canvas, settings);
+const posterUploader = new PosterUploader(canvas, settings);
 
 docReady(() => {
     resizeCanvas();
@@ -31,7 +33,7 @@ function resizeCanvas() {
     floatingCanvasParent.style.position = 'absolute';
     floatingCanvasParent.style.left = canvasParent.offsetLeft + 'px';
     floatingCanvasParent.style.top = canvasParent.offsetTop + 'px';
-    floatingCanvasParent.style.zIndex = '99999';
+    floatingCanvasParent.style.zIndex = '9';
 
     canvas.setWidth(canvasParent.offsetWidth);
     canvas.setHeight(canvasParent.offsetHeight);

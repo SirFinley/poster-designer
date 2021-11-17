@@ -58,8 +58,6 @@ export default class Border {
             self.eventHub.triggerEvent('borderSettingChanged');
         });
         this.verticalBorderInput.slider.on('slide', (thing) => {
-            console.log(thing);
-
             let value = self.verticalBorderInput.get();
             this.updateVerticalBorder(value);
             self.eventHub.triggerEvent('borderSettingChanged');
@@ -95,7 +93,7 @@ export default class Border {
         }
     }
 
-    private drawBorder() {
+    drawBorder() {
         if (!this.posterImage.image) {
             return;
         }
@@ -274,10 +272,8 @@ export default class Border {
 
         // Offset the slider value.
         value -= this.borderLockedValues[b] - this.borderLockedValues[a];
-        // console.log(this.borderLockedValues);
 
         // Set the value
-        console.log(value);
         slider.set(value);
         callback(value);
     }
