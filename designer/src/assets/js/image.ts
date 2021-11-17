@@ -146,17 +146,56 @@ export default class PosterImage {
     }
 
     centerImage() {
-        // TODO - implement
-        throw new Error('Method not implemented.');
+        console.log('center image');
+        
+        if (!this.image) {
+            return;
+        }
+
+        let dims = this.settings.getVirtualDimensions();
+        let scaledImageWidth = this.image.getScaledWidth();
+        let scaledImageHeight = this.image.getScaledHeight();
+        let imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
+        let imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
+
+        this.image.set({
+            left: dims.posterLeftBorder + imageLeftOffset,
+            top: dims.posterTopBorder + imageTopOffset,
+        });
+
+        this.canvas.renderAll();
+    }
+    
+    centerImageVertical() {
+        if (!this.image) {
+            return;
+        }
+
+        let dims = this.settings.getVirtualDimensions();
+        let scaledImageHeight = this.image.getScaledHeight();
+        let imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
+
+        this.image.set({
+            top: dims.posterTopBorder + imageTopOffset,
+        });
+
+        this.canvas.renderAll();
     }
 
     centerImageHorizontal() {
-        // TODO - implement
-        throw new Error('Method not implemented.');
-    }
-    centerImageVertical() {
-        // TODO - implement
-        throw new Error('Method not implemented.');
+        if (!this.image) {
+            return;
+        }
+
+        let dims = this.settings.getVirtualDimensions();
+        let scaledImageWidth = this.image.getScaledWidth();
+        let imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
+
+        this.image.set({
+            left: dims.posterLeftBorder + imageLeftOffset,
+        });
+
+        this.canvas.renderAll();
     }
 
     updateScaleSlider() {
@@ -238,16 +277,7 @@ export default class PosterImage {
             this.scaleToHeight(dims.posterInnerBorderHeight);
         }
 
-        let scaledImageWidth = this.image.getScaledWidth();
-        let scaledImageHeight = this.image.getScaledHeight();
-        let imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
-        let imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
-
-        this.image.set({
-            left: dims.posterLeftBorder + imageLeftOffset,
-            top: dims.posterTopBorder + imageTopOffset,
-        });
-
+        this.centerImage();
         this.canvas.renderAll();
     }
 
@@ -265,15 +295,7 @@ export default class PosterImage {
             this.scaleToWidth(dims.posterInnerBorderWidth);
         }
 
-        let scaledImageWidth = this.image.getScaledWidth();
-        let scaledImageHeight = this.image.getScaledHeight();
-        let imageHorizontalMargin = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
-        let imageVerticalMargin = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
-
-        this.image.set({
-            left: dims.posterLeftBorder + imageHorizontalMargin,
-            top: dims.posterTopBorder + imageVerticalMargin,
-        });
+        this.centerImage();
         this.canvas.renderAll();
     }
 
@@ -291,15 +313,7 @@ export default class PosterImage {
             this.scaleToWidth(dims.posterWidth);
         }
 
-        let scaledImageWidth = this.image.getScaledWidth();
-        let scaledImageHeight = this.image.getScaledHeight();
-        let imageHorizontalMargin = (dims.posterWidth - scaledImageWidth) / 2;
-        let imageVerticalMargin = (dims.posterHeight - scaledImageHeight) / 2;
-
-        this.image.set({
-            left: dims.posterLeft + imageHorizontalMargin,
-            top: dims.posterTop + imageVerticalMargin,
-        });
+        this.centerImage();
         this.canvas.renderAll();
     }
 
