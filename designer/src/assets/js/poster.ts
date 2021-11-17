@@ -37,8 +37,26 @@ function resizeCanvas() {
     floatingCanvasParent.style.top = canvasParent.offsetTop + 'px';
     floatingCanvasParent.style.zIndex = '9';
 
+    const oldDims = settings.getVirtualDimensions();
+    
     canvas.setWidth(canvasParent.offsetWidth);
     canvas.setHeight(canvasParent.offsetHeight);
+
+    const newDims = settings.getVirtualDimensions();
+
+    if (image.image) {
+        let oldInchesFromLeft = (image.image.left! - oldDims.posterLeft) * oldDims.inchesPerPixel;
+        let oldInchesFromTop = (image.image.top! - oldDims.posterTop) * oldDims.inchesPerPixel;
+
+        eventHub.triggerEvent('imageScaled'); // scale image to canvas
+
+        let newLeft = (oldInchesFromLeft / newDims.inchesPerPixel) + newDims.posterLeft;
+        let newTop = (oldInchesFromTop / newDims.inchesPerPixel) + newDims.posterTop;
+        image.moveImageTo({
+            left: newLeft,
+            top: newTop,
+        });
+    }
 
     overlay.drawOverlay();
     border.drawBorder();

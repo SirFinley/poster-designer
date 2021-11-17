@@ -96,7 +96,7 @@ export default class PosterImage {
             // keep centered on center point
             let dx = (this.image.getScaledWidth() - prevWidth) / 2;
             let dy = (this.image.getScaledHeight() - prevHeight) / 2;
-            this.image.set({
+            this.moveImageTo({
                 left: this.image.left! - dx,
                 top: this.image.top! - dy,
             })
@@ -158,14 +158,14 @@ export default class PosterImage {
         let imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
         let imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
 
-        this.image.set({
+        this.moveImageTo({
             left: dims.posterLeftBorder + imageLeftOffset,
             top: dims.posterTopBorder + imageTopOffset,
         });
 
         this.canvas.renderAll();
     }
-    
+
     centerImageVertical() {
         if (!this.image) {
             return;
@@ -175,7 +175,7 @@ export default class PosterImage {
         let scaledImageHeight = this.image.getScaledHeight();
         let imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
 
-        this.image.set({
+        this.moveImageTo({
             top: dims.posterTopBorder + imageTopOffset,
         });
 
@@ -191,7 +191,7 @@ export default class PosterImage {
         let scaledImageWidth = this.image.getScaledWidth();
         let imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
 
-        this.image.set({
+        this.moveImageTo({
             left: dims.posterLeftBorder + imageLeftOffset,
         });
 
@@ -206,6 +206,12 @@ export default class PosterImage {
         let scale = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
         this.settings.setImageScale(scale);
     }
+
+    moveImageTo(coords: ImageCoords) {
+        this.image?.set(coords);
+        this.image?.setCoords();
+    }
+
 
     handleFile(file: File) {
         // not an image
@@ -335,4 +341,9 @@ export default class PosterImage {
         this.updateScaleSlider();
     }
 
+}
+
+interface ImageCoords {
+    left?: number,
+    top?: number,
 }
