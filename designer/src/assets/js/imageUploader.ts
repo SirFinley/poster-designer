@@ -9,38 +9,31 @@ export default class ImageUploader {
         this.settings = settings;
         this.eventHub = eventHub;
 
-        this.imageClearButton = document.getElementById("btn-clear-image") as HTMLButtonElement;
         this.imagePreviewElem = document.getElementById("img-preview") as HTMLImageElement;
         this.imagePreviewSpinnerElem = document.getElementById("img-preview-spinner") as HTMLElement;
         this.imageUploadCard = document.getElementById("img-upload-card") as HTMLElement;
         this.progressElem = document.getElementById("img-progress") as HTMLProgressElement;
         this.progressLabelElem = document.getElementById("img-progress-label") as HTMLLabelElement;
         this.controller = new AbortController();
-        this.signal = this.controller.signal;
 
         this.eventHub.subscribe('imageChanged', () => {
             showElement(this.imagePreviewElem);
             hideElement(this.imagePreviewSpinnerElem);
-        })
+        });
 
-        this.imageClearButton.addEventListener('click', () => {
-            this.cancel();
+        this.eventHub.subscribe('imageCleared', () => {
             hideElement(this.imageUploadCard);
-            
-            this.eventHub.triggerEvent('imageCleared');
-        })
+        });
     }
 
     settings: Settings;
     eventHub: PosterEventHub;
     controller: AbortController;
-    imageClearButton: HTMLButtonElement;
     imagePreviewElem: HTMLImageElement;
     imagePreviewSpinnerElem: HTMLElement;
     imageUploadCard: HTMLElement;
     progressElem: HTMLProgressElement;
     progressLabelElem: HTMLLabelElement;
-    signal: AbortSignal;
 
     async start(file: File) {
         // this.initializeProgress();
@@ -52,6 +45,8 @@ export default class ImageUploader {
         // }, 1100);
         // return;
         try {
+            this.cancel(); // attempt to cancel ongoing upload
+
             this.initializeProgress();
             const uploadUrl = await this.getPresignedUrl(file);
             this.uploadFile(uploadUrl.uploadUrl, file);
@@ -63,7 +58,7 @@ export default class ImageUploader {
 
     private async getPresignedUrl(file: File): Promise<GetUploadUrlResponse> {
         let response = await axios.get<GetUploadUrlResponse>(this.apiUrl, {
-            signal: this.signal,
+            signal: this.controller.signal,
             params: {
                 contentType: file.type,
             },
@@ -74,8 +69,9 @@ export default class ImageUploader {
                 this.eventHub.triggerEvent('imageUploadCancelled');
             } else {
                 console.error('Error while getting upload url: ', err)
-                throw err;
             }
+
+            throw err;
         });
 
         if (!response) {
@@ -88,7 +84,7 @@ export default class ImageUploader {
     private uploadFile(signedUrl: string, file: File) {
         axios.put(signedUrl, file, {
             method: 'PUT',
-            signal: this.signal,
+            signal: this.controller.signal,
             headers: {
                 'Content-Type': file.type,
             },
@@ -102,9 +98,10 @@ export default class ImageUploader {
                 console.error('Fetch aborted')
                 this.eventHub.triggerEvent('imageUploadCancelled');
             } else {
-                console.error('Error while getting upload url: ', err)
-                throw err;
+                console.error('Error while uploading file: ', err)
             }
+
+            throw err;
         });
     }
 
@@ -128,6 +125,7 @@ export default class ImageUploader {
 
     private cancel() {
         this.controller.abort();
+        this.controller = new AbortController();
     }
 }
 
