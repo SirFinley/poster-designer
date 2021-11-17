@@ -6,6 +6,7 @@ import Border from "./border";
 import Render from './render';
 import PosterEventHub from "./posterEventHub";
 import PosterUploader from "./posterUploader";
+import ClearPoster from "./clearPoster";
 
 const canvas = new fabric.Canvas('fabric-canvas');
 
@@ -20,6 +21,7 @@ const image = new PosterImage(canvas, settings, eventHub);
 const border = new Border(canvas, settings, image, eventHub);
 const render = new Render(canvas, settings);
 const posterUploader = new PosterUploader(canvas, settings);
+const clearPoster = new ClearPoster(settings, eventHub);
 
 docReady(() => {
     resizeCanvas();
