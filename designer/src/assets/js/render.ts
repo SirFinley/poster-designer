@@ -1,101 +1,84 @@
 import { fabric } from "fabric";
+import PosterImage from "./image";
 import Settings from "./settings";
+import PosterExporter, { SaveData } from "./PosterExporter";
 
 export default class Render {
-    constructor(canvas: fabric.Canvas, settings: Settings) {
+    constructor(image: PosterImage, canvas: fabric.Canvas, settings: Settings) {
+        this.image = image;
         this.canvas = canvas;
         this.settings = settings;
     }
 
+    image: PosterImage;
     canvas: fabric.Canvas;
     settings: Settings;
 
-    render(){
+    async render() {
         fabric.Object.NUM_FRACTION_DIGITS = 8;
 
-        let clone = new fabric.Canvas(null);
-        clone.loadFromJSON(this.canvas.toJSON(), () =>{
-            clone.overlayImage = undefined;
-            let objects = clone.getObjects();
+        let saveData = await new PosterExporter().getSaveData(this.settings, this.canvas, this.image);
 
-            let image: fabric.Image = new fabric.Image();
-            objects.forEach(o => {
-                if (o.type != 'image') {
-                    clone.remove(o);
-                }
-                else {
-                    image = o as fabric.Image;
-                }
-            })
+        let image = saveData.canvasImage;
 
-            clone.renderAll();
+        let dims = saveData.virtualDimensions;
 
-            let dims = this.settings.getVirtualDimensions();
+        const imageRawWidth = image.width;
+        const imageCanvasWidth = image.width * image.scaleX;
 
-            const imageRawWidth = image.width!;
-            const imageCanvasWidth = image.getScaledWidth();
-            
-            let canvasPixelsPerInch = 1 / dims.inchesPerPixel;
-            let imageWidthInInches = imageCanvasWidth / canvasPixelsPerInch;
-            let imagePixelsPerInch = imageRawWidth / imageWidthInInches;
+        let canvasPixelsPerInch = 1 / dims.inchesPerPixel;
+        let imageWidthInInches = imageCanvasWidth / canvasPixelsPerInch;
+        let imagePixelsPerInch = imageRawWidth / imageWidthInInches;
 
-            let multiplier = imagePixelsPerInch / canvasPixelsPerInch; 
+        let multiplier = imagePixelsPerInch / canvasPixelsPerInch;
 
-            console.log('canvas dpi: ' + canvasPixelsPerInch);
-            console.log('print dpi: ' + imagePixelsPerInch);
-            console.log('render multiplier: ' + multiplier);
+        console.log('canvas dpi: ' + canvasPixelsPerInch);
+        console.log('print dpi: ' + imagePixelsPerInch);
+        console.log('render multiplier: ' + multiplier);
 
-            let oldInchesFromLeft = (image.left! - dims.posterLeft) / canvasPixelsPerInch;
-            let oldInchesFromTop = (image.top! - dims.posterTop) / canvasPixelsPerInch;
-            let newLeft = Math.round(oldInchesFromLeft * imagePixelsPerInch);
-            let newTop = Math.round(oldInchesFromTop * imagePixelsPerInch);
+        let oldInchesFromLeft = (image.left - dims.posterLeft) / canvasPixelsPerInch;
+        let oldInchesFromTop = (image.top - dims.posterTop) / canvasPixelsPerInch;
+        let newLeft = Math.round(oldInchesFromLeft * imagePixelsPerInch);
+        let newTop = Math.round(oldInchesFromTop * imagePixelsPerInch);
 
-            let canvas = new fabric.StaticCanvas(null, {
-                width: Math.round(multiplier * dims.posterWidth),
-                height: Math.round(multiplier * dims.posterHeight),
-                backgroundColor: this.canvas.backgroundColor,
+        let canvas = new fabric.StaticCanvas(null, {
+            width: Math.round(multiplier * dims.posterWidth),
+            height: Math.round(multiplier * dims.posterHeight),
+            backgroundColor: saveData.borders.color,
+        });
+
+        fabric.Image.fromURL(this.getImageUrl(saveData), (newImage) => {
+            let newClipPath = new fabric.Rect({
+                left: Math.round(saveData.borders.horizontal * imagePixelsPerInch),
+                top: Math.round(saveData.borders.vertical * imagePixelsPerInch),
+                width: Math.round(multiplier * dims.posterInnerBorderWidth),
+                height: Math.round(multiplier * dims.posterInnerBorderHeight),
+                absolutePositioned: true,
             });
 
-            fabric.Image.fromURL(image.getSrc(), (newImage) => {
-                const oldClipPath = image.clipPath!;
-                let oldClipInchesFromLeft = (oldClipPath.left! - dims.posterLeft) / canvasPixelsPerInch;
-                let oldClipInchesFromTop = (oldClipPath.top! - dims.posterTop) / canvasPixelsPerInch;
-                let clipNewLeft = Math.round(oldClipInchesFromLeft * imagePixelsPerInch);
-                let clipNewTop = Math.round(oldClipInchesFromTop * imagePixelsPerInch);
+            newImage.set({
+                left: newLeft,
+                top: newTop,
+                clipPath: newClipPath,
+            });
 
-                let newClipPath = new fabric.Rect({
-                    left: clipNewLeft,
-                    top: clipNewTop,
-                    width: Math.round(multiplier * dims.posterInnerBorderWidth),
-                    height: Math.round(multiplier * dims.posterInnerBorderHeight),
-                    absolutePositioned: true,
-                });
+            canvas.add(newImage);
+            canvas.renderAll();
 
-                newImage.set({
-                    left: newLeft,
-                    top: newTop,
-                    clipPath: newClipPath,
-                });
+            let dataUrl = canvas.toDataURL({
+                format: 'png',
+                multiplier: 1,
+            });
 
-                canvas.add(newImage);
-                canvas.renderAll();
-
-                let dataUrl = canvas.toDataURL({
-                    format: 'png',
-                });
-
-                (document.getElementById('img-preview') as HTMLImageElement).src = dataUrl;
-            })
-
+            (document.getElementById('img-preview') as HTMLImageElement).src = dataUrl;
         })
     }
 
-    getSaveData(): SaveData{
-        // TODO: implement
-        return {};
+    getImageUrl(saveData: SaveData): string {
+        // client
+        return this.image.image!.getSrc()
+
+        // server
+        // get s3 link for saveData.imageKey
     }
-}
-
-interface SaveData {
-
 }

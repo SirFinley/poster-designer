@@ -1,11 +1,14 @@
 import { fabric } from 'fabric';
 import axios from "axios";
 import Settings from "./settings";
+import PosterExporter from './PosterExporter';
+import PosterImage from './image';
 
 export default class PosterUploader {
     readonly apiUrl = "https://bqq1e7cavi.execute-api.us-east-1.amazonaws.com/latest";
 
-    constructor(canvas: fabric.Canvas, settings: Settings) {
+    constructor(image: PosterImage, canvas: fabric.Canvas, settings: Settings) {
+        this.image = image;
         this.canvas = canvas;
         this.settings = settings;
 
@@ -27,9 +30,10 @@ export default class PosterUploader {
         })
     }
 
+    image: PosterImage;
     canvas: fabric.Canvas;
     settings: Settings;
-    
+
     controller: AbortController;
     signal: AbortSignal;
 
@@ -59,20 +63,14 @@ export default class PosterUploader {
         });
 
         if (response) {
-            let id  = response.data.id
+            let id = response.data.id
             this.posterIdDisplay.innerText = `<${id}>`;
             console.log('poster saved with id ' + id);
-            
         }
     }
 
-    private getPostData() {
-        return {
-            originalImageKey: this.settings.originalImageKey,
-            posterJson: {}
-            // TODO: get canvas json
-            // posterJson: this.canvas.toJSON(),
-        };
+    private async getPostData() {
+        return await new PosterExporter().getSaveData(this.settings, this.canvas, this.image);
     }
 }
 

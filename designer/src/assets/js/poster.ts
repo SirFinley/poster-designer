@@ -19,8 +19,8 @@ settings.readSettingsFromUrl(window.location.toString());
 const overlay = new Overlay(canvas, settings, eventHub);
 const image = new PosterImage(canvas, settings, eventHub);
 const border = new Border(canvas, settings, image, eventHub);
-const render = new Render(canvas, settings);
-const posterUploader = new PosterUploader(canvas, settings);
+const render = new Render(image, canvas, settings);
+const posterUploader = new PosterUploader(image, canvas, settings);
 const clearPoster = new ClearPoster(settings, eventHub);
 
 docReady(() => {

@@ -130,6 +130,7 @@ export default class Border {
                 // selectable: false,
                 // evented: false,
                 padding: 5, // increase selectable area
+                name: 'border-line',
                 ...lineOptions,
             });
         }
