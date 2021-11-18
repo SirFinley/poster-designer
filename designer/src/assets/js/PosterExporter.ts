@@ -11,6 +11,8 @@ export default class PosterExporter {
 
         let image = posterImage.image!;
 
+        fabric.Object.NUM_FRACTION_DIGITS = 17;
+
         return {
             version: 1,
             size: settings.size,

@@ -15,8 +15,6 @@ export default class Render {
     settings: Settings;
 
     async render() {
-        fabric.Object.NUM_FRACTION_DIGITS = 8;
-
         let saveData = await new PosterExporter().getSaveData(this.settings, this.canvas, this.image);
 
         let image = saveData.canvasImage;
