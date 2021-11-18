@@ -121,6 +121,7 @@ export default class PosterImage {
 
         image.set({
             centeredScaling: true,
+            name: 'main-image',
         })
 
         if (this.image) {
