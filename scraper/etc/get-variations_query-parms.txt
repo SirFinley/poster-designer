@@ -1,0 +1,11 @@
+log_performance_metrics: false
+specs[listing_async_review_variations][]: Etsy\Web\ListingPage\Reviews\VariationsApiSpec
+specs[listing_async_review_variations][1][transaction_ids][]: 2519325182
+specs[listing_async_review_variations][1][transaction_ids][]: 2519325180
+specs[listing_async_review_variations][1][transaction_ids][]: 2640014591
+specs[listing_async_review_variations][1][transaction_ids][]: 2638208162
+specs[listing_async_review_variations][1][shop_id]: 23972174
+specs[listing_async_review_variations][1][listing_id]: 882964486
+specs[listing_async_review_variations][1][category_path][]: 66
+specs[listing_async_review_variations][1][category_path][]: 119
+specs[listing_async_review_variations][1][category_path][]: 2078

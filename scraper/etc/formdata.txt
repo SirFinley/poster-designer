@@ -1,0 +1,17 @@
+log_performance_metrics: false
+specs[reviews][]: Etsy\Web\ListingPage\Reviews\ApiSpec
+specs[reviews][1][listing_id]: 882964486
+specs[reviews][1][shop_id]: 23972174
+specs[reviews][1][render_complete]: true
+specs[reviews][1][active_tab]: same_listing_reviews
+specs[reviews][1][should_lazy_load_images]: false
+specs[reviews][1][should_use_pagination]: true
+specs[reviews][1][page]: 2
+specs[reviews][1][category_path][]: 66
+specs[reviews][1][category_path][]: 119
+specs[reviews][1][category_path][]: 2078
+specs[reviews][1][should_show_variations]: true
+specs[reviews][1][selected_keyword_filter]: all
+specs[reviews][1][is_reviews_untabbed_cached]: false
+specs[reviews][1][search_query]: 
+specs[reviews][1][sort_option]: Recency
