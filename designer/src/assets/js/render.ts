@@ -15,7 +15,6 @@ export default class Render {
 
         let clone = new fabric.Canvas(null);
         clone.loadFromJSON(this.canvas.toJSON(), () =>{
-        // this.canvas.clone((clone: fabric.Canvas) => {
             clone.overlayImage = undefined;
             let objects = clone.getObjects();
 
@@ -29,12 +28,7 @@ export default class Render {
                 }
             })
 
-            if (!image) {
-                return;
-            }
-
             clone.renderAll();
-            console.log(clone);
 
             let dims = this.settings.getVirtualDimensions();
 
@@ -45,31 +39,63 @@ export default class Render {
             let imageWidthInInches = imageCanvasWidth / canvasPixelsPerInch;
             let imagePixelsPerInch = imageRawWidth / imageWidthInInches;
 
-            let multiplier = 1 * imagePixelsPerInch / canvasPixelsPerInch; 
+            let multiplier = imagePixelsPerInch / canvasPixelsPerInch; 
 
             console.log('canvas dpi: ' + canvasPixelsPerInch);
             console.log('print dpi: ' + imagePixelsPerInch);
             console.log('render multiplier: ' + multiplier);
 
-            image.set({
-                left: Math.round(image.left!),
-                top: Math.round(image.top!),
-            })
+            let oldInchesFromLeft = (image.left! - dims.posterLeft) / canvasPixelsPerInch;
+            let oldInchesFromTop = (image.top! - dims.posterTop) / canvasPixelsPerInch;
+            let newLeft = Math.round(oldInchesFromLeft * imagePixelsPerInch);
+            let newTop = Math.round(oldInchesFromTop * imagePixelsPerInch);
 
-            let dataUrl = clone.toDataURL({
-                width: Math.ceil(dims.posterWidth),
-                height: Math.ceil(dims.posterHeight),
-                left: Math.round(dims.posterLeft),
-                top: Math.round(dims.posterTop),
-                // width: dims.posterWidth,
-                // height: dims.posterHeight,
-                // left: dims.posterLeft,
-                // top: dims.posterTop,
-                format: 'png',
-                multiplier,
+            let canvas = new fabric.StaticCanvas(null, {
+                width: Math.round(multiplier * dims.posterWidth),
+                height: Math.round(multiplier * dims.posterHeight),
+                backgroundColor: this.canvas.backgroundColor,
             });
 
-            (document.getElementById('img-preview') as HTMLImageElement).src = dataUrl;
+            fabric.Image.fromURL(image.getSrc(), (newImage) => {
+                const oldClipPath = image.clipPath!;
+                let oldClipInchesFromLeft = (oldClipPath.left! - dims.posterLeft) / canvasPixelsPerInch;
+                let oldClipInchesFromTop = (oldClipPath.top! - dims.posterTop) / canvasPixelsPerInch;
+                let clipNewLeft = Math.round(oldClipInchesFromLeft * imagePixelsPerInch);
+                let clipNewTop = Math.round(oldClipInchesFromTop * imagePixelsPerInch);
+
+                let newClipPath = new fabric.Rect({
+                    left: clipNewLeft,
+                    top: clipNewTop,
+                    width: Math.round(multiplier * dims.posterInnerBorderWidth),
+                    height: Math.round(multiplier * dims.posterInnerBorderHeight),
+                    absolutePositioned: true,
+                });
+
+                newImage.set({
+                    left: newLeft,
+                    top: newTop,
+                    clipPath: newClipPath,
+                });
+
+                canvas.add(newImage);
+                canvas.renderAll();
+
+                let dataUrl = canvas.toDataURL({
+                    format: 'png',
+                });
+
+                (document.getElementById('img-preview') as HTMLImageElement).src = dataUrl;
+            })
+
         })
     }
+
+    getSaveData(): SaveData{
+        // TODO: implement
+        return {};
+    }
+}
+
+interface SaveData {
+
 }
