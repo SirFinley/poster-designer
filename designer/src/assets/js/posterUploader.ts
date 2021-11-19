@@ -48,7 +48,7 @@ export default class PosterUploader {
     }
 
     async upload() {
-        const data = this.getPostData();
+        const data = await this.getPostData();
         let response = await axios.post<SavePosterResponse>(this.apiUrl, data, {
             method: 'POST',
             signal: this.signal,
