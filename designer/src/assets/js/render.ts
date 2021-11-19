@@ -14,6 +14,10 @@ export default class Render {
     canvas: fabric.Canvas;
     settings: Settings;
 
+    async getSaveData() {
+        return JSON.stringify(await new PosterExporter().getSaveData(this.settings, this.canvas, this.image));
+    }
+
     async render() {
         let saveData = await new PosterExporter().getSaveData(this.settings, this.canvas, this.image);
 
@@ -47,8 +51,8 @@ export default class Render {
 
         fabric.Image.fromURL(this.getImageUrl(saveData), (newImage) => {
             let newClipPath = new fabric.Rect({
-                left: Math.round(saveData.borders.horizontal * imagePixelsPerInch),
-                top: Math.round(saveData.borders.vertical * imagePixelsPerInch),
+                left: Math.round(saveData.borders.left * imagePixelsPerInch),
+                top: Math.round(saveData.borders.top * imagePixelsPerInch),
                 width: Math.round(multiplier * dims.posterInnerBorderWidth),
                 height: Math.round(multiplier * dims.posterInnerBorderHeight),
                 absolutePositioned: true,
@@ -65,11 +69,12 @@ export default class Render {
 
             let dataUrl = canvas.toDataURL({
                 format: 'png',
-                multiplier: 1,
             });
 
             (document.getElementById('img-preview') as HTMLImageElement).src = dataUrl;
-        })
+        }, {
+            crossOrigin: 'anonymous',
+        });
     }
 
     getImageUrl(saveData: SaveData): string {
