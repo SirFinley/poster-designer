@@ -19,8 +19,10 @@ export default class PosterExporter {
             orientation: settings.orientation,
             virtualDimensions: settings.getVirtualDimensions(),
             borders: {
-                horizontal: settings.sideBorder,
-                vertical: settings.verticalBorder,
+                top: settings.verticalBorder,
+                bottom: settings.verticalBorder,
+                left: settings.sideBorder,
+                right: settings.sideBorder,
                 color: settings.borderColor,
             },
             canvasJson: await this.getCanvasJson(canvas),
@@ -70,6 +72,7 @@ export default class PosterExporter {
             let clone = new fabric.StaticCanvas(null);
             clone.loadFromJSON(canvas.toJSON(), async () => {
                 clone.overlayImage = undefined;
+                clone.remove(...clone.getObjects());
                 resolve(clone.toJSON());
             });
         });
@@ -82,8 +85,10 @@ export interface SaveData {
     orientation: string,
     virtualDimensions: VirtualDimensions
     borders: {
-        horizontal: number,
-        vertical: number,
+        top: number,
+        bottom: number,
+        left: number,
+        right: number,
         color: string,
     },
     canvasJson: string,
