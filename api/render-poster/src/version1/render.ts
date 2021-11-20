@@ -1,8 +1,8 @@
-import fs from 'fs';
-import { createCanvas, loadImage } from 'canvas';
+import { Canvas, createCanvas, loadImage } from 'canvas';
 
 import { SaveData } from "./SaveData";
 import RenderSettings from './renderSettings';
+import { getDownloadUrl, uploadImage } from '../s3';
 
 export default class Render {
     async getRenderSettings(saveData: SaveData): Promise<RenderSettings> {
@@ -56,19 +56,11 @@ export default class Render {
     }
 
     async getImageUrl(saveData: SaveData): Promise<string> {
-        // client
-        // return this.image.image!.getSrc()
-        // return 'https://visual-inkworks-dev.s3.amazonaws.com/1bec20b7-571c-4839-aa83-0b6bca99b6dc.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAY2RB5K65O5LDDGZY%2F20211119%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20211119T022553Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=eb9ae6e3140cba3c806cb7d117f6ba9784ad4456fc320e617c53076763f80f77';
-        return 'https://visual-inkworks-dev.s3.amazonaws.com/9bb91e5c-d51a-4cb6-a893-3fee2ffbefe6.jpeg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAY2RB5K65O5LDDGZY%2F20211119%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20211119T031513Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=df98f5ba1d04f2484e4719a8d429b73adf6d56b04c9c0b171151f124636c0f46';
-
-        // server
-        // get s3 link for saveData.imageKey
+        return await getDownloadUrl(saveData.imageKey);
     }
 
-    async render(saveData: SaveData) {
+    async render(id: string, saveData: SaveData): Promise<RenderKeys> {
         const renderSettings = await this.getRenderSettings(saveData);
-        console.log(renderSettings);
-        
 
         const canvas = createCanvas(renderSettings.canvas.width, renderSettings.canvas.height);
         const context = canvas.getContext('2d');
@@ -91,14 +83,44 @@ export default class Render {
         context.fillRect(0, 0, canvas.width, borders.top); // top
         context.fillRect(0, borders.bottom, canvas.width, canvas.height - borders.bottom); // bottom
 
+        // save full render
+        const fullRenderKey = `${id}/full-render.png`;
+        await uploadImage(canvas.toBuffer(), fullRenderKey);
 
-        // render
-        const out = fs.createWriteStream(__dirname + '/helloworld.png');
-        var stream = canvas.createPNGStream();
-        stream.on('data', function (chunk) {
-            out.write(chunk);
-        });
-        // TODO on 'error'
-        // TODO on 'done'
+        // save preview-render
+        const previewCanvas = this.getPreviewCanvas(canvas);
+        const previewRenderKey = `${id}/preview-render.png`;
+        await uploadImage(previewCanvas.toBuffer(), previewRenderKey);
+
+        return {
+            fullRenderKey,
+            previewRenderKey
+        };
     }
+
+    getPreviewCanvas(otherCanvas: Canvas) {
+        const maxSide = 300;
+        const scale = maxSide / Math.max(otherCanvas.width, otherCanvas.height);
+
+        const canvas = createCanvas(otherCanvas.width * scale, otherCanvas.height * scale);
+        const context = canvas.getContext('2d');
+
+        context.scale(scale, scale);
+        context.drawImage(otherCanvas, 0, 0);
+        
+        return canvas;
+    }
+}
+
+// function saveToFile(canvas: Canvas, fileName: string) {
+        // const stream = canvas.createPNGStream();
+        // const out = fs.createWriteStream(__dirname + fileName);
+        // stream.on('data', function (chunk) {
+        //     out.write(chunk);
+        // });
+// }
+
+export interface RenderKeys{
+    fullRenderKey: string,
+    previewRenderKey: string,
 }

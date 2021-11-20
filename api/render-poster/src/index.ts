@@ -1,24 +1,75 @@
+import AWS from 'aws-sdk';
+import Render, { RenderKeys } from "./version1/render";
+import { getDownloadUrl } from './s3';
+import { updateRenders } from './dynamo';
 
+const REGION = 'us-east-1';
+const POSTERS_TABLE = 'posters';
 
+async function getPosterItem(id: string) {
+    var docClient = new AWS.DynamoDB.DocumentClient({
+        region: REGION,
+    });
 
-// TODO: read save data from dynamo
-// TODO: load image from s3
-// TODO: save rendered image to s3
-// TODO: save thumbnail image to s3
+    let params = {
+        TableName: POSTERS_TABLE,
+        Key: { "id": id },
+    };
 
-import Render from "./version1/render";
+    const response = await docClient.get(params).promise();
+    if (!response.Item) {
+        throw new Error(`Item with id ${id} not found`);
+    }
 
-// testing
-const saveDataJson = "{\"version\":1,\"size\":\"11x17\",\"orientation\":\"portrait\",\"virtualDimensions\":{\"canvasWidth\":987,\"canvasHeight\":913,\"canvasAspectRatio\":1.0810514786418401,\"canvasHorizontalMargin\":227.65588235294115,\"canvasVerticalMargin\":45.64999999999998,\"inchesPerPixel\":0.02068881586953876,\"posterAspectRatio\":0.6470588235294118,\"posterWidth\":531.6882352941177,\"posterHeight\":821.7,\"posterLeft\":227.65588235294115,\"posterRight\":759.3441176470589,\"posterTop\":45.64999999999998,\"posterBottom\":867.35,\"borderWidth\":96.67058823529412,\"borderHeight\":96.67058823529412,\"posterLeftBorder\":324.3264705882353,\"posterRightBorder\":662.6735294117648,\"posterTopBorder\":142.3205882352941,\"posterBottomBorder\":770.679411764706,\"posterInnerBorderWidth\":338.3470588235295,\"posterInnerBorderHeight\":628.3588235294119,\"borderInnerAspectRatio\":0.5384615384615384},\"borders\":{\"top\":2,\"bottom\":2,\"left\":2,\"right\":2,\"color\":\"#061c2f\"},\"canvasJson\":{\"version\":\"4.6.0\",\"objects\":[],\"background\":\"#061c2f\"},\"canvasImage\":{\"left\":-645.6254193432719,\"top\":-362.578387089545,\"width\":1600,\"height\":1000,\"scaleX\":1.42015677417909,\"scaleY\":1.42015677417909},\"canvasObjectJsons\":[\"{\\\"type\\\":\\\"image\\\",\\\"version\\\":\\\"4.6.0\\\",\\\"originX\\\":\\\"left\\\",\\\"originY\\\":\\\"top\\\",\\\"left\\\":-645.6254193432719,\\\"top\\\":-362.578387089545,\\\"width\\\":1600,\\\"height\\\":1000,\\\"fill\\\":\\\"rgb(0,0,0)\\\",\\\"stroke\\\":null,\\\"strokeWidth\\\":0,\\\"strokeDashArray\\\":null,\\\"strokeLineCap\\\":\\\"butt\\\",\\\"strokeDashOffset\\\":0,\\\"strokeLineJoin\\\":\\\"miter\\\",\\\"strokeUniform\\\":false,\\\"strokeMiterLimit\\\":4,\\\"scaleX\\\":1.42015677417909,\\\"scaleY\\\":1.42015677417909,\\\"angle\\\":0,\\\"flipX\\\":false,\\\"flipY\\\":false,\\\"opacity\\\":1,\\\"shadow\\\":null,\\\"visible\\\":true,\\\"backgroundColor\\\":\\\"\\\",\\\"fillRule\\\":\\\"nonzero\\\",\\\"paintFirst\\\":\\\"fill\\\",\\\"globalCompositeOperation\\\":\\\"source-over\\\",\\\"skewX\\\":0,\\\"skewY\\\":0,\\\"clipPath\\\":{\\\"type\\\":\\\"rect\\\",\\\"version\\\":\\\"4.6.0\\\",\\\"originX\\\":\\\"left\\\",\\\"originY\\\":\\\"top\\\",\\\"left\\\":324.3264705882353,\\\"top\\\":142.3205882352941,\\\"width\\\":338.3470588235295,\\\"height\\\":628.3588235294119,\\\"fill\\\":\\\"rgb(0,0,0)\\\",\\\"stroke\\\":null,\\\"strokeWidth\\\":1,\\\"strokeDashArray\\\":null,\\\"strokeLineCap\\\":\\\"butt\\\",\\\"strokeDashOffset\\\":0,\\\"strokeLineJoin\\\":\\\"miter\\\",\\\"strokeUniform\\\":false,\\\"strokeMiterLimit\\\":4,\\\"scaleX\\\":1,\\\"scaleY\\\":1,\\\"angle\\\":0,\\\"flipX\\\":false,\\\"flipY\\\":false,\\\"opacity\\\":1,\\\"shadow\\\":null,\\\"visible\\\":true,\\\"backgroundColor\\\":\\\"\\\",\\\"fillRule\\\":\\\"nonzero\\\",\\\"paintFirst\\\":\\\"fill\\\",\\\"globalCompositeOperation\\\":\\\"source-over\\\",\\\"skewX\\\":0,\\\"skewY\\\":0,\\\"rx\\\":0,\\\"ry\\\":0,\\\"inverted\\\":false,\\\"absolutePositioned\\\":true},\\\"cropX\\\":0,\\\"cropY\\\":0,\\\"src\\\":\\\"s3://9bb91e5c-d51a-4cb6-a893-3fee2ffbefe6.jpeg\\\",\\\"crossOrigin\\\":null,\\\"filters\\\":[],\\\"name\\\":\\\"main-image\\\"}\",\"{\\\"type\\\":\\\"line\\\",\\\"version\\\":\\\"4.6.0\\\",\\\"originX\\\":\\\"left\\\",\\\"originY\\\":\\\"top\\\",\\\"left\\\":324.3264705882353,\\\"top\\\":0,\\\"width\\\":0,\\\"height\\\":913,\\\"fill\\\":\\\"rgb(0,0,0)\\\",\\\"stroke\\\":\\\"#f7d8bd\\\",\\\"strokeWidth\\\":1,\\\"strokeDashArray\\\":[6,6],\\\"strokeLineCap\\\":\\\"butt\\\",\\\"strokeDashOffset\\\":0,\\\"strokeLineJoin\\\":\\\"miter\\\",\\\"strokeUniform\\\":false,\\\"strokeMiterLimit\\\":4,\\\"scaleX\\\":1,\\\"scaleY\\\":1,\\\"angle\\\":0,\\\"flipX\\\":false,\\\"flipY\\\":false,\\\"opacity\\\":0.8,\\\"shadow\\\":null,\\\"visible\\\":true,\\\"backgroundColor\\\":\\\"\\\",\\\"fillRule\\\":\\\"nonzero\\\",\\\"paintFirst\\\":\\\"fill\\\",\\\"globalCompositeOperation\\\":\\\"source-over\\\",\\\"skewX\\\":0,\\\"skewY\\\":0,\\\"x1\\\":0,\\\"x2\\\":0,\\\"y1\\\":-456.5,\\\"y2\\\":456.5,\\\"name\\\":\\\"border-line\\\"}\",\"{\\\"type\\\":\\\"line\\\",\\\"version\\\":\\\"4.6.0\\\",\\\"originX\\\":\\\"left\\\",\\\"originY\\\":\\\"top\\\",\\\"left\\\":662.6735294117648,\\\"top\\\":0,\\\"width\\\":0,\\\"height\\\":913,\\\"fill\\\":\\\"rgb(0,0,0)\\\",\\\"stroke\\\":\\\"#f7d8bd\\\",\\\"strokeWidth\\\":1,\\\"strokeDashArray\\\":[6,6],\\\"strokeLineCap\\\":\\\"butt\\\",\\\"strokeDashOffset\\\":0,\\\"strokeLineJoin\\\":\\\"miter\\\",\\\"strokeUniform\\\":false,\\\"strokeMiterLimit\\\":4,\\\"scaleX\\\":1,\\\"scaleY\\\":1,\\\"angle\\\":0,\\\"flipX\\\":false,\\\"flipY\\\":false,\\\"opacity\\\":0.8,\\\"shadow\\\":null,\\\"visible\\\":true,\\\"backgroundColor\\\":\\\"\\\",\\\"fillRule\\\":\\\"nonzero\\\",\\\"paintFirst\\\":\\\"fill\\\",\\\"globalCompositeOperation\\\":\\\"source-over\\\",\\\"skewX\\\":0,\\\"skewY\\\":0,\\\"x1\\\":0,\\\"x2\\\":0,\\\"y1\\\":-456.5,\\\"y2\\\":456.5,\\\"name\\\":\\\"border-line\\\"}\",\"{\\\"type\\\":\\\"line\\\",\\\"version\\\":\\\"4.6.0\\\",\\\"originX\\\":\\\"left\\\",\\\"originY\\\":\\\"top\\\",\\\"left\\\":0,\\\"top\\\":142.3205882352941,\\\"width\\\":987,\\\"height\\\":0,\\\"fill\\\":\\\"rgb(0,0,0)\\\",\\\"stroke\\\":\\\"#f7d8bd\\\",\\\"strokeWidth\\\":1,\\\"strokeDashArray\\\":[6,6],\\\"strokeLineCap\\\":\\\"butt\\\",\\\"strokeDashOffset\\\":0,\\\"strokeLineJoin\\\":\\\"miter\\\",\\\"strokeUniform\\\":false,\\\"strokeMiterLimit\\\":4,\\\"scaleX\\\":1,\\\"scaleY\\\":1,\\\"angle\\\":0,\\\"flipX\\\":false,\\\"flipY\\\":false,\\\"opacity\\\":0.8,\\\"shadow\\\":null,\\\"visible\\\":true,\\\"backgroundColor\\\":\\\"\\\",\\\"fillRule\\\":\\\"nonzero\\\",\\\"paintFirst\\\":\\\"fill\\\",\\\"globalCompositeOperation\\\":\\\"source-over\\\",\\\"skewX\\\":0,\\\"skewY\\\":0,\\\"x1\\\":-493.5,\\\"x2\\\":493.5,\\\"y1\\\":0,\\\"y2\\\":0,\\\"name\\\":\\\"border-line\\\"}\",\"{\\\"type\\\":\\\"line\\\",\\\"version\\\":\\\"4.6.0\\\",\\\"originX\\\":\\\"left\\\",\\\"originY\\\":\\\"top\\\",\\\"left\\\":0,\\\"top\\\":770.679411764706,\\\"width\\\":987,\\\"height\\\":0,\\\"fill\\\":\\\"rgb(0,0,0)\\\",\\\"stroke\\\":\\\"#f7d8bd\\\",\\\"strokeWidth\\\":1,\\\"strokeDashArray\\\":[6,6],\\\"strokeLineCap\\\":\\\"butt\\\",\\\"strokeDashOffset\\\":0,\\\"strokeLineJoin\\\":\\\"miter\\\",\\\"strokeUniform\\\":false,\\\"strokeMiterLimit\\\":4,\\\"scaleX\\\":1,\\\"scaleY\\\":1,\\\"angle\\\":0,\\\"flipX\\\":false,\\\"flipY\\\":false,\\\"opacity\\\":0.8,\\\"shadow\\\":null,\\\"visible\\\":true,\\\"backgroundColor\\\":\\\"\\\",\\\"fillRule\\\":\\\"nonzero\\\",\\\"paintFirst\\\":\\\"fill\\\",\\\"globalCompositeOperation\\\":\\\"source-over\\\",\\\"skewX\\\":0,\\\"skewY\\\":0,\\\"x1\\\":-493.5,\\\"x2\\\":493.5,\\\"y1\\\":0,\\\"y2\\\":0,\\\"name\\\":\\\"border-line\\\"}\"],\"imageKey\":\"9bb91e5c-d51a-4cb6-a893-3fee2ffbefe6.jpeg\"}";
-const saveData = JSON.parse(saveDataJson);
+    return response.Item;
+}
 
-    // saveData.borders.left = 0.25;
-    // saveData.borders.top = 0.5;
-    // saveData.borders.right = 0.75;
-    // saveData.borders.bottom = 1;
-    // saveData.borders.color = '#ffffff';
-// testing
+const posterId = "FIAD4ABV".replace('<', '').replace('>', '');
 
-const posterId = "5MAC4ADF".replace('<', '').replace('>', '');
+async function render() {
+    let item = await getPosterItem(posterId) as PosterItem;
 
-new Render().render(saveData);
+    // already rendered
+    if (item.fullRenderKey && item.previewRenderKey) {
+        return await getRenderUrls({
+            fullRenderKey: item.fullRenderKey,
+            previewRenderKey: item.previewRenderKey
+        });
+    }
+
+    // save rendered image to s3
+    // save thumbnail image to s3
+    let saveData = item.posterJson;
+    const renderKeys = await new Render().render(posterId, saveData);
+
+    // update dynamo entry with full-render s3 key
+    await updateRenders(posterId, renderKeys);
+
+    // get image urls
+    return await getRenderUrls(renderKeys);
+}
+
+async function getRenderUrls(renderKeys: RenderKeys) {
+    const fullUrl = getDownloadUrl(renderKeys.fullRenderKey);
+    const previewUrl = getDownloadUrl(renderKeys.previewRenderKey);
+    await Promise.all([fullUrl, previewUrl]);
+    return {
+        fullUrl: await fullUrl,
+        previewUrl: await previewUrl,
+    }
+}
+
+try {
+    render().then((value) => {
+        console.log(value);
+    });
+} catch (error) {
+    console.log(error);
+}
+
+interface PosterItem {
+    id: string,
+    posterJson: any,
+    fullRenderKey?: string,
+    previewRenderKey?: string,
+}
