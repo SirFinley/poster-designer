@@ -1,11 +1,11 @@
-import { S3 } from "aws-sdk";
+import AWS, { S3 } from "aws-sdk";
 import { randomUUID } from "crypto";
 
 const BUCKET = 'visual-inkworks-dev';
 const URL_EXPIRATION_SECONDS = 24 * 60 * 60; // 24 hours
 
+const s3 = new AWS.S3();
 export async function getDownloadUrl(key: string) {
-    let s3 = new S3();
     const url = await s3.getSignedUrlPromise('getObject', {
         Bucket: BUCKET,
         Key: key,
@@ -24,7 +24,6 @@ export async function uploadImage(buffer: Buffer, key: string) {
     };
 
     try {
-        const s3 = new S3();
         await s3.putObject(object).promise();
         return key;
     } catch (err) {

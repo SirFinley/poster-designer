@@ -2,9 +2,34 @@ import AWS from 'aws-sdk';
 import Render, { RenderKeys } from "./version1/render";
 import { getDownloadUrl } from './s3';
 import { updateRenders } from './dynamo';
+import ApiBuilder from 'claudia-api-builder';
 
 const REGION = 'us-east-1';
 const POSTERS_TABLE = 'posters';
+
+const api = new ApiBuilder();
+api.get('/',
+	(event, context) => postRender(event, context),
+	{
+		success: { contentType: 'application/json' },
+	}
+);
+
+export = api;
+
+async function postRender(event, context) {
+	const unparsedPosterId = event['queryString']['posterId'];
+    const posterId =unparsedPosterId.replace('<', '').replace('>', '');
+
+    try {
+        const result = await render(posterId);
+        console.log(result);
+        return result;
+    } catch (error) {
+        console.log(error);
+        throw(error);
+    }
+}
 
 async function getPosterItem(id: string) {
     var docClient = new AWS.DynamoDB.DocumentClient({
@@ -24,9 +49,7 @@ async function getPosterItem(id: string) {
     return response.Item;
 }
 
-const posterId = "FIAD4ABV".replace('<', '').replace('>', '');
-
-async function render() {
+async function render(posterId: string) {
     let item = await getPosterItem(posterId) as PosterItem;
 
     // already rendered
@@ -42,8 +65,12 @@ async function render() {
     let saveData = item.posterJson;
     const renderKeys = await new Render().render(posterId, saveData);
 
+    // copy original image to `${posterId}/originalKey`
+
     // update dynamo entry with full-render s3 key
     await updateRenders(posterId, renderKeys);
+
+    // delete originalImageKey
 
     // get image urls
     return await getRenderUrls(renderKeys);
@@ -57,14 +84,6 @@ async function getRenderUrls(renderKeys: RenderKeys) {
         fullUrl: await fullUrl,
         previewUrl: await previewUrl,
     }
-}
-
-try {
-    render().then((value) => {
-        console.log(value);
-    });
-} catch (error) {
-    console.log(error);
 }
 
 interface PosterItem {

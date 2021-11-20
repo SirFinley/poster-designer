@@ -1,6 +1,6 @@
 import { Canvas, createCanvas, loadImage } from 'canvas';
 
-import { SaveData } from "./SaveData";
+import { SaveData } from "./saveData";
 import RenderSettings from './renderSettings';
 import { getDownloadUrl, uploadImage } from '../s3';
 

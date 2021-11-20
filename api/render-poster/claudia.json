@@ -1,0 +1,11 @@
+{
+  "lambda": {
+    "role": "api-render-poster-executor",
+    "name": "api-render-poster",
+    "region": "us-east-1"
+  },
+  "api": {
+    "id": "ju9q2gq145",
+    "module": "bin/index"
+  }
+}
