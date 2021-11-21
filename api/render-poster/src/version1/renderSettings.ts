@@ -1,10 +1,10 @@
 export default interface RenderSettings {
     imgUrl: string,
     borders: {
-        left: number,
-        right: number,
-        top: number,
-        bottom: number,
+        leftWidth: number,
+        rightWidth: number,
+        topWidth: number,
+        bottomWidth: number,
         color: string,
     },
     image: {

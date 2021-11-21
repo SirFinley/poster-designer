@@ -35,10 +35,10 @@ export default class Render {
         };
 
         const borders = {
-            left: Math.round(saveData.borders.left * imagePixelsPerInch),
-            right: canvas.width - Math.round(saveData.borders.right * imagePixelsPerInch),
-            top: Math.round(saveData.borders.top * imagePixelsPerInch),
-            bottom: canvas.height - Math.round(saveData.borders.bottom * imagePixelsPerInch),
+            leftWidth: Math.round(saveData.borders.left * imagePixelsPerInch),
+            rightWidth: Math.round(saveData.borders.right * imagePixelsPerInch),
+            topWidth: Math.round(saveData.borders.top * imagePixelsPerInch),
+            bottomWidth: Math.round(saveData.borders.bottom * imagePixelsPerInch),
             color: saveData.borders.color,
         };
 
@@ -78,10 +78,13 @@ export default class Render {
         // draw borders
         const borders = renderSettings.borders;
         context.fillStyle = borders.color;
-        context.fillRect(0, 0, borders.left, canvas.height); // left
-        context.fillRect(borders.right, 0, canvas.width - borders.right, canvas.height); // right
-        context.fillRect(0, 0, canvas.width, borders.top); // top
-        context.fillRect(0, borders.bottom, canvas.width, canvas.height - borders.bottom); // bottom
+        context.fillRect(0, 0, canvas.width, borders.topWidth); // top
+        context.fillRect(0, canvas.height - borders.bottomWidth, canvas.width, borders.bottomWidth); // bottom
+
+
+        const sidesHeight = canvas.height - (borders.topWidth + borders.bottomWidth); 
+        context.fillRect(0, borders.topWidth, borders.leftWidth, sidesHeight); // left
+        context.fillRect(canvas.width - borders.rightWidth, borders.topWidth, borders.rightWidth, sidesHeight); // right
 
         // save full render
         const fullRenderKey = `${id}/full-render.png`;
