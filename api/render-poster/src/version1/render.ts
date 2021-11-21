@@ -63,7 +63,7 @@ export default class Render {
         const renderSettings = await this.getRenderSettings(saveData);
 
         const canvas = createCanvas(renderSettings.canvas.width, renderSettings.canvas.height);
-        const context = canvas.getContext('2d');
+        const context = canvas.getContext('2d', { alpha: false,  });
 
         // fill canvas with background color
         context.fillStyle = renderSettings.canvas.backgroundColor;
@@ -103,7 +103,7 @@ export default class Render {
         const scale = maxSide / Math.max(otherCanvas.width, otherCanvas.height);
 
         const canvas = createCanvas(otherCanvas.width * scale, otherCanvas.height * scale);
-        const context = canvas.getContext('2d');
+        const context = canvas.getContext('2d', { alpha: false });
 
         context.scale(scale, scale);
         context.drawImage(otherCanvas, 0, 0);
@@ -120,7 +120,7 @@ export default class Render {
         // });
 // }
 
-export interface RenderKeys{
+export interface RenderKeys {
     fullRenderKey: string,
     previewRenderKey: string,
 }
