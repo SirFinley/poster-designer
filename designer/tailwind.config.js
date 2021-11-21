@@ -1,5 +1,6 @@
 module.exports = {
     mode: "jit",
+    darkMode: false,
     purge: [
         './src/**/*.html',
         './src/**/*.js',
@@ -8,5 +9,7 @@ module.exports = {
         extend: {},
     },
     variants: {},
-    plugins: [],
+    plugins: [
+        require('@themesberg/flowbite/plugin')
+    ],
 };

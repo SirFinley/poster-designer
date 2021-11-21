@@ -20,6 +20,11 @@ export default class SaveModal {
         this.saveModal = document.getElementById('save-modal') as HTMLElement;
         this.modalCloseButton = document.getElementById('save-modal-close-btn') as HTMLButtonElement;
         this.posterIdDisplay = document.getElementById('poster-id') as HTMLElement;
+        this.title = document.getElementById('save-modal-title') as HTMLElement;
+        this.spinner = document.getElementById('poster-id-spinner') as HTMLElement;
+        this.instructions = document.getElementById('save-modal-instructions') as HTMLElement;
+        this.copyButton = document.getElementById('save-modal-copy-button') as HTMLButtonElement;
+        this.copyTooltip = document.getElementById('copy-tooltip') as HTMLElement;
 
         this.saveButton.addEventListener('click', () => {
             this.initializeModal();
@@ -28,7 +33,22 @@ export default class SaveModal {
 
         this.modalCloseButton.addEventListener('click', () => {
             this.saveModal.classList.add('hidden');
-        })
+        });
+
+        this.posterIdDisplay.addEventListener('mouseenter', () => {
+            this.copyTooltip.innerText = 'Copy to clipboard';
+        });
+
+        this.posterIdDisplay.addEventListener('mouseleave', () => {
+            this.copyTooltip.innerText = 'Copy to clipboard';
+        });
+
+        this.posterIdDisplay.addEventListener('click', () => {
+            this.copyId();
+            this.copyTooltip.innerText = 'Copied!';
+            console.log('copied');
+        });
+        this.copyButton.addEventListener('click', () => this.copyId());
 
         eventHub.subscribe('imageUploaded', () => this.enableSaveButton());
         eventHub.subscribe('imageCleared', () => this.disableSaveButton());
@@ -45,10 +65,18 @@ export default class SaveModal {
     saveModal: HTMLElement;
     posterIdDisplay: HTMLElement;
     modalCloseButton: HTMLButtonElement;
+    title: HTMLElement;
+    spinner: HTMLElement;
+    instructions: HTMLElement;
+    copyButton: HTMLButtonElement;
+    copyTooltip: HTMLElement;
 
     initializeModal() {
-        this.saveModal.classList.remove('hidden');
-        this.posterIdDisplay.innerText = 'Getting id...';
+        showElement(this.saveModal);
+        this.title.innerText = "Saving poster...";
+        hideElement(this.posterIdDisplay);
+        showElement(this.spinner);
+        hideElement(this.instructions);
     }
 
     async upload() {
@@ -67,14 +95,22 @@ export default class SaveModal {
         });
 
         if (response) {
-            let id = response.data.id
+            this.title.innerText = 'Poster Saved!';
+            const id = response.data.id
             this.posterIdDisplay.innerText = `<${id}>`;
+            showElement(this.posterIdDisplay);
+            hideElement(this.spinner);
+            showElement(this.instructions);
             console.log('poster saved with id ' + id);
         }
     }
 
     private async getPostData() {
         return await new PosterExporter().getSaveData(this.settings, this.canvas, this.image);
+    }
+
+    private copyId() {
+        navigator.clipboard.writeText(this.posterIdDisplay.innerText);
     }
 
     private enableSaveButton() {
@@ -84,6 +120,14 @@ export default class SaveModal {
     private disableSaveButton() {
         this.saveButton.disabled = true;
     }
+}
+
+function hideElement(elem: HTMLElement) {
+    elem.classList.add('hidden');
+}
+
+function showElement(elem: HTMLElement) {
+    elem.classList.remove('hidden');
 }
 
 interface SavePosterResponse {

@@ -94,8 +94,10 @@
                 <!-- image -->
                 <div id="" class="drop-area p-3">
                     <form class="m-0">
-                        <p>Drag and drop your poster image here or in the editor</p>
-                        <input type="file" id="photo-input" accept="image/*" />
+                        <label for="photo-input">Drag and drop your poster image here or in the editor</label>
+                        <input id="photo-input" type="file" accept="image/*"
+                            class="block w-full cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-transparent text-sm rounded-lg" 
+                            aria-describedby="user_avatar_help">
                         <div id="img-upload-card" class="flex hidden p-2">
                             <img src="#" id="img-preview" alt="" class="w-20 h-20 object-scale-down hidden" >
                             <div id="img-preview-spinner" class="flex justify-center items-center">
@@ -133,14 +135,27 @@
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
             <div class="sm:flex sm:items-start">
                 <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                    Save Poster
+                <h3 id="save-modal-title" class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                    Saving Poster...
                 </h3>
-                <div class="mt-2">
+                <div class="mt-4">
                     <p class="">
-                        Poster Id: <span id="poster-id" class="text-lg"></span>
+                        Poster Id: 
+                            <span id="poster-id-spinner"><i class="fa fa-spinner fa-spin fa-1x fa-fw text-lg"></i></span>
+                            <span id="poster-id" class="text-xl font-bold bg-gray-200 p-2 hover:cursor-pointer" data-tooltip-target="copy-tooltip" data-tooltip-trigger="hover">
+                                    AAGHEBAE
+                            </span>
+                            
+                            <div id="copy-tooltip" role="tooltip" class="tooltip absolute z-10 inline-block bg-gray-900 font-medium shadow-sm text-white py-2 px-3 text-sm rounded-lg opacity-0 duration-300 transition-opacity invisible" style="position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate(597px, -293px);" data-popper-placement="top">
+                                Copy to clipboard
+                                <div class="tooltip-arrow" data-popper-arrow></div>
+                            </div>
                     </p>
-                    <p>Copy your poster Id and paste it in the personalization field back in the <a id="etsy-url" href="#" class="">Etsy listing</a></p>
+                    <p id="save-modal-instructions" class="pt-4">
+                        <a id="save-modal-copy-button" href="#" class="underline">Copy</a> 
+                        your poster Id and paste it in the personalization field back in the 
+                        <a id="etsy-url" href="#" class="">Etsy listing</a>
+                    </p>
                 </div>
                 </div>
             </div>

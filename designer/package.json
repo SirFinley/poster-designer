@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
+    "@themesberg/flowbite": "^1.1.1",
     "@types/fabric": "^4.5.4",
     "axios": "^0.24.0",
     "fabric": "^4.6.0",

@@ -9,6 +9,8 @@ import SaveModal from "./saveModal";
 import ClearPoster from "./clearPoster";
 import UploadModal from "./uploadModal";
 
+import '@themesberg/flowbite';
+
 const canvas = new fabric.Canvas('fabric-canvas');
 
 const eventHub = new PosterEventHub();
