@@ -12,8 +12,9 @@ export default class ImageUploader {
         this.imagePreviewElem = document.getElementById("img-preview") as HTMLImageElement;
         this.imagePreviewSpinnerElem = document.getElementById("img-preview-spinner") as HTMLElement;
         this.imageUploadCard = document.getElementById("img-upload-card") as HTMLElement;
-        this.progressElem = document.getElementById("img-progress") as HTMLProgressElement;
-        this.progressLabelElem = document.getElementById("img-progress-label") as HTMLLabelElement;
+        this.progressElem = document.getElementById("img-progress") as HTMLElement;
+        this.progressLabelStatus = document.getElementById("img-progress-label-status") as HTMLElement;
+        this.progressLabelPercent = document.getElementById("img-progress-label-percent") as HTMLElement;
         this.controller = new AbortController();
 
         this.eventHub.subscribe('imageChanged', () => {
@@ -32,13 +33,18 @@ export default class ImageUploader {
     imagePreviewElem: HTMLImageElement;
     imagePreviewSpinnerElem: HTMLElement;
     imageUploadCard: HTMLElement;
-    progressElem: HTMLProgressElement;
-    progressLabelElem: HTMLLabelElement;
+    progressElem: HTMLElement;
+    progressLabelStatus: HTMLElement;
+    progressLabelPercent: HTMLElement;
 
     async start(file: File) {
         // this.initializeProgress();
+        // let progress = 0;
         // let interval = setInterval(() => {
-        //     this.updateProgress(this.progressElem.value + 10);
+        //     progress+=10;
+        //     if (progress <= 100) {
+        //         this.updateProgress(progress);
+        //     }
         // }, 100);
         // setTimeout(()=>{
         //     clearInterval(interval);
@@ -114,14 +120,16 @@ export default class ImageUploader {
     
     private updateProgress(percent: number){
         if (percent < 100){
-            this.progressLabelElem.innerText = `Uploading... ${percent}%`
+            this.progressLabelStatus.innerText = 'Uploading...';
+            this.progressLabelPercent.innerText = percent + '%';
         }
         else {
-            this.progressLabelElem.innerText = "Uploaded!";
+            this.progressLabelStatus.innerText = 'Uploaded!';
+            this.progressLabelPercent.innerText = '';
             this.eventHub.triggerEvent('imageUploaded');
         }
 
-        this.progressElem.value = percent;
+        this.progressElem.style.width = percent + '%';
     }
 
     private cancel() {

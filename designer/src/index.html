@@ -103,10 +103,18 @@
                             <div id="img-preview-spinner" class="flex justify-center items-center">
                                 <div class="animate-spin rounded-full h-14 w-14 border-b-2 border-gray-900" ></div>
                             </div>
-                            <div class="p-4">
-                                <label for="img-progress" id="img-progress-label"></label>
+                            <div class="p-4 pr-0 w-full">
+                                <!-- <label for="img-progress" id="img-progress-label"></label>
                                 <div>
                                     <progress id="img-progress" value="0" max="100" class="inline-block"></progress>
+                                </div> -->
+                                
+                                <div class="mb-1 flex justify-between">
+                                    <span id="img-progress-label-status" class="text-base font-medium">Uploading...</span>
+                                    <span id="img-progress-label-percent" class="text-sm font-medium">0%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-4">
+                                    <div id="img-progress" class="bg-gray-600 h-4 rounded-full" style="width: 45%"></div>
                                 </div>
                             </div>
                         </div>
