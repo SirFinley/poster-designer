@@ -24,26 +24,25 @@ const posterUploader = new PosterUploader(image, canvas, settings);
 const clearPoster = new ClearPoster(settings, eventHub);
 
 docReady(() => {
-    resizeCanvas();
     setUpWelcomeText();
 });
 
-window.onresize = resizeCanvas;
-function resizeCanvas() {
-    let canvasParent = document.getElementById('fabric-canvas-wrapper')!;
-    let floatingCanvasParent = document.getElementById('floating-canvas-container')!;
-    floatingCanvasParent.style.position = 'absolute';
-    floatingCanvasParent.style.left = canvasParent.offsetLeft + 'px';
-    floatingCanvasParent.style.top = canvasParent.offsetTop + 'px';
-    floatingCanvasParent.style.zIndex = '9';
+const canvasResizeObserver = new ResizeObserver((entries) => resizeCanvas(entries));
+const canvasElem = document.getElementById('fabric-canvas-wrapper')!;
+canvasResizeObserver.observe(canvasElem);
+function resizeCanvas(entries: ResizeObserverEntry[]) {
+    if (entries.length != 1) {
+        console.error('invalid number of entries');
+        return;
+    }
+    const canvasParent = entries[0].contentRect;
 
     const oldDims = settings.getVirtualDimensions();
-    
-    canvas.setWidth(canvasParent.offsetWidth);
-    canvas.setHeight(canvasParent.offsetHeight);
-
+    canvas.setWidth(canvasParent.width);
+    canvas.setHeight(canvasParent.height);
     const newDims = settings.getVirtualDimensions();
 
+    // scale image to fit new canvas size
     if (image.image) {
         let oldInchesFromLeft = (image.image.left! - oldDims.posterLeft) * oldDims.inchesPerPixel;
         let oldInchesFromTop = (image.image.top! - oldDims.posterTop) * oldDims.inchesPerPixel;
