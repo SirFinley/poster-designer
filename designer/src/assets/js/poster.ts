@@ -7,6 +7,7 @@ import Render from './render';
 import PosterEventHub from "./posterEventHub";
 import PosterUploader from "./posterUploader";
 import ClearPoster from "./clearPoster";
+import UploadModal from "./uploadModal";
 
 const canvas = new fabric.Canvas('fabric-canvas');
 
@@ -22,10 +23,7 @@ const border = new Border(canvas, settings, image, eventHub);
 const render = new Render(image, canvas, settings);
 const posterUploader = new PosterUploader(image, canvas, settings);
 const clearPoster = new ClearPoster(settings, eventHub);
-
-docReady(() => {
-    setUpWelcomeText();
-});
+const uploadModal = new UploadModal(eventHub);
 
 const canvasResizeObserver = new ResizeObserver((entries) => resizeCanvas(entries));
 const canvasElem = document.getElementById('fabric-canvas-wrapper')!;
@@ -60,46 +58,6 @@ function resizeCanvas(entries: ResizeObserverEntry[]) {
     overlay.drawOverlay();
     border.drawBorder();
     canvas.renderAll();
-}
-
-function docReady(fn: () => void) {
-    // see if DOM is already available
-    if (document.readyState === "complete" || document.readyState === "interactive") {
-        // call on next available tick
-        setTimeout(fn, 1);
-    } else {
-        document.addEventListener("DOMContentLoaded", fn);
-    }
-}
-
-function setUpWelcomeText() {
-    // TODO: remove this - load test image on start
-    // let image = new fabric.Image(document.getElementById('cm-img') as HTMLImageElement);
-    // this.setNewImage(image);
-    // TODO: remove this - load test image on start
-
-    if (image.image) {
-        return;
-    }
-
-    let dims = settings.getVirtualDimensions();
-    let text = new fabric.Textbox('Drag and drop your image here or upload from the side menu', {
-        fill: 'black',
-        fontSize: 72,
-        left: dims.posterLeft,
-        top: dims.posterTop,
-        width: dims.posterWidth,
-        height: dims.posterHeight,
-        selectable: false,
-        evented: false,
-    });
-
-    canvas.add(text);
-    canvas.renderAll();
-
-    eventHub.subscribe('imageChanged', () => {
-        canvas.remove(text);
-    });
 }
 
 // TODO: remove
