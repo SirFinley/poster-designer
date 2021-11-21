@@ -3,11 +3,12 @@ import axios from "axios";
 import Settings from "./settings";
 import PosterExporter from './PosterExporter';
 import PosterImage from './image';
+import PosterEventHub from './posterEventHub';
 
-export default class PosterUploader {
+export default class SaveModal {
     readonly apiUrl = "https://bqq1e7cavi.execute-api.us-east-1.amazonaws.com/latest";
 
-    constructor(image: PosterImage, canvas: fabric.Canvas, settings: Settings) {
+    constructor(image: PosterImage, canvas: fabric.Canvas, settings: Settings, eventHub: PosterEventHub) {
         this.image = image;
         this.canvas = canvas;
         this.settings = settings;
@@ -28,6 +29,9 @@ export default class PosterUploader {
         this.modalCloseButton.addEventListener('click', () => {
             this.saveModal.classList.add('hidden');
         })
+
+        eventHub.subscribe('imageUploaded', () => this.enableSaveButton());
+        eventHub.subscribe('imageCleared', () => this.disableSaveButton());
     }
 
     image: PosterImage;
@@ -71,6 +75,14 @@ export default class PosterUploader {
 
     private async getPostData() {
         return await new PosterExporter().getSaveData(this.settings, this.canvas, this.image);
+    }
+
+    private enableSaveButton() {
+        this.saveButton.disabled = false;
+    }
+
+    private disableSaveButton() {
+        this.saveButton.disabled = true;
     }
 }
 

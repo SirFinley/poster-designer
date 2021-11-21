@@ -118,6 +118,7 @@ export default class ImageUploader {
         }
         else {
             this.progressLabelElem.innerText = "Uploaded!";
+            this.eventHub.triggerEvent('imageUploaded');
         }
 
         this.progressElem.value = percent;

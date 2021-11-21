@@ -5,7 +5,7 @@ import PosterImage from './image';
 import Border from "./border";
 import Render from './render';
 import PosterEventHub from "./posterEventHub";
-import PosterUploader from "./posterUploader";
+import SaveModal from "./saveModal";
 import ClearPoster from "./clearPoster";
 import UploadModal from "./uploadModal";
 
@@ -21,7 +21,7 @@ const overlay = new Overlay(canvas, settings, eventHub);
 const image = new PosterImage(canvas, settings, eventHub);
 const border = new Border(canvas, settings, image, eventHub);
 const render = new Render(image, canvas, settings);
-const posterUploader = new PosterUploader(image, canvas, settings);
+const posterUploader = new SaveModal(image, canvas, settings, eventHub);
 const clearPoster = new ClearPoster(settings, eventHub);
 const uploadModal = new UploadModal(eventHub);
 
