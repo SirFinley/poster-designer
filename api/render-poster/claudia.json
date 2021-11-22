@@ -1,11 +1,12 @@
 {
-  "lambda": {
-    "role": "api-render-poster-executor",
-    "name": "api-render-poster",
-    "region": "us-east-1"
-  },
-  "api": {
-    "id": "ju9q2gq145",
-    "module": "bin/index"
+    "lambda": {
+      "role": "render-poster-executor",
+      "name": "render-poster",
+      "region": "us-east-1"
+    },
+    "api": {
+      "id": "z5sqmk4hmb",
+      "module": "bin/index",
+      "url": "https://z5sqmk4hmb.execute-api.us-east-1.amazonaws.com/latest"
+    }
   }
-}

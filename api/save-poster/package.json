@@ -1,5 +1,5 @@
 {
-  "name": "api-save-poster",
+  "name": "save-poster",
   "version": "1.0.0",
   "main": "bin/index",
   "author": "",
@@ -10,8 +10,9 @@
     "package.json"
   ],
   "scripts": {
-    "update": "tsc && claudia update --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json",
-    "create": "tsc && claudia create --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json",
+    "update-api-mapping": "node ../etc/update-api-mapping.js",
+    "update": "tsc && claudia update --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json && npm run update-api-mapping",
+    "create": "tsc && claudia create --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json && npm run update-api-mapping",
     "pack": "tsc && claudia pack --no-optional-dependencies --api-module bin/index --force"
   },
   "dependencies": {

@@ -3,7 +3,7 @@ import axios from 'axios';
 import Settings from "./settings";
 
 export default class ImageUploader {
-    readonly apiUrl = "https://ot3uw7itn6.execute-api.us-east-1.amazonaws.com/latest";
+    readonly apiUrl = "https://api.visualinkworks.com/upload-image";
 
     constructor(settings: Settings, eventHub: PosterEventHub) {
         this.settings = settings;

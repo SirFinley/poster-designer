@@ -6,7 +6,7 @@ import PosterImage from './image';
 import PosterEventHub from './posterEventHub';
 
 export default class SaveModal {
-    readonly apiUrl = "https://bqq1e7cavi.execute-api.us-east-1.amazonaws.com/latest";
+    readonly apiUrl = "https://api.visualinkworks.com/save-poster";
 
     constructor(image: PosterImage, canvas: fabric.Canvas, settings: Settings, eventHub: PosterEventHub) {
         this.image = image;

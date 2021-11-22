@@ -1,5 +1,5 @@
 {
-  "name": "api-render-poster",
+  "name": "render-poster",
   "version": "1.0.0",
   "main": "bin/index",
   "author": "",
@@ -10,8 +10,10 @@
     "package.json"
   ],
   "scripts": {
+    "update-api-mapping": "node ../etc/update-api-mapping.js",
+    "update-memory": "aws lambda update-function-configuration --function-name render-poster --memory-size 10240",
     "update": "tsc && claudia update --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json",
-    "create": "tsc && claudia create --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json --timeout 300 --memory 4096 --layers arn:aws:lambda:us-east-1:606735259578:layer:canvas-nodejs:1",
+    "create": "tsc && claudia create --no-optional-dependencies --api-module bin/index --region us-east-1 --policies policies/*.json --timeout 300 --memory 2048 --layers arn:aws:lambda:us-east-1:606735259578:layer:canvas-nodejs:1",
     "pack": "tsc && claudia pack --no-optional-dependencies --api-module bin/index --force",
     "render": "tsc && node ./bin/index.js"
   },

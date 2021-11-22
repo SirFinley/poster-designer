@@ -1,11 +1,11 @@
 {
   "lambda": {
-    "role": "api-test-upload-image-executor",
-    "name": "api-test-upload-image",
+    "role": "upload-image-executor",
+    "name": "upload-image",
     "region": "us-east-1"
   },
   "api": {
-    "id": "ot3uw7itn6",
+    "id": "lgzfx4m1ek",
     "module": "bin/index"
   }
 }

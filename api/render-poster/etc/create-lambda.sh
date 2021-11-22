@@ -9,3 +9,5 @@ docker run \
 # -it render-lambda bash
 #  render-lambda npm run create
 # docker run -it render-lambda bash
+
+npm run update-api-mapping
