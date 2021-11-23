@@ -10,6 +10,10 @@ import ClearPoster from "./clearPoster";
 import UploadModal from "./uploadModal";
 
 import '@themesberg/flowbite';
+import axios from "axios";
+
+// configure axios
+axios.defaults.baseURL = 'https://api.visualinkworks.com';
 
 const canvas = new fabric.Canvas('fabric-canvas');
 

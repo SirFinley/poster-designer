@@ -3,7 +3,7 @@ import axios from 'axios';
 import Settings from "./settings";
 
 export default class ImageUploader {
-    readonly apiUrl = "https://api.visualinkworks.com/upload-image";
+    readonly API_PATH = "upload-image";
 
     constructor(settings: Settings, eventHub: PosterEventHub) {
         this.settings = settings;
@@ -63,7 +63,7 @@ export default class ImageUploader {
     }
 
     private async getPresignedUrl(file: File): Promise<GetUploadUrlResponse> {
-        let response = await axios.get<GetUploadUrlResponse>(this.apiUrl, {
+        let response = await axios.get<GetUploadUrlResponse>(this.API_PATH, {
             signal: this.controller.signal,
             params: {
                 contentType: file.type,

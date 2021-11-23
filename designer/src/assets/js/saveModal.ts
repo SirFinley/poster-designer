@@ -6,7 +6,7 @@ import PosterImage from './image';
 import PosterEventHub from './posterEventHub';
 
 export default class SaveModal {
-    readonly apiUrl = "https://api.visualinkworks.com/save-poster";
+    readonly API_PATH = "save-poster";
 
     constructor(image: PosterImage, canvas: fabric.Canvas, settings: Settings, eventHub: PosterEventHub) {
         this.image = image;
@@ -81,7 +81,7 @@ export default class SaveModal {
 
     async upload() {
         const data = await this.getPostData();
-        let response = await axios.post<SavePosterResponse>(this.apiUrl, data, {
+        let response = await axios.post<SavePosterResponse>(this.API_PATH, data, {
             method: 'POST',
             signal: this.signal,
         })
