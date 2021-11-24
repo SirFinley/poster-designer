@@ -21,12 +21,12 @@ export default function main(app: sst.App): void {
     certArn,
   });
 
-  // new SiteStack(app, "designer-site", {
-  //   certArn,
-  //   config: {
-  //     appApiUrl: apiStack.api.customDomainUrl!,
-  //   },
-  // });
+  new SiteStack(app, "designer-site", {
+    certArn,
+    config: {
+      appApiUrl: apiStack.api.customDomainUrl || apiStack.api.url,
+    },
+  });
 
   // Add more stacks
 }

@@ -8,23 +8,24 @@ export default class SiteStack extends sst.Stack {
 
     const certificate = Certificate.fromCertificateArn(this, "rootCert", props.certArn);
 
-    new sst.StaticSite(this, "designer-site", {
-      path: "../designer/dist",
+    const site = new sst.StaticSite(this, "designer-site", {
+      path: "designer",
+      buildOutput: "dist",
+      buildCommand: "npm run build",
       environment: {
         APP_API_URL: props.config.appApiUrl,
       },
       customDomain: {
-        domainName: scope.stage === 'prod' ? "designer.visualinkworks.com" : `${scope.stage}.visualinkworks.com`,
+        domainName: scope.stage === 'prod' ? "designer.visualinkworks.com" : `${scope.stage}-designer.visualinkworks.com`,
         hostedZone: 'visualinkworks.com',
         certificate: certificate,
       },
-      cfDistribution: {
-        defaultBehavior: {
-          viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-          allowedMethods: AllowedMethods.ALLOW_ALL,
-        }
-      },
     });
+
+    this.addOutputs({
+      SiteUrl: site.url,
+      CustomDomainUrl: site.customDomainUrl || 'N/A',
+    })
   }
 }
 
