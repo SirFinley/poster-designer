@@ -31,8 +31,8 @@ export default class ApiStack extends sst.Stack {
                     function: {
                         handler: "src/render-poster.main",
                         timeout: 5 * 60,
-                        layers: [canvasLayer],
                         bundle: { externalModules: ['canvas'] },
+                        layers: [canvasLayer],
                         memorySize: 10240,
                     },
                 },

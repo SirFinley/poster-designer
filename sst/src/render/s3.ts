@@ -1,12 +1,12 @@
 import AWS from "aws-sdk";
+import environment from "../util/environment";
 
-const BUCKET = 'visual-inkworks-dev';
 const URL_EXPIRATION_SECONDS = 24 * 60 * 60; // 24 hours
 
 const s3 = new AWS.S3();
 export async function getDownloadUrl(key: string) {
     const url = await s3.getSignedUrlPromise('getObject', {
-        Bucket: BUCKET,
+        Bucket: environment.bucketName,
         Key: key,
         Expires: URL_EXPIRATION_SECONDS,
     });
@@ -16,7 +16,7 @@ export async function getDownloadUrl(key: string) {
 
 export async function uploadImage(buffer: Buffer, key: string) {
     const object = {
-        Bucket: BUCKET,
+        Bucket: environment.bucketName,
         Key: key,
         // ACL: "public-read",
         Body: buffer
