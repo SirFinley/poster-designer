@@ -1,10 +1,9 @@
-import AWS from 'aws-sdk';
 import * as base32 from 'hi-base32';
 import handler from './util/handler';
+import dynamodb from './util/dynamodb';
 
 const COUNTS_TABLE = process.env.COUNTS_TABLE_NAME!;
 const POSTERS_TABLE = process.env.POSTERS_TABLE_NAME!;
-const REGION = process.env.REGION!;
 
 export const main = handler(async (event) => {
 	const posterJson = event.body as string;
@@ -40,10 +39,6 @@ async function getId() {
 async function updateAndIncreaseCounter() {
 	const itemId = "poster";
 
-	const docClient = new AWS.DynamoDB.DocumentClient({
-		region: REGION,
-	});
-
 	const params = {
 		TableName: COUNTS_TABLE,
 		Key: {
@@ -57,15 +52,11 @@ async function updateAndIncreaseCounter() {
 		ReturnValues: "UPDATED_NEW"
 	};
 
-	const result = await docClient.update(params).promise();
+	const result = await dynamodb.update(params);
 	return result!.Attributes!.counts
 }
 
 async function savePoster(id: string, posterJson: string) {
-	const docClient = new AWS.DynamoDB.DocumentClient({
-		region: REGION,
-	});
-
 	const params = {
 		TableName: POSTERS_TABLE,
 		Item: {
@@ -74,5 +65,5 @@ async function savePoster(id: string, posterJson: string) {
 		},
 	};
 
-	await docClient.put(params).promise();
+	await dynamodb.put(params);
 }
