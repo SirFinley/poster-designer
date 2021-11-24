@@ -5,17 +5,19 @@ import { Certificate } from "@aws-cdk/aws-certificatemanager";
 import { CorsHttpMethod } from "@aws-cdk/aws-apigatewayv2";
 
 const canvasLayerArn = 'arn:aws:lambda:us-east-1:606735259578:layer:canvas-nodejs:1';
-const certArn = 'arn:aws:acm:us-east-1:606735259578:certificate/594527e2-48c0-4d89-8ac8-3c0f127339fb';
 
 export default class ApiStack extends sst.Stack {
     // Public reference to the API
     api;
 
-    constructor(scope: sst.App, id: string, props: EnvironmentVars) {
+    constructor(scope: sst.App, id: string, props: ApiProps) {
         super(scope, id, props);
 
-        const { countsTable, postersTable, bucket } = props;
+        const { countsTable, postersTable, bucket } = props.config;
         const canvasLayer = LayerVersion.fromLayerVersionArn(this, "CanvasLayer", canvasLayerArn);
+        const certificate = Certificate.fromCertificateArn(this, "rootCert", props.certArn);
+
+        const apiDomain = 'api.visualinkworks.com';
 
         // Create the API
         this.api = new sst.Api(this, "Api", {
@@ -23,9 +25,9 @@ export default class ApiStack extends sst.Stack {
                 allowMethods: [CorsHttpMethod.ANY],
             },
             customDomain: {
-                domainName: 'api.visualinkworks.com',
+                domainName: scope.stage === 'prod' ? apiDomain : `${scope.stage}-${apiDomain}`,
                 hostedZone: 'visualinkworks.com',
-                certificate: Certificate.fromCertificateArn(this, "ApiCert", certArn),
+                certificate,
             },
             defaultFunctionProps: {
                 environment: {
@@ -58,11 +60,16 @@ export default class ApiStack extends sst.Stack {
         // Show the API endpoint in the output
         this.addOutputs({
             ApiEndpoint: this.api.url,
+            CustomDomainUrl: this.api.customDomainUrl || 'N/A',
         });
     }
 }
 
-interface EnvironmentVars extends sst.StackProps {
+interface ApiProps extends sst.StackProps {
+    config: Config,
+    certArn: string,
+}
+interface Config extends sst.StackProps {
     countsTable: Table,
     postersTable: Table,
     bucket: Bucket,

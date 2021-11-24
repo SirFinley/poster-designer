@@ -2,18 +2,21 @@ import * as sst from "@serverless-stack/resources";
 import { Certificate } from "@aws-cdk/aws-certificatemanager";
 import { ViewerProtocolPolicy, AllowedMethods } from "@aws-cdk/aws-cloudfront";
 
-const certArn = 'arn:aws:acm:us-east-1:606735259578:certificate/594527e2-48c0-4d89-8ac8-3c0f127339fb';
-
 export default class SiteStack extends sst.Stack {
-  constructor(scope: sst.App, id: string, props?: sst.StackProps) {
+  constructor(scope: sst.App, id: string, props: SiteProps) {
     super(scope, id, props);
+
+    const certificate = Certificate.fromCertificateArn(this, "rootCert", props.certArn);
 
     new sst.StaticSite(this, "designer-site", {
       path: "../designer/dist",
+      environment: {
+        APP_API_URL: props.config.appApiUrl,
+      },
       customDomain: {
         domainName: scope.stage === 'prod' ? "designer.visualinkworks.com" : `${scope.stage}.visualinkworks.com`,
         hostedZone: 'visualinkworks.com',
-        certificate: Certificate.fromCertificateArn(this, "ViRootCert", certArn),
+        certificate: certificate,
       },
       cfDistribution: {
         defaultBehavior: {
@@ -23,4 +26,11 @@ export default class SiteStack extends sst.Stack {
       },
     });
   }
+}
+
+interface SiteProps extends sst.StackProps {
+  certArn: string,
+  config: {
+    appApiUrl: string,
+  },
 }
