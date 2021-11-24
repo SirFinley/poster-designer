@@ -1,9 +1,7 @@
 import * as base32 from 'hi-base32';
 import handler from './util/handler';
 import dynamodb from './util/dynamodb';
-
-const COUNTS_TABLE = process.env.COUNTS_TABLE_NAME!;
-const POSTERS_TABLE = process.env.POSTERS_TABLE_NAME!;
+import environment from './util/environment';
 
 export const main = handler(async (event) => {
 	const posterJson = event.body as string;
@@ -40,7 +38,7 @@ async function updateAndIncreaseCounter() {
 	const itemId = "poster";
 
 	const params = {
-		TableName: COUNTS_TABLE,
+		TableName: environment.countsTableName,
 		Key: {
 			"name": itemId,
 		},
@@ -58,7 +56,7 @@ async function updateAndIncreaseCounter() {
 
 async function savePoster(id: string, posterJson: string) {
 	const params = {
-		TableName: POSTERS_TABLE,
+		TableName: environment.postersTableName,
 		Item: {
 			id: id,
 			posterJson: posterJson,

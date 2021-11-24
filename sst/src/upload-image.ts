@@ -1,6 +1,7 @@
 import { S3 } from 'aws-sdk';
 import { randomUUID } from 'crypto';
 import handler from './util/handler';
+import environment from './util/environment';
 
 const URL_EXPIRATION_SECONDS = 5 * 60;
 
@@ -16,7 +17,7 @@ export const main = handler(async (event) => {
 	// Get signed URL from S3
 	const s3 = new S3();
 	const s3Params = {
-		Bucket: process.env.BUCKET_NAME,
+		Bucket: environment.bucketName,
 		Key: key,
 		Expires: URL_EXPIRATION_SECONDS,
 		ContentType: contentType,
