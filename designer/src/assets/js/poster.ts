@@ -16,6 +16,9 @@ import axios from "axios";
 axios.defaults.baseURL = process.env.APP_API_URL || 'https://api.visualinkworks.com';
 
 const canvas = new fabric.Canvas('fabric-canvas');
+// enforce uniform scaling
+canvas.uniformScaling = true;
+canvas.uniScaleKey = '';
 
 const eventHub = new PosterEventHub();
 const settings = new Settings(canvas, eventHub);
