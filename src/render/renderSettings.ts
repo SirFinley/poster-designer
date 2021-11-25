@@ -10,6 +10,8 @@ export default interface RenderSettings {
     image: {
         left: number,
         top: number,
+        width: number,
+        height: number,
     },
     canvas: {
         width: number,

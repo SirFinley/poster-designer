@@ -4,6 +4,7 @@ import { SaveData } from "./saveData";
 import RenderSettings from './renderSettings';
 import { getDownloadUrl, uploadImage } from './s3';
 
+const svgTargetDpi = 600;
 export default class Render {
     async getRenderSettings(saveData: SaveData): Promise<RenderSettings> {
         const image = saveData.canvasImage;
@@ -17,34 +18,42 @@ export default class Render {
         const imageWidthInInches = imageCanvasWidth / canvasPixelsPerInch;
         const imagePixelsPerInch = imageRawWidth / imageWidthInInches;
 
-        const multiplier = imagePixelsPerInch / canvasPixelsPerInch;
+        const canvasMultiplier = imagePixelsPerInch / canvasPixelsPerInch;
+
+        let allMultiplier = 1;
+        // if svg, scale everything to reach target dpi
+        if (/\.svg/.test(saveData.imageKey)) {
+            allMultiplier = svgTargetDpi / imagePixelsPerInch;
+        }
 
         console.log('canvas dpi: ' + canvasPixelsPerInch);
         console.log('print dpi: ' + imagePixelsPerInch);
-        console.log('render multiplier: ' + multiplier);
+        console.log('render multiplier: ' + canvasMultiplier);
 
-        const oldInchesFromLeft = (image.left - dims.posterLeft) / canvasPixelsPerInch;
-        const oldInchesFromTop = (image.top - dims.posterTop) / canvasPixelsPerInch;
-        const newLeft = Math.round(oldInchesFromLeft * imagePixelsPerInch);
-        const newTop = Math.round(oldInchesFromTop * imagePixelsPerInch);
+        // round all coordinates and sizes to integers to avoid subpixel rendering
 
         const canvas = {
-            width: Math.round(multiplier * dims.posterWidth),
-            height: Math.round(multiplier * dims.posterHeight),
+            width: Math.round(allMultiplier * canvasMultiplier * dims.posterWidth),
+            height: Math.round(allMultiplier * canvasMultiplier * dims.posterHeight),
             backgroundColor: saveData.borders.color,
         };
 
         const borders = {
-            leftWidth: Math.round(saveData.borders.left * imagePixelsPerInch),
-            rightWidth: Math.round(saveData.borders.right * imagePixelsPerInch),
-            topWidth: Math.round(saveData.borders.top * imagePixelsPerInch),
-            bottomWidth: Math.round(saveData.borders.bottom * imagePixelsPerInch),
+            leftWidth: Math.round(allMultiplier * saveData.borders.left * imagePixelsPerInch),
+            rightWidth: Math.round(allMultiplier * saveData.borders.right * imagePixelsPerInch),
+            topWidth: Math.round(allMultiplier * saveData.borders.top * imagePixelsPerInch),
+            bottomWidth: Math.round(allMultiplier * saveData.borders.bottom * imagePixelsPerInch),
             color: saveData.borders.color,
         };
 
+
+        const oldInchesFromLeft = (image.left - dims.posterLeft) / canvasPixelsPerInch;
+        const oldInchesFromTop = (image.top - dims.posterTop) / canvasPixelsPerInch;
         const newImage = {
-            left: newLeft,
-            top: newTop,
+            left: Math.round(allMultiplier * oldInchesFromLeft * imagePixelsPerInch),
+            top: Math.round(allMultiplier * oldInchesFromTop * imagePixelsPerInch),
+            width: Math.round(allMultiplier * image.width),
+            height: Math.round(allMultiplier * image.height),
         };
 
         return {
@@ -63,7 +72,7 @@ export default class Render {
         const renderSettings = await this.getRenderSettings(saveData);
 
         const canvas = createCanvas(renderSettings.canvas.width, renderSettings.canvas.height);
-        const context = canvas.getContext('2d', { alpha: false,  });
+        const context = canvas.getContext('2d', { alpha: false, });
 
         // fill canvas with background color
         context.fillStyle = renderSettings.canvas.backgroundColor;
@@ -72,7 +81,9 @@ export default class Render {
 
         // draw image
         const image = await loadImage(renderSettings.imgUrl);
-        context.drawImage(image, renderSettings.image.left, renderSettings.image.top);
+        image.width = renderSettings.image.width;
+        image.height = renderSettings.image.height;
+        context.drawImage(image, renderSettings.image.left, renderSettings.image.top, renderSettings.image.width, renderSettings.image.height);
 
 
         // draw borders
@@ -81,8 +92,7 @@ export default class Render {
         context.fillRect(0, 0, canvas.width, borders.topWidth); // top
         context.fillRect(0, canvas.height - borders.bottomWidth, canvas.width, borders.bottomWidth); // bottom
 
-
-        const sidesHeight = canvas.height - (borders.topWidth + borders.bottomWidth); 
+        const sidesHeight = canvas.height - (borders.topWidth + borders.bottomWidth);
         context.fillRect(0, borders.topWidth, borders.leftWidth, sidesHeight); // left
         context.fillRect(canvas.width - borders.rightWidth, borders.topWidth, borders.rightWidth, sidesHeight); // right
 
@@ -110,18 +120,10 @@ export default class Render {
 
         context.scale(scale, scale);
         context.drawImage(otherCanvas, 0, 0);
-        
+
         return canvas;
     }
 }
-
-// function saveToFile(canvas: Canvas, fileName: string) {
-        // const stream = canvas.createPNGStream();
-        // const out = fs.createWriteStream(__dirname + fileName);
-        // stream.on('data', function (chunk) {
-        //     out.write(chunk);
-        // });
-// }
 
 export interface RenderKeys {
     fullRenderKey: string,
