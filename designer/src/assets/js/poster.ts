@@ -13,7 +13,7 @@ import '@themesberg/flowbite';
 import axios from "axios";
 
 // configure axios
-axios.defaults.baseURL = 'https://api.visualinkworks.com';
+axios.defaults.baseURL = process.env.APP_API_URL || 'https://api.visualinkworks.com';
 
 const canvas = new fabric.Canvas('fabric-canvas');
 
@@ -48,13 +48,13 @@ function resizeCanvas(entries: ResizeObserverEntry[]) {
 
     // scale image to fit new canvas size
     if (image.image) {
-        let oldInchesFromLeft = (image.image.left! - oldDims.posterLeft) * oldDims.inchesPerPixel;
-        let oldInchesFromTop = (image.image.top! - oldDims.posterTop) * oldDims.inchesPerPixel;
+        const oldInchesFromLeft = (image.image.left! - oldDims.posterLeft) * oldDims.inchesPerPixel;
+        const oldInchesFromTop = (image.image.top! - oldDims.posterTop) * oldDims.inchesPerPixel;
 
         eventHub.triggerEvent('imageScaled'); // scale image to canvas
 
-        let newLeft = (oldInchesFromLeft / newDims.inchesPerPixel) + newDims.posterLeft;
-        let newTop = (oldInchesFromTop / newDims.inchesPerPixel) + newDims.posterTop;
+        const newLeft = (oldInchesFromLeft / newDims.inchesPerPixel) + newDims.posterLeft;
+        const newTop = (oldInchesFromTop / newDims.inchesPerPixel) + newDims.posterTop;
         image.moveImageTo({
             left: newLeft,
             top: newTop,
