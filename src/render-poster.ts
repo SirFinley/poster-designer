@@ -46,7 +46,7 @@ async function render(posterId: string) {
 
     // save rendered image to s3
     // save thumbnail image to s3
-    const saveData = item.posterJson;
+    const saveData = JSON.parse(item.posterJson);
     const renderKeys = await new Render().render(posterId, saveData);
 
     // copy original image to `${posterId}/originalKey`
