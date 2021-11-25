@@ -1,6 +1,5 @@
 import * as sst from "@serverless-stack/resources";
 import { Certificate } from "@aws-cdk/aws-certificatemanager";
-import { ViewerProtocolPolicy, AllowedMethods } from "@aws-cdk/aws-cloudfront";
 
 export default class SiteStack extends sst.Stack {
   constructor(scope: sst.App, id: string, props: SiteProps) {

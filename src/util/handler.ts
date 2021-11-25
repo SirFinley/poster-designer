@@ -1,7 +1,7 @@
-import { APIGatewayProxyHandlerV2, APIGatewayProxyEventV2, Context } from "aws-lambda";
+import { APIGatewayProxyEventV2 } from "aws-lambda";
 
 export default function handler(lambda: ApiLambda) {
-  return async function (event: APIGatewayProxyEventV2, context: Context) {
+  return async function (event: APIGatewayProxyEventV2) {
     let body, statusCode;
 
     try {
@@ -19,6 +19,10 @@ export default function handler(lambda: ApiLambda) {
     return {
       statusCode,
       body: JSON.stringify(body),
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Credentials": true,
+      },
     };
   };
 }

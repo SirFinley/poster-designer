@@ -1,8 +1,7 @@
-import { LayerVersion } from '@aws-cdk/aws-lambda';
 import * as sst from "@serverless-stack/resources";
 import { Bucket, Table } from "@serverless-stack/resources";
+import { LayerVersion } from '@aws-cdk/aws-lambda';
 import { Certificate } from "@aws-cdk/aws-certificatemanager";
-import { CorsHttpMethod } from "@aws-cdk/aws-apigatewayv2";
 
 const canvasLayerArn = 'arn:aws:lambda:us-east-1:606735259578:layer:canvas-nodejs:1';
 
@@ -21,9 +20,7 @@ export default class ApiStack extends sst.Stack {
 
         // Create the API
         this.api = new sst.Api(this, "Api", {
-            cors: {
-                allowMethods: [CorsHttpMethod.ANY],
-            },
+            cors: true,
             customDomain: {
                 domainName: scope.stage === 'prod' ? apiDomain : `${scope.stage}-${apiDomain}`,
                 hostedZone: 'visualinkworks.com',

@@ -1,4 +1,5 @@
 import * as sst from "@serverless-stack/resources";
+import { HttpMethods } from "@aws-cdk/aws-s3";
 
 export default class StorageStack extends sst.Stack {
     // Public reference to the table
@@ -27,6 +28,17 @@ export default class StorageStack extends sst.Stack {
             primaryIndex: { partitionKey: "id" },
         });
 
-        this.bucket = new sst.Bucket(this, "Uploads");
+        this.bucket = new sst.Bucket(this, "Uploads", {
+            s3Bucket: {
+                cors: [
+                    {
+                        maxAge: 3000,
+                        allowedOrigins: ["*"],
+                        allowedHeaders: ["*"],
+                        allowedMethods: [HttpMethods.GET, HttpMethods.PUT],
+                    },
+                ],
+            },
+        });
     }
 }
