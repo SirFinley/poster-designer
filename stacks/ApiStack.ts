@@ -1,20 +1,21 @@
 import * as sst from "@serverless-stack/resources";
-import { Bucket, Table } from "@serverless-stack/resources";
 import { LayerVersion } from '@aws-cdk/aws-lambda';
 import { Certificate } from "@aws-cdk/aws-certificatemanager";
+
+import { rootCertArn } from './Constants';
 
 const canvasLayerArn = 'arn:aws:lambda:us-east-1:606735259578:layer:canvas-nodejs:1';
 
 export default class ApiStack extends sst.Stack {
     // Public reference to the API
-    api;
+    api: sst.Api;
 
     constructor(scope: sst.App, id: string, props: ApiProps) {
         super(scope, id, props);
 
         const { countsTable, postersTable, bucket } = props.config;
         const canvasLayer = LayerVersion.fromLayerVersionArn(this, "CanvasLayer", canvasLayerArn);
-        const certificate = Certificate.fromCertificateArn(this, "rootCert", props.certArn);
+        const certificate = Certificate.fromCertificateArn(this, "rootCert", rootCertArn);
 
         const apiDomain = 'api.visualinkworks.com';
 
@@ -63,11 +64,9 @@ export default class ApiStack extends sst.Stack {
 }
 
 interface ApiProps extends sst.StackProps {
-    config: Config,
-    certArn: string,
-}
-interface Config extends sst.StackProps {
-    countsTable: Table,
-    postersTable: Table,
-    bucket: Bucket,
+    config: {
+        countsTable: sst.Table,
+        postersTable: sst.Table,
+        bucket: sst.Bucket,
+    },
 }

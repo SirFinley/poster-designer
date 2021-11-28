@@ -3,9 +3,9 @@ import { HttpMethods } from "@aws-cdk/aws-s3";
 
 export default class StorageStack extends sst.Stack {
     // Public reference to the table
-    countsTable;
-    postersTable;
-    bucket;
+    countsTable: sst.Table;
+    postersTable: sst.Table;
+    bucket: sst.Bucket;
 
     constructor(scope: sst.App, id: string, props?: sst.StackProps) {
         super(scope, id, props);
