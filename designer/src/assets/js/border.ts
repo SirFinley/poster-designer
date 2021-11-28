@@ -94,10 +94,6 @@ export default class Border {
     }
 
     drawBorder() {
-        if (!this.posterImage.image) {
-            return;
-        }
-
         let dims = this.settings.getVirtualDimensions();
 
         let innerPath = new fabric.Rect({
@@ -108,7 +104,9 @@ export default class Border {
             absolutePositioned: true,
         });
 
-        this.posterImage.image.clipPath = innerPath;
+        if (this.posterImage.image) {
+            this.posterImage.image.clipPath = innerPath;
+        }
         this.canvas.renderAll();
 
         this.drawLines();
