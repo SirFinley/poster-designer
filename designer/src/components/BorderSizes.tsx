@@ -1,70 +1,96 @@
-import { API as NoUiAPI } from 'nouislider';
+import { useEffect, useRef, useState } from 'react';
 import poster from '../class/poster';
 import eventHub from '../class/posterEventHub';
 import NoUiSlider from './Slider';
 import NoUiSliderClass from '../class/noUiSlider';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faLink, faUnlink } from '@fortawesome/free-solid-svg-icons'
 
 function BorderSizes() {
+    const fullSlider = useRef(null);
+    const [linked, setLinked] = useState(true);
+    const [, setSideBorder] = useState(0);
+    const [, setVerticalBorder] = useState(0);
 
-    // TODO: update only one border
-    function onBorderSliderSetup(slider: NoUiSliderClass) {
+    useEffect(() => {
+        eventHub.subscribe('borderSettingChanged', () => {
+            setSideBorder(poster.settings.sideBorder);
+            setVerticalBorder(poster.settings.verticalBorder);
+        })
+        
+        poster.border.fullSlider = fullSlider.current!;
+        poster.border.initialize();
+        poster.border.drawBorder();
+    }, [fullSlider])
+
+    function onSideBorderSliderSetup(slider: NoUiSliderClass) {
         slider.slider.updateOptions({
             range: {
                 min: 0,
-                max: 20,
+                max: 10,
             },
             start: 0,
             step: 0.125,
         }, false);
-        poster.settings.imageScaleInput = slider;
+        poster.border.sideBorderInput = slider;
 
-        slider.slider.on('slide', onScaleImage);
-        function onScaleImage(this: NoUiAPI) {
-            let value = fromSliderScaleValue(this.get() as string);
-            // TODO: update only one border
-            poster.settings.sideBorder = value;
-            poster.settings.verticalBorder = value;
-            eventHub.triggerEvent('borderSettingChanged');
-        }
+        slider.slider.on('slide', () => {
+            poster.border.onSideBorderSlide();
+        });
     }
 
-    function fromSliderScaleValue(sliderValue: string): number {
-        let value = parseFloat(sliderValue) || 1;
-        value = Math.pow(2, value) - 1;
-        return value;
+    function onVerticalBorderSliderSetup(slider: NoUiSliderClass) {
+        slider.slider.updateOptions({
+            range: {
+                min: 0,
+                max: 10,
+            },
+            start: 0,
+            step: 0.125,
+        }, false);
+        poster.border.verticalBorderInput = slider;
+
+        slider.slider.on('slide', () => {
+            poster.border.onVerticalBorderSlide();
+        });
     }
+
+    function toggleLink() {
+        const newLinked = !linked;
+        poster.border.bordersLinked = newLinked;
+        setLinked(newLinked);
+        console.log('link toggle');
+    }
+
+    const linkButton = (
+        <button className="btn-border-link mr-3" onClick={toggleLink}>
+            <FontAwesomeIcon icon={linked ? faLink : faUnlink}></FontAwesomeIcon>
+        </button>
+    );
 
     return (
         <div className="pt-2 flex flex-col flex-wrap place-content-between overflow-auto">
             <div className="mb-2">
-                <label id="vertical-border-value" className="text-sm" htmlFor="vertical-border">Top/Bottom Border: 0"</label>
+                <label id="vertical-border-value" className="text-sm" htmlFor="vertical-border">Top/Bottom Border: {poster.settings.verticalBorder}"</label>
                 <div className="flex">
-                    <button className="btn-border-link"> <i className="border-link fas fa-link"></i> </button>
-                    {/* <div id="vertical-border" className="noUiSlider slider-round mx-3"></div> */}
-                    <NoUiSlider setup={onBorderSliderSetup}></NoUiSlider>
+                    {linkButton}
+                    <NoUiSlider setup={onVerticalBorderSliderSetup}></NoUiSlider>
                 </div>
             </div>
-            <div className="mb-2">
-                <label id="side-border-value" className="text-sm" htmlFor="side-border">Side Border: 0"</label>
-                <div className="flex ">
-                    <button className="btn-border-link"> <i className="border-link fas fa-link"></i> </button>
-                    {/* <div id="side-border" className="noUiSlider slider-round mx-3"></div> */}
-                    <NoUiSlider setup={onBorderSliderSetup}></NoUiSlider>
+            <div className="mb-0">
+                <label id="side-border-value" className="text-sm" htmlFor="side-border">Side Border: {poster.settings.sideBorder}"</label>
+                <div className="flex">
+                    {linkButton}
+                    <NoUiSlider setup={onSideBorderSliderSetup}></NoUiSlider>
                 </div>
             </div>
-            <div className="">
+            <div className="h-0 overflow-hidden">
                 {/* <!-- used to calculate width for border sliders --> */}
                 <div className="flex">
-                    <button hidden> <i className="border-link fas fa-link"></i> </button>
-                    <div id="hidden-border" className="noUiSlider mx-3 w-80" ></div>
+                    {linkButton}
+                    <div ref={fullSlider} className="noUiSlider w-80" ></div>
                 </div>
             </div>
-            {/* <div className="">
-                <label id="side-border-value" className="text-sm" htmlFor="border-color">Border Color </label>
-                <div className="">
-                    <input type="color" id="border-color" className="shadow-md border-1 w-12 h-12" value={borderColor} onInput={onBorderColorInput}></input>
-                </div>
-            </div> */}
         </div>
     );
 }

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import poster from '../class/poster';
+import eventHub from '../class/posterEventHub';
 import { fabric } from 'fabric';
 
 function Canvas() {
@@ -39,30 +40,32 @@ function resizeCanvas(canvas: fabric.Canvas, entries: ResizeObserverEntry[]) {
         return;
     }
     const canvasParent = entries[0].contentRect;
+    const settings = poster.settings;
+    const image = poster.image;
 
     // TODO: uncomment
-    // const oldDims = settings.getVirtualDimensions();
+    const oldDims = settings.getVirtualDimensions();
     canvas.setWidth(canvasParent.width);
     canvas.setHeight(canvasParent.height);
-    // const newDims = settings.getVirtualDimensions();
+    const newDims = settings.getVirtualDimensions();
 
-    // // scale image to fit new canvas size
-    // if (image.image) {
-    //     const oldInchesFromLeft = (image.image.left! - oldDims.posterLeft) * oldDims.inchesPerPixel;
-    //     const oldInchesFromTop = (image.image.top! - oldDims.posterTop) * oldDims.inchesPerPixel;
+    // scale image to fit new canvas size
+    if (image.image) {
+        const oldInchesFromLeft = (image.image.left! - oldDims.posterLeft) * oldDims.inchesPerPixel;
+        const oldInchesFromTop = (image.image.top! - oldDims.posterTop) * oldDims.inchesPerPixel;
 
-    //     eventHub.triggerEvent('imageScaled'); // scale image to canvas
+        eventHub.triggerEvent('imageScaled'); // scale image to canvas
 
-    //     const newLeft = (oldInchesFromLeft / newDims.inchesPerPixel) + newDims.posterLeft;
-    //     const newTop = (oldInchesFromTop / newDims.inchesPerPixel) + newDims.posterTop;
-    //     image.moveImageTo({
-    //         left: newLeft,
-    //         top: newTop,
-    //     });
-    // }
+        const newLeft = (oldInchesFromLeft / newDims.inchesPerPixel) + newDims.posterLeft;
+        const newTop = (oldInchesFromTop / newDims.inchesPerPixel) + newDims.posterTop;
+        image.moveImageTo({
+            left: newLeft,
+            top: newTop,
+        });
+    }
 
     poster.overlay.drawOverlay();
-    // border.drawBorder();
+    poster.border.drawBorder();
     canvas.renderAll();
 }
 

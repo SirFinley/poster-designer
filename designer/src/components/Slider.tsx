@@ -11,10 +11,6 @@ function NoUiSlider({ setup }: IProps) {
     
     return (
         <div ref={sliderRef} className="noUiSlider slider-round"></div>
-        
-        // TODO: style for borders sliders
-        // border sliders
-        // <div ref={sliderRef} className="noUiSlider slider-round mx-3"></div>
     )
 }
 
