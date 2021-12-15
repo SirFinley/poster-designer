@@ -17,7 +17,7 @@ function BorderSizes() {
             setSideBorder(poster.settings.sideBorder);
             setVerticalBorder(poster.settings.verticalBorder);
         })
-        
+
         poster.border.fullSlider = fullSlider.current!;
         poster.border.initialize();
         poster.border.drawBorder();
@@ -84,8 +84,8 @@ function BorderSizes() {
                     <NoUiSlider setup={onSideBorderSliderSetup}></NoUiSlider>
                 </div>
             </div>
+            {/* <!-- used to calculate width for border sliders --> */}
             <div className="h-0 overflow-hidden">
-                {/* <!-- used to calculate width for border sliders --> */}
                 <div className="flex">
                     {linkButton}
                     <div ref={fullSlider} className="noUiSlider w-80" ></div>

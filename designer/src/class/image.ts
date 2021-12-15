@@ -11,6 +11,7 @@ export default class PosterImage {
         this.image = null;
         this.imageAspectRatio = 0;
         this.imgElem = null;
+        // TODO: upload
         // this.imageUploader = new ImageUploader(this.settings)
 
         this.setupEventListeners();
@@ -20,6 +21,7 @@ export default class PosterImage {
     settings: Settings;
     // imageUploader: ImageUploader;
 
+    imageInput?: HTMLInputElement;
     image: fabric.Image | null;
     imageAspectRatio: number;
     imgElem: HTMLImageElement | null;
@@ -200,8 +202,9 @@ export default class PosterImage {
             this.canvas.renderAll();
         }
 
-        // TODO: clear file input
-        // this.imageInput.value = '';
+        if (this.imageInput){
+            this.imageInput.value = '';
+        }
     }
 
     getAverageColor() {

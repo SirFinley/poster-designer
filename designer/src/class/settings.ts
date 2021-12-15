@@ -1,7 +1,3 @@
-import { API as NoUiAPI } from 'nouislider';
-// import 'nouislider/dist/nouislider.css';
-// import '@fortawesome/fontawesome-free'
-
 import NoUiSliderClass from "./noUiSlider";
 import eventHub, { PosterEventHub } from "./posterEventHub";
 import VirtualDimensions from "./virtualDimensions";

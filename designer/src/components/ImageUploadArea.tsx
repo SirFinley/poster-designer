@@ -1,48 +1,48 @@
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useEffect, useRef, ChangeEvent } from 'react';
 import poster from '../class/poster';
+import './ImageUploadArea.css';
 
 function ImageUploadArea() {
-    // // drag and drop upload
-    // let dropAreas = document.getElementsByClassName("drop-area") as HTMLCollectionOf<HTMLElement>;
-    // for (const dropArea of dropAreas) {
-    //     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    //         dropArea.addEventListener(eventName, preventDefaults, false);
-    //     })
+    const dropAreaRef = useRef<HTMLDivElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    //     function preventDefaults(e: Event) {
-    //         e.preventDefault()
-    //         e.stopPropagation()
-    //     }
+    useEffect(() => {
+        const dropArea = dropAreaRef.current!;
+        const imageInput = fileInputRef.current!;
+        poster.image.imageInput = imageInput;
 
-    //     // TODO: handle drop area highlight
-    //     ['dragenter', 'dragover'].forEach(eventName => {
-    //         dropArea.addEventListener(eventName, highlight, false);
-    //     });
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        })
 
-    //     ['dragleave', 'drop'].forEach(eventName => {
-    //         dropArea.addEventListener(eventName, unhighlight, false);
-    //     })
+        function preventDefaults(e: Event) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
 
-    //     dropArea.addEventListener('drop', (e) => {
-    //         let dt = e.dataTransfer!;
-    //         let file = dt.files[-1];
-    //         this.imageInput.files = dt.files;
-    //         this.handleFile(file);
-    //     });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
 
-    //     function highlight() {
-    //         dropArea.classList.add('highlight')
-    //     }
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        })
 
-    //     function unhighlight() {
-    //         dropArea.classList.remove('highlight')
-    //     }
+        dropArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer!;
+            const file = dt.files[0];
+            imageInput.files = dt.files;
+            poster.image.handleFile(file);
+        });
 
-    //     this.imageInput.addEventListener('change', (e: Event) => {
-    //         let target = e.target as HTMLInputElement;
-    //         this.handleFile(target.files![-1]);
-    //     });
-    // }
+        function highlight() {
+            dropArea.classList.add('highlight')
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('highlight')
+        }
+    }, [dropAreaRef])
 
     function onFileSelect(e: ChangeEvent<HTMLInputElement>) {
         const target = e.target;
@@ -50,13 +50,14 @@ function ImageUploadArea() {
     }
 
     return (
-        <div id="" className="drop-area p-3">
+        <div id="" className="p-3 drop-area" ref={dropAreaRef}>
             <form className="m-0">
                 <label htmlFor="photo-input">Drag and drop your poster image here or in the editor</label>
                 <input id="photo-input" type="file" accept="image/*"
                     className="block w-full cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-transparent text-sm rounded-lg"
                     aria-describedby="user_avatar_help"
-                    onChange={onFileSelect}></input>
+                    onChange={onFileSelect}
+                    ref={fileInputRef}></input>
                 <div id="img-upload-card" className="flex hidden p-2">
                     <img src="#" id="img-preview" alt="" className="w-20 h-20 object-scale-down hidden" ></img>
                     <div id="img-preview-spinner" className="flex justify-center items-center">

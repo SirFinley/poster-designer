@@ -8,13 +8,13 @@ import Border from "./border";
 // import SaveModal from "./saveModal";
 // import ClearPoster from "./clearPoster";
 // import UploadModal from "./uploadModal";
+import axios from "axios";
 
 // TODO: this
-// import '@themesberg/flowbite';
-// import axios from "axios";
+import '@themesberg/flowbite';
 
 // // configure axios
-// axios.defaults.baseURL = process.env.APP_API_URL || 'https://api.visualinkworks.com';
+axios.defaults.baseURL = process.env.APP_API_URL || 'https://api.visualinkworks.com';
 
 class Poster {
     constructor() {
