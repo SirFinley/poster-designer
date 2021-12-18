@@ -37,6 +37,7 @@ function ImageUploadArea() {
 
     function handleFile(file: File) {
         setFilePresent(true);
+        setPercentage(0);
 
         const imageUploader = new ImageUploader(poster.settings, (progress) => {
             setPercentage(progress);
@@ -109,8 +110,10 @@ function ImageUploadArea() {
         setInDropZone(false);
     }
 
+    const uploadComplete = percentage === 100;
+
     return (
-        <div className={`p-3 drop-area ${inDropZone ? 'highlight' : null}`}
+        <div className={`p-3 drop-area ${inDropZone && 'highlight'}`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragEnter={handleDragEnter}
@@ -124,15 +127,15 @@ function ImageUploadArea() {
                     onChange={onFileSelect}
                     ref={fileInputRef}></input>
 
-                <div className={`flex ${filePresent ? null : 'hidden'} p-2`}>
-                    <img ref={previewImgRef} alt="" className={`w-20 h-20 object-scale-down ${rendering ? 'hidden' : null}`} ></img>
-                    <div className={`flex justify-center items-center ${!rendering ? 'hidden' : null}`} >
+                <div className={`flex p-2 ${!filePresent && 'hidden'}`}>
+                    <img ref={previewImgRef} alt="" className={`w-20 h-20 object-scale-down ${rendering && 'hidden'}`} ></img>
+                    <div className={`flex justify-center items-center ${!rendering && 'hidden'}`} >
                         <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-gray-900" ></div>
                     </div>
                     <div className="p-4 pr-0 w-full">
                         <div className="mb-1 flex justify-between">
-                            {percentage < 100 ? (<span className="text-base font-medium">Uploading...</span>) : null}
-                            <span className="text-sm font-medium">{percentage}%</span>
+                            <span className="text-base font-medium">{uploadComplete ? 'Uploaded!' : 'Uploading...'}</span>
+                            {!uploadComplete && <span className="text-sm font-medium">{percentage}%</span>}
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-4">
                             <div className="bg-gray-600 h-4 rounded-full" style={{ width: `${percentage}%` }}></div>
