@@ -17,7 +17,7 @@ function ImageUploadArea() {
     useEffect(() => {
         const imageInput = fileInputRef.current!;
         poster.image.imageInput = imageInput;
-        poster.image.uploadFile = handleFile;
+        poster.image.uploadFile = handleDrop;
 
         const onImageCleared = eventHub.subscribe('imageCleared', () => setFilePresent(false));
         const onImageChanged = eventHub.subscribe('imageChanged', () => setRendering(false));

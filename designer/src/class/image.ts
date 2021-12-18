@@ -22,7 +22,7 @@ export default class PosterImage {
     image: fabric.Image | null;
     imageAspectRatio: number;
     imgElem: HTMLImageElement | null;
-    uploadFile: (file: File) => void;
+    uploadFile: (files: FileList) => void;
 
     setupEventListeners() {
 

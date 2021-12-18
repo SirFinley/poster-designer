@@ -29,7 +29,7 @@ function Canvas() {
     }
 
     function onDrop(files: FileList) {
-        poster.image.uploadFile(files[0]);
+        poster.image.uploadFile(files);
     }
 
     return (

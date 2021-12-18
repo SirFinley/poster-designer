@@ -10,7 +10,7 @@ export default function ClearPosterModal() {
     const [open, setOpen] = useState(true)
 
     function onDrop(files: FileList) {
-        poster.image.uploadFile(files[0]);
+        poster.image.uploadFile(files);
         setOpen(false);
     }
 
