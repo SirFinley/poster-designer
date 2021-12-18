@@ -33,7 +33,7 @@ export default function DropArea(props: IDropAreaProps) {
     }
 
     return (
-        <div className={props.unstyled ? '' : `drop-area ${inDropZone && 'highlight'}`}
+        <div className={`${props.unstyled ? null : 'drop-area'} ${inDropZone && 'drop-highlight'}`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragEnter={handleDragEnter}

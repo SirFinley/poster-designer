@@ -4,18 +4,17 @@
   font-family: sans-serif;
 }
 
-.drop-area.highlight {
-  border-color: purple;
+  /* purple */
+  /* background: rgba(155, 50, 155, 0.15); */
+
+.drop-area.drop-highlight {
+  border-color: blue;
+  background: rgba(0, 50, 155, 0.15);
 }
 
-canvas.drop-area {
-  border: none;
-  border-radius: 0px;
-}
-
-canvas.highlight {
-  border: 4px dashed purple;
-  background: rgba(255, 255, 255, 0.2);
+.drop-highlight .upper-canvas{
+  background: rgba(0, 50, 155, 0.15);
+  border: 2px dashed blue;
   border-radius: 20px;
   padding: 20px;
 }

@@ -50,7 +50,6 @@ export default function ClearPosterModal() {
                                         <div className="mt-2">
                                             <DropArea onDrop={onDrop}>
                                                 <div className="text-center pt-8">
-                                                    <i className="fa fa-upload fa-5x text-blue-500"></i>
                                                     <FontAwesomeIcon icon={faUpload} className='text-blue-500 fa-5x'></FontAwesomeIcon>
                                                     <p className="p-4">
                                                         Drag and drop your image here or upload from the side menu

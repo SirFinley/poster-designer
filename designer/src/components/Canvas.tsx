@@ -34,9 +34,8 @@ function Canvas() {
 
     return (
         <div ref={canvasWrapper} className="flex-grow flex-1 self-stretch" style={{ minWidth: '200px' }}>
-            <DropArea unstyled onDrop={onDrop}>
-                <canvas id="fabric-canvas">
-                </canvas>
+            <DropArea onDrop={onDrop} unstyled>
+                <canvas id="fabric-canvas"> </canvas>
             </DropArea>
         </div>
     );
@@ -51,7 +50,6 @@ function resizeCanvas(canvas: fabric.Canvas, entries: ResizeObserverEntry[]) {
     const settings = poster.settings;
     const image = poster.image;
 
-    // TODO: uncomment
     const oldDims = settings.getVirtualDimensions();
     canvas.setWidth(canvasParent.width);
     canvas.setHeight(canvasParent.height);
