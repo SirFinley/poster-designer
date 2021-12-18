@@ -1,16 +1,18 @@
-/* drag and drop */
 .drop-area {
   border: 2px dashed #ccc;
   border-radius: 20px;
   font-family: sans-serif;
 }
+
 .drop-area.highlight {
   border-color: purple;
 }
+
 canvas.drop-area {
   border: none;
   border-radius: 0px;
 }
+
 canvas.highlight {
   border: 4px dashed purple;
   background: rgba(255, 255, 255, 0.2);
@@ -18,71 +20,15 @@ canvas.highlight {
   padding: 20px;
 
 }
+
 p {
   margin-top: 0;
 }
+
 .my-form {
   margin-bottom: 10px;
 }
-#gallery {
-  margin-top: 10px;
-}
-#gallery img {
-  width: 150px;
-  margin-bottom: 10px;
-  margin-right: 10px;
-  vertical-align: middle;
-}
-.button {
-  display: inline-block;
-  padding: 10px;
-  background: #ccc;
-  cursor: pointer;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-}
-.button:hover {
-  background: #ddd;
-}
+
 #fileElem {
   display: none;
 }
-/* drag and drop */
-
-/* slider */
-.slider-round.noUiSlider {
-  height: 10px;
-  margin-top: 4px;
-}
-
-.slider-round .noUi-connect {
-    background: #0075ff;
-}
-
-.slider-round.noUi-horizontal .noUi-handle {
-    height: 18px;
-    width: 18px;
-    top: -5px;
-    right: -9px; /* half the width */
-    border-radius: 9px;
-}
-
-.slider-round .noUi-handle {
-  background: #0075ff;
-  box-shadow: none;
-}
-
-.slider-round .noUi-handle::before {
-  display: none;
-}
-
-.slider-round .noUi-handle::after {
-  display: none;
-}
-/* slider */
-
-/* save modal */
-#etsy-url {
-  text-decoration: revert;
-}
-/* save modal */

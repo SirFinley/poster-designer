@@ -1,6 +1,5 @@
 import { fabric } from 'fabric';
 import FastAverageColor from 'fast-average-color';
-// import ImageUploader from './imageUploader';
 import eventHub from './posterEventHub';
 import Settings from './settings';
 export default class PosterImage {
@@ -11,15 +10,12 @@ export default class PosterImage {
         this.image = null;
         this.imageAspectRatio = 0;
         this.imgElem = null;
-        // TODO: upload
-        // this.imageUploader = new ImageUploader(this.settings)
 
         this.setupEventListeners();
     }
 
     canvas: fabric.Canvas;
     settings: Settings;
-    // imageUploader: ImageUploader;
 
     imageInput?: HTMLInputElement;
     image: fabric.Image | null;
@@ -161,38 +157,6 @@ export default class PosterImage {
         this.image?.setCoords();
     }
 
-
-    handleFile(file: File) {
-        // not an image
-        if (!/image\//.test(file.type)) {
-            return;
-        }
-
-        // this.imageUploader.start(file);
-
-        let reader = new FileReader();
-
-        eventHub.subscribe('imageUploadCancelled', abortReader);
-        eventHub.subscribe('imageCleared', abortReader);
-        function abortReader() {
-            reader.abort();
-        }
-
-        reader.onload = (event) => {
-            eventHub.remove('imageUploadCancelled', abortReader);
-            eventHub.remove('imageCleared', abortReader);
-
-            let imgElem = document.getElementById("img-preview") as HTMLImageElement;
-            imgElem.src = event.target!.result as string;
-            imgElem.onload = () => {
-                var image = new fabric.Image(imgElem);
-                this.setNewImage(image);
-            };
-            this.imgElem = imgElem;
-        }
-
-        reader.readAsDataURL(file);
-    }
 
     clearImage() {
         if (this.image) {
