@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import poster from '../class/poster';
 import eventHub from '../class/posterEventHub';
 import { fabric } from 'fabric';
+import DropArea from './DropArea';
 
 function Canvas() {
     const canvasWrapper = useRef<HTMLDivElement>(null);
@@ -27,9 +28,16 @@ function Canvas() {
         return canvas;
     }
 
+    function onDrop(files: FileList) {
+        poster.image.uploadFile(files[0]);
+    }
+
     return (
         <div ref={canvasWrapper} className="flex-grow flex-1 self-stretch" style={{ minWidth: '200px' }}>
-            <canvas id="fabric-canvas" className="drop-area"><p>hello</p></canvas>
+            <DropArea unstyled onDrop={onDrop}>
+                <canvas id="fabric-canvas">
+                </canvas>
+            </DropArea>
         </div>
     );
 }

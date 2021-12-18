@@ -10,6 +10,7 @@ export default class PosterImage {
         this.image = null;
         this.imageAspectRatio = 0;
         this.imgElem = null;
+        this.uploadFile = () => { throw new Error('upload file not implemented'); };
 
         this.setupEventListeners();
     }
@@ -21,6 +22,7 @@ export default class PosterImage {
     image: fabric.Image | null;
     imageAspectRatio: number;
     imgElem: HTMLImageElement | null;
+    uploadFile: (file: File) => void;
 
     setupEventListeners() {
 
@@ -166,7 +168,7 @@ export default class PosterImage {
             this.canvas.renderAll();
         }
 
-        if (this.imageInput){
+        if (this.imageInput) {
             this.imageInput.value = '';
         }
     }

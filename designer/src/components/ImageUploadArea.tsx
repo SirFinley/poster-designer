@@ -2,10 +2,10 @@ import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
 import { fabric } from 'fabric';
 import eventHub from '../class/posterEventHub';
 import poster from '../class/poster';
-import './ImageUploadArea.css';
 
 import axios from 'axios';
 import Settings from "../class/settings";
+import DropArea from './DropArea';
 
 function ImageUploadArea() {
     const previewImgRef = useRef<HTMLImageElement>(null);
@@ -13,11 +13,11 @@ function ImageUploadArea() {
     const [filePresent, setFilePresent] = useState(false);
     const [percentage, setPercentage] = useState(0);
     const [rendering, setRendering] = useState(true);
-    const [inDropZone, setInDropZone] = useState(false);
 
     useEffect(() => {
         const imageInput = fileInputRef.current!;
         poster.image.imageInput = imageInput;
+        poster.image.uploadFile = handleFile;
 
         const onImageCleared = eventHub.subscribe('imageCleared', () => setFilePresent(false));
         const onImageChanged = eventHub.subscribe('imageChanged', () => setRendering(false));
@@ -77,71 +77,43 @@ function ImageUploadArea() {
         reader.readAsDataURL(file);
     }
 
-    function preventDefaults(e: Event) {
-        e.preventDefault()
-        e.stopPropagation()
-    }
-
-    function handleDrop(e: React.DragEvent<HTMLDivElement>) {
-        preventDefaults(e.nativeEvent);
-        setInDropZone(false);
-
-        const dt = e.dataTransfer!;
-        const file = dt.files[0];
+    function handleDrop(files: FileList) {
         const imageInput = fileInputRef.current!;
-        imageInput.files = dt.files;
-        handleFile(file);
-    }
-
-    function handleDragEnter(e: React.DragEvent<HTMLDivElement>) {
-        preventDefaults(e.nativeEvent);
-        setInDropZone(true);
-    }
-
-    function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
-        preventDefaults(e.nativeEvent);
-        setInDropZone(true);
-    }
-
-    function handleDragLeave(e: React.DragEvent<HTMLDivElement>) {
-        preventDefaults(e.nativeEvent);
-        setInDropZone(false);
+        imageInput.files = files;
+        handleFile(files[0]);
     }
 
     const uploadComplete = percentage === 100;
 
     return (
-        <div className={`p-3 drop-area ${inDropZone && 'highlight'}`}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-            onDragEnter={handleDragEnter}
-            onDragLeave={handleDragLeave}
-        >
-            <form className="m-0">
-                <label htmlFor="photo-input">Drag and drop your poster image here or in the editor</label>
-                <input type="file" accept="image/*"
-                    className="block w-full cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-transparent text-sm rounded-lg"
-                    aria-describedby="user_avatar_help"
-                    onChange={onFileSelect}
-                    ref={fileInputRef}></input>
+        <DropArea onDrop={handleDrop} >
+            <div className='p-3'>
+                <form className="m-0">
+                    <label htmlFor="photo-input">Drag and drop your poster image here or in the editor</label>
+                    <input type="file" accept="image/*"
+                        className="block w-full cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-transparent text-sm rounded-lg"
+                        aria-describedby="user_avatar_help"
+                        onChange={onFileSelect}
+                        ref={fileInputRef}></input>
 
-                <div className={`flex p-2 ${!filePresent && 'hidden'}`}>
-                    <img ref={previewImgRef} alt="" className={`w-20 h-20 object-scale-down ${rendering && 'hidden'}`} ></img>
-                    <div className={`flex justify-center items-center ${!rendering && 'hidden'}`} >
-                        <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-gray-900" ></div>
-                    </div>
-                    <div className="p-4 pr-0 w-full">
-                        <div className="mb-1 flex justify-between">
-                            <span className="text-base font-medium">{uploadComplete ? 'Uploaded!' : 'Uploading...'}</span>
-                            {!uploadComplete && <span className="text-sm font-medium">{percentage}%</span>}
+                    <div className={`flex p-2 ${!filePresent && 'hidden'}`}>
+                        <img ref={previewImgRef} alt="" className={`w-20 h-20 object-scale-down ${rendering && 'hidden'}`} ></img>
+                        <div className={`flex justify-center items-center ${!rendering && 'hidden'}`} >
+                            <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-gray-900" ></div>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-4">
-                            <div className="bg-gray-600 h-4 rounded-full" style={{ width: `${percentage}%` }}></div>
+                        <div className="p-4 pr-0 w-full">
+                            <div className="mb-1 flex justify-between">
+                                <span className="text-base font-medium">{uploadComplete ? 'Uploaded!' : 'Uploading...'}</span>
+                                {!uploadComplete && <span className="text-sm font-medium">{percentage}%</span>}
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-4">
+                                <div className="bg-gray-600 h-4 rounded-full" style={{ width: `${percentage}%` }}></div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </form>
-        </div>
+                </form>
+            </div>
+        </DropArea>
     );
 }
 

@@ -63,8 +63,14 @@ export default function SavePosterModal() {
             setSaved(true);
             const id = response.data.id
             setPosterId(id);
+            setEtsyUrl(getEtsyUrl());
             console.log('poster saved with id ' + id);
         }
+    }
+
+    function getEtsyUrl() {
+        // TODO: get etsy url
+        return '#';
     }
 
     async function getPostData() {
