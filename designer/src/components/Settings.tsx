@@ -5,6 +5,8 @@ import BorderColor from './BorderColor';
 import ImageScaler from './ImageScaler';
 import ImageControls from './ImageControls';
 import ImageUploadArea from './ImageUploadArea';
+import ClearPosterModal from './ClearPosterModal';
+import SavePosterModal from './SavePosterModal';
 
 function Settings() {
     return (
@@ -21,11 +23,9 @@ function Settings() {
             <ImageControls></ImageControls>
             <ImageUploadArea></ImageUploadArea>
 
-            {/* <!-- clear and save buttons --> */}
             <div className="flex justify-items-end justify-around">
-                <button className="w-40 p-2 rounded text-white bg-red-500 hover:bg-red-600 transition font-bold">Clear Poster</button>
-                <button className="w-40 p-2 rounded text-white bg-green-500 hover:bg-green-600 transition font-bold
-                     disabled:opacity-30 disabled:hover:bg-green-500 disabled:cursor-not-allowed" disabled>Save Poster</button>
+                <ClearPosterModal></ClearPosterModal>
+                <SavePosterModal></SavePosterModal>
             </div>
         </div>
     );

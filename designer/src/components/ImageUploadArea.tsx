@@ -19,14 +19,12 @@ function ImageUploadArea() {
         const imageInput = fileInputRef.current!;
         poster.image.imageInput = imageInput;
 
-        const onImageCleared = () => setFilePresent(false);
-        const onImageChanged = () => setRendering(false);
-        eventHub.subscribe('imageCleared', onImageCleared);
-        eventHub.subscribe('imageChanged', onImageChanged);
+        const onImageCleared = eventHub.subscribe('imageCleared', () => setFilePresent(false));
+        const onImageChanged = eventHub.subscribe('imageChanged', () => setRendering(false));
 
         return function cancel() {
-            eventHub.remove('imageCleared', onImageCleared);
-            eventHub.remove('imageChanged', onImageChanged);
+            onImageCleared.unsubscribe();
+            onImageChanged.unsubscribe();
         };
     }, [previewImgRef])
 
@@ -51,16 +49,16 @@ function ImageUploadArea() {
 
         let reader = new FileReader();
 
-        eventHub.subscribe('imageUploadCancelled', abortReader);
-        eventHub.subscribe('imageCleared', abortReader);
+        const onImageUploadCancelled = eventHub.subscribe('imageUploadCancelled', abortReader);
+        const onImageCleared = eventHub.subscribe('imageCleared', abortReader);
         function abortReader() {
             reader.abort();
             imageUploader.abort();
         }
 
         reader.onload = (event) => {
-            eventHub.remove('imageUploadCancelled', abortReader);
-            eventHub.remove('imageCleared', abortReader);
+            onImageUploadCancelled.unsubscribe();
+            onImageCleared.unsubscribe();
 
             const src = event.target!.result as string;
 
