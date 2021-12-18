@@ -1,18 +1,18 @@
-import { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import poster from '../class/poster';
 import eventHub from '../class/posterEventHub';
 import { fabric } from 'fabric';
 
 function Canvas() {
+    const canvasWrapper = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const canvas = initCanvas();
 
         const canvasResizeObserver = new ResizeObserver((entries) => resizeCanvas(canvas, entries));
-        const canvasElem = document.getElementById('fabric-canvas-wrapper')!;
-        canvasResizeObserver.observe(canvasElem);
+        canvasResizeObserver.observe(canvasWrapper.current!);
         poster.setCanvas(canvas);
-    }, [])
+    }, [canvasWrapper])
 
     const initCanvas = () => {
         const canvas = new fabric.Canvas('fabric-canvas', {
@@ -28,7 +28,7 @@ function Canvas() {
     }
 
     return (
-        <div id="fabric-canvas-wrapper" className="flex-grow flex-1 self-stretch" style={{ minWidth: '200px' }}>
+        <div ref={canvasWrapper} className="flex-grow flex-1 self-stretch" style={{ minWidth: '200px' }}>
             <canvas id="fabric-canvas" className="drop-area"><p>hello</p></canvas>
         </div>
     );
