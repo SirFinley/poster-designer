@@ -32,7 +32,7 @@ function ImageScaler() {
 
     return (
         <div className="w-full">
-            <label id="image-scale-value" className="text-sm" htmlFor="image-scale">Scale Image</label>
+            <label className="text-sm" htmlFor="image-scale">Scale Image</label>
             <div className="mx-2">
                 <NoUiSlider setup={onScaleSetup}></NoUiSlider>
             </div>

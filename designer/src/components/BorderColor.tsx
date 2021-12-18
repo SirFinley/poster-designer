@@ -22,9 +22,9 @@ function BorderColor() {
 
     return (
         <div className="">
-            <label id="side-border-value" className="text-sm" htmlFor="border-color">Border Color </label>
+            <label className="text-sm" htmlFor="border-color">Border Color </label>
             <div className="">
-                <input type="color" id="border-color" className="shadow-md border-1 w-12 h-12" value={borderColor} onInput={onBorderColorInput}></input>
+                <input type="color" className="shadow-md border-1 w-12 h-12" value={borderColor} onInput={onBorderColorInput}></input>
             </div>
         </div>
     );

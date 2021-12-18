@@ -71,14 +71,14 @@ function BorderSizes() {
     return (
         <div className="pt-2 flex flex-col flex-wrap place-content-between overflow-auto">
             <div className="mb-2">
-                <label id="vertical-border-value" className="text-sm" htmlFor="vertical-border">Top/Bottom Border: {poster.settings.verticalBorder}"</label>
+                <label className="text-sm" htmlFor="vertical-border">Top/Bottom Border: {poster.settings.verticalBorder}"</label>
                 <div className="flex">
                     {linkButton}
                     <NoUiSlider setup={onVerticalBorderSliderSetup}></NoUiSlider>
                 </div>
             </div>
             <div className="mb-0">
-                <label id="side-border-value" className="text-sm" htmlFor="side-border">Side Border: {poster.settings.sideBorder}"</label>
+                <label className="text-sm" htmlFor="side-border">Side Border: {poster.settings.sideBorder}"</label>
                 <div className="flex">
                     {linkButton}
                     <NoUiSlider setup={onSideBorderSliderSetup}></NoUiSlider>

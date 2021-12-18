@@ -23,8 +23,8 @@ function Settings() {
 
             {/* <!-- clear and save buttons --> */}
             <div className="flex justify-items-end justify-around">
-                <button id="clear-button" className="w-40 p-2 rounded text-white bg-red-500 hover:bg-red-600 transition font-bold">Clear Poster</button>
-                <button id="save-button" className="w-40 p-2 rounded text-white bg-green-500 hover:bg-green-600 transition font-bold
+                <button className="w-40 p-2 rounded text-white bg-red-500 hover:bg-red-600 transition font-bold">Clear Poster</button>
+                <button className="w-40 p-2 rounded text-white bg-green-500 hover:bg-green-600 transition font-bold
                      disabled:opacity-30 disabled:hover:bg-green-500 disabled:cursor-not-allowed" disabled>Save Poster</button>
             </div>
         </div>
