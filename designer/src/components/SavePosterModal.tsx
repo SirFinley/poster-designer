@@ -7,6 +7,7 @@ import eventHub from '../class/posterEventHub';
 import poster from '../class/poster';
 import axios from "axios";
 import PosterExporter from '../class/PosterExporter';
+import Tooltip from './Tooltip';
 
 const API_PATH = "save-poster";
 
@@ -21,6 +22,7 @@ export default function SavePosterModal() {
     const [posterId, setPosterId] = useState('<AAAGGGH>');
     const [etsyUrl, setEtsyUrl] = useState('');
     const [copiedId, setCopiedId] = useState(false);
+
 
     const cancelButtonRef = useRef(null)
 
@@ -132,26 +134,16 @@ export default function SavePosterModal() {
                                                     <div className="mt-4">
                                                         Poster Id:
                                                         <span><i className="fa fa-spinner fa-spin fa-1x fa-fw text-lg"></i></span>
-                                                        <span className="text-xl font-bold bg-gray-200 p-2 hover:cursor-pointer"
-                                                            data-tooltip-target="copy-tooltip" data-tooltip-trigger="hover"
-                                                            onClick={onIdClick}
-                                                            onDragEnter={() => setCopiedId(false)}
-                                                        >
-                                                            {posterId}
-                                                        </span>
+                                                        <Tooltip text={copiedId ? 'Copied!' : 'Copy to clipboard'} >
 
-                                                        {/* TODO: copy tooltip */}
-                                                        <div id="copy-tooltip" role="tooltip"
-                                                            className="tooltip absolute z-10 inline-block bg-gray-900 font-medium shadow-sm text-white py-2 px-3 text-sm rounded-lg opacity-0 duration-300 transition-opacity invisible"
-                                                            style={{ position: 'absolute', inset: 'auto auto 0px 0px', margin: '0px', transform: 'translate(597px, -293px)' }}
-                                                            data-popper-placement="top">
-                                                            {
-                                                                copiedId ?
-                                                                    'Copied!' :
-                                                                    'Copy to clipboard'
-                                                            }
-                                                            <div className="tooltip-arrow" data-popper-arrow></div>
-                                                        </div>
+                                                            <span className="text-xl font-bold bg-gray-200 p-2 hover:cursor-pointer"
+                                                                onClick={onIdClick}
+                                                                onMouseEnter={() => setCopiedId(false)}
+                                                            >
+                                                                {posterId}
+                                                            </span>
+                                                        </Tooltip>
+
                                                         <p id="save-modal-instructions" className="pt-4">
                                                             <a href="#" className="underline" onClick={onIdClick}>Copy</a>
                                                             <span> </span>your poster Id above and paste it in the personalization field back in the <a href={etsyUrl}>Etsy listing</a>
