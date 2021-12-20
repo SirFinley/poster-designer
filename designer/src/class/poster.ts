@@ -3,15 +3,7 @@ import PosterImage from "./image";
 import Overlay from "./overlay";
 import PosterSettings, { SizeOptions } from "./settings";
 import Border from "./border";
-// import Render from './render';
-// import PosterEventHub from "./posterEventHub";
-// import SaveModal from "./saveModal";
-// import ClearPoster from "./clearPoster";
-// import UploadModal from "./uploadModal";
 import axios from "axios";
-
-// TODO: this
-import '@themesberg/flowbite';
 
 // // configure axios
 axios.defaults.baseURL = process.env.APP_API_URL || 'https://api.visualinkworks.com';
@@ -28,9 +20,6 @@ class Poster {
         this.image = new PosterImage(canvas, this.settings);
         this.border = new Border(canvas, this.settings, this.image);
         // const render = new Render(image, canvas, settings);
-        // const posterUploader = new SaveModal(image, canvas, settings, eventHub);
-        // const clearPoster = new ClearPoster(settings, eventHub);
-        // const uploadModal = new UploadModal(eventHub);
 
         this.defaultSize = '8.5x11';
         this.readSettingsFromUrl();

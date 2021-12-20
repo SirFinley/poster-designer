@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import NoUiSliderClass from '../class/noUiSlider';
+import './Slider.css';
 
 function NoUiSlider({ setup }: IProps) {
     const sliderRef = useRef(null);

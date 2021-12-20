@@ -3,7 +3,6 @@ import { Fragment, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Dialog, Transition } from '@headlessui/react';
-import '@themesberg/flowbite'
 import eventHub from '../class/posterEventHub';
 import poster from '../class/poster';
 import axios from "axios";
