@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload } from '@fortawesome/free-solid-svg-icons'
 import { Dialog, Transition } from '@headlessui/react';
@@ -8,6 +8,7 @@ import poster from '../class/poster';
 
 export default function ClearPosterModal() {
     const [open, setOpen] = useState(true)
+    const emptyRef = useRef(null);
 
     function onDrop(files: FileList) {
         poster.image.uploadFile(files);
@@ -16,7 +17,8 @@ export default function ClearPosterModal() {
 
     return (
         <Transition.Root show={open} as={Fragment}>
-            <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" onClose={setOpen}>
+            <Dialog as="div" className="fixed z-10 inset-0 overflow-y-auto" onClose={setOpen} initialFocus={emptyRef}>
+                <span ref={emptyRef}> {/* empty ref so initial focus is not on the close button */} </span>
                 <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                     <Transition.Child
                         as={Fragment}
@@ -49,8 +51,8 @@ export default function ClearPosterModal() {
                                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                         <div className="mt-2">
                                             <DropArea onDrop={onDrop}>
-                                                <div className="text-center pt-8">
-                                                    <FontAwesomeIcon icon={faUpload} className='text-blue-500 fa-5x'></FontAwesomeIcon>
+                                                <div className="text-center pt-8" >
+                                                    <FontAwesomeIcon icon={faUpload} className='text-blue-500 fa-5x' ></FontAwesomeIcon>
                                                     <p className="p-4">
                                                         Drag and drop your image here or upload from the side menu
                                                     </p>
