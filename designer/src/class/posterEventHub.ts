@@ -47,4 +47,6 @@ export type PosterEventType = 'sizeSettingChanged'
     | 'imageScaled'
     | 'imageUploaded'
     | 'imageUploadCancelled'
-    | 'imageCleared';
+    | 'imageCleared'
+    | 'dpiChanged'
+    ;

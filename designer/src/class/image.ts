@@ -55,6 +55,29 @@ export default class PosterImage {
         eventHub.subscribe('orientationSettingChanged', () => this.updateScaleSlider());
         eventHub.subscribe('imageUploadCancelled', () => this.clearImage());
         eventHub.subscribe('imageCleared', () => this.clearImage());
+
+        // setup dpi
+        eventHub.subscribe('imageChanged', () => eventHub.triggerEvent('dpiChanged'));
+        eventHub.subscribe('imageCleared', () => eventHub.triggerEvent('dpiChanged'));
+        eventHub.subscribe('imageScaled', () => eventHub.triggerEvent('dpiChanged'));
+        eventHub.subscribe('orientationSettingChanged', () => eventHub.triggerEvent('dpiChanged'));
+        eventHub.subscribe('sizeSettingChanged', () => eventHub.triggerEvent('dpiChanged'));
+
+    }
+
+    getDpi() : number|null {
+        if (!this.image) {
+            return null;
+        }
+
+        const imageScaledWidthPixels = this.image.getScaledWidth();
+        const imageRawWidthPixels = this.image.width!;
+
+        const posterWidthPixels = this.settings.getVirtualDimensions().posterWidth;
+        const posterWidthInches = this.settings.getRealPosterDimensions().width;
+
+        const ratio = posterWidthPixels / imageScaledWidthPixels;
+        return ratio * imageRawWidthPixels / posterWidthInches;
     }
 
     setNewImage(image: fabric.Image) {
@@ -152,6 +175,7 @@ export default class PosterImage {
 
         let scale = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
         this.settings.setImageScale(scale);
+        eventHub.triggerEvent('dpiChanged');
     }
 
     moveImageTo(coords: ImageCoords) {
