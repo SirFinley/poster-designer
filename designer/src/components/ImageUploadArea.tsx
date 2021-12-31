@@ -33,6 +33,7 @@ function ImageUploadArea() {
     }
 
     function handleFile(file: File) {
+        eventHub.triggerEvent('imageChanged');
         setFilePresent(true);
         setPercentage(0);
 

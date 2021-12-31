@@ -28,9 +28,11 @@ export default function SavePosterModal() {
 
     useEffect(() => {
         const onImageUploaded = eventHub.subscribe('imageUploaded', () => setDisabled(false));
+        const onImageChanged = eventHub.subscribe('imageChanged', () => setDisabled(true));
         const onImageCleared = eventHub.subscribe('imageCleared', () => setDisabled(true));
         return () => {
             onImageUploaded.unsubscribe();
+            onImageChanged.unsubscribe();
             onImageCleared.unsubscribe();
         }
     })
