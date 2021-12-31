@@ -90,9 +90,9 @@ export default class Border {
         this.canvas.remove(...this.borderLines);
         this.borderLines = [];
 
-        let dims = this.settings.getVirtualDimensions();
+        const dims = this.settings.getVirtualDimensions();
 
-        let invertedBackgroundColor = this.getContrastingColor(this.settings.borderColor) || 'black';
+        const invertedBackgroundColor = this.getContrastingColor(this.settings.borderColor) || 'black';
         function createLine(points: number[], lineOptions?: fabric.ILineOptions) {
             return new fabric.Line(points, {
                 strokeWidth: 1,
@@ -155,7 +155,7 @@ export default class Border {
             return null;
         }
 
-        let bgColor = tinycolor(color);
+        const bgColor = tinycolor(color);
         if (bgColor.isDark()) {
             return bgColor.spin(180).lighten(75).toHexString();
         }

@@ -9,7 +9,7 @@ export default class PosterExporter {
             throw Error('image key not found');
         }
 
-        let image = posterImage.image!;
+        const image = posterImage.image!;
 
         fabric.Object.NUM_FRACTION_DIGITS = 17;
 
@@ -41,7 +41,7 @@ export default class PosterExporter {
 
     private getCanvasObjectsJson(settings: Settings, canvas: fabric.Canvas) {
         const objects = [];
-        for (let obj of canvas.getObjects()) {
+        for (const obj of canvas.getObjects()) {
             // extend toObject to serialize name property
             obj.toObject = (function (toObject) {
                 return function () {
@@ -69,7 +69,7 @@ export default class PosterExporter {
 
     private async getCanvasJson(canvas: fabric.Canvas) {
         return new Promise<string>((resolve, reject) => {
-            let clone = new fabric.StaticCanvas(null);
+            const clone = new fabric.StaticCanvas(null);
             clone.loadFromJSON(canvas.toJSON(), async () => {
                 clone.overlayImage = undefined;
                 clone.remove(...clone.getObjects());

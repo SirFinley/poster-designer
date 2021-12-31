@@ -43,10 +43,10 @@ export default class PosterSettings {
     }
 
     getVirtualDimensions(): VirtualDimensions {
-        let canvasWidth = this.canvas.getWidth();
-        let canvasHeight = this.canvas.getHeight();
-        let canvasAspectRatio = canvasWidth / canvasHeight;
-        let posterAspectRatio = this.getAspectRatio();
+        const canvasWidth = this.canvas.getWidth();
+        const canvasHeight = this.canvas.getHeight();
+        const canvasAspectRatio = canvasWidth / canvasHeight;
+        const posterAspectRatio = this.getAspectRatio();
 
         let posterWidth;
         let posterHeight;
@@ -61,26 +61,26 @@ export default class PosterSettings {
             posterWidth = posterAspectRatio * posterHeight;
         }
 
-        let canvasHorizontalMargin = (canvasWidth - posterWidth) / 2;
-        let canvasVerticalMargin = (canvasHeight - posterHeight) / 2;
+        const canvasHorizontalMargin = (canvasWidth - posterWidth) / 2;
+        const canvasVerticalMargin = (canvasHeight - posterHeight) / 2;
 
-        let posterLeft = canvasHorizontalMargin;
-        let posterRight = canvasHorizontalMargin + posterWidth;
-        let posterTop = canvasVerticalMargin;
-        let posterBottom = canvasVerticalMargin + posterHeight;
+        const posterLeft = canvasHorizontalMargin;
+        const posterRight = canvasHorizontalMargin + posterWidth;
+        const posterTop = canvasVerticalMargin;
+        const posterBottom = canvasVerticalMargin + posterHeight;
 
-        let realPosterDimensions = this.getRealPosterDimensions();
-        let inchesPerPixel = realPosterDimensions.width / posterWidth;
+        const realPosterDimensions = this.getRealPosterDimensions();
+        const inchesPerPixel = realPosterDimensions.width / posterWidth;
 
-        let borderWidth = this.sideBorder / inchesPerPixel;
-        let borderHeight = this.verticalBorder / inchesPerPixel;
-        let posterLeftBorder = posterLeft + borderWidth;
-        let posterRightBorder = posterRight - borderWidth;
-        let posterTopBorder = posterTop + borderHeight;
-        let posterBottomBorder = posterBottom - borderHeight;
-        let posterInnerBorderWidth = posterRightBorder - posterLeftBorder;
-        let posterInnerBorderHeight = posterBottomBorder - posterTopBorder;
-        let borderInnerAspectRatio = posterInnerBorderWidth / posterInnerBorderHeight;
+        const borderWidth = this.sideBorder / inchesPerPixel;
+        const borderHeight = this.verticalBorder / inchesPerPixel;
+        const posterLeftBorder = posterLeft + borderWidth;
+        const posterRightBorder = posterRight - borderWidth;
+        const posterTopBorder = posterTop + borderHeight;
+        const posterBottomBorder = posterBottom - borderHeight;
+        const posterInnerBorderWidth = posterRightBorder - posterLeftBorder;
+        const posterInnerBorderHeight = posterBottomBorder - posterTopBorder;
+        const borderInnerAspectRatio = posterInnerBorderWidth / posterInnerBorderHeight;
 
         return {
             canvasWidth,
@@ -109,12 +109,12 @@ export default class PosterSettings {
     }
 
     readSettingsFromUrl(urlStr: string) {
-        let url = new URL(urlStr);
+        const url = new URL(urlStr);
 
         // TODO - validate orientation and size are set, display warning if they are not
         // TODO: etsy - map from etsy variation id to option
-        let orientation = url.searchParams.get('orientation');
-        let size = url.searchParams.get('size');
+        const orientation = url.searchParams.get('orientation');
+        const size = url.searchParams.get('size');
 
         if (orientation) {
             this.orientation = orientationOptionsEtsyUrlMap[orientation];
@@ -131,8 +131,8 @@ export default class PosterSettings {
     }
 
     getRealPosterDimensions(): RealPosterDimensions {
-        let width = parseFloat(this.size.split('x')[0]);
-        let height = parseFloat(this.size.split('x')[1]);
+        const width = parseFloat(this.size.split('x')[0]);
+        const height = parseFloat(this.size.split('x')[1]);
 
         if (this.orientation === 'portrait') {
             return {
@@ -149,8 +149,8 @@ export default class PosterSettings {
     }
 
     getAspectRatio(): number {
-        let width = parseFloat(this.size.split('x')[0]);
-        let height = parseFloat(this.size.split('x')[1]);
+        const width = parseFloat(this.size.split('x')[0]);
+        const height = parseFloat(this.size.split('x')[1]);
 
         if (this.orientation === 'portrait') {
             return width / height;
@@ -168,7 +168,7 @@ export default class PosterSettings {
 }
 
 function toSliderScaleValue(value: number): number {
-    let sliderValue = value;
+    const sliderValue = value;
     return Math.log2(sliderValue + 1);
 }
 

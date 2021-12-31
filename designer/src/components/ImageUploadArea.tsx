@@ -47,7 +47,7 @@ function ImageUploadArea() {
             return;
         }
 
-        let reader = new FileReader();
+        const reader = new FileReader();
 
         const onImageUploadCancelled = eventHub.subscribe('imageUploadCancelled', abortReader);
         const onImageCleared = eventHub.subscribe('imageCleared', abortReader);
@@ -193,7 +193,7 @@ class ImageUploader {
                 'Content-Type': file.type,
             },
             onUploadProgress: (progressEvent) => {
-                let percent = Math.round(progressEvent.loaded / progressEvent.total * 100);
+                const percent = Math.round(progressEvent.loaded / progressEvent.total * 100);
                 this.updateProgress(percent)
             },
         })

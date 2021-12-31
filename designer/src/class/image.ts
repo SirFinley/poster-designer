@@ -32,17 +32,17 @@ export default class PosterImage {
                 return;
             }
 
-            let prevWidth = this.image.getScaledWidth();
-            let prevHeight = this.image.getScaledHeight();
+            const prevWidth = this.image.getScaledWidth();
+            const prevHeight = this.image.getScaledHeight();
 
-            let dims = this.settings.getVirtualDimensions();
-            let scale = this.settings.imageScaleValue;
+            const dims = this.settings.getVirtualDimensions();
+            const scale = this.settings.imageScaleValue;
 
             this.scaleToWidth(dims.posterWidth * scale);
 
             // keep centered on center point
-            let dx = (this.image.getScaledWidth() - prevWidth) / 2;
-            let dy = (this.image.getScaledHeight() - prevHeight) / 2;
+            const dx = (this.image.getScaledWidth() - prevWidth) / 2;
+            const dy = (this.image.getScaledHeight() - prevHeight) / 2;
             this.moveImageTo({
                 left: this.image.left! - dx,
                 top: this.image.top! - dy,
@@ -108,7 +108,7 @@ export default class PosterImage {
         this.canvas.add(image);
         this.canvas.renderAll();
 
-        let avgColor = this.getAverageColor();
+        const avgColor = this.getAverageColor();
         this.settings.setBorderColor(avgColor);
         this.canvas.setBackgroundColor(avgColor, () => { });
         this.canvas.renderAll();
@@ -122,11 +122,11 @@ export default class PosterImage {
             return;
         }
 
-        let dims = this.settings.getVirtualDimensions();
-        let scaledImageWidth = this.image.getScaledWidth();
-        let scaledImageHeight = this.image.getScaledHeight();
-        let imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
-        let imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
+        const dims = this.settings.getVirtualDimensions();
+        const scaledImageWidth = this.image.getScaledWidth();
+        const scaledImageHeight = this.image.getScaledHeight();
+        const imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
+        const imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
 
         this.moveImageTo({
             left: dims.posterLeftBorder + imageLeftOffset,
@@ -141,9 +141,9 @@ export default class PosterImage {
             return;
         }
 
-        let dims = this.settings.getVirtualDimensions();
-        let scaledImageHeight = this.image.getScaledHeight();
-        let imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
+        const dims = this.settings.getVirtualDimensions();
+        const scaledImageHeight = this.image.getScaledHeight();
+        const imageTopOffset = (dims.posterInnerBorderHeight - scaledImageHeight) / 2;
 
         this.moveImageTo({
             top: dims.posterTopBorder + imageTopOffset,
@@ -157,9 +157,9 @@ export default class PosterImage {
             return;
         }
 
-        let dims = this.settings.getVirtualDimensions();
-        let scaledImageWidth = this.image.getScaledWidth();
-        let imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
+        const dims = this.settings.getVirtualDimensions();
+        const scaledImageWidth = this.image.getScaledWidth();
+        const imageLeftOffset = (dims.posterInnerBorderWidth - scaledImageWidth) / 2;
 
         this.moveImageTo({
             left: dims.posterLeftBorder + imageLeftOffset,
@@ -173,7 +173,7 @@ export default class PosterImage {
             return;
         }
 
-        let scale = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
+        const scale = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
         this.settings.setImageScale(scale);
         eventHub.triggerEvent('dpiChanged');
     }
@@ -202,7 +202,7 @@ export default class PosterImage {
             return this.settings.borderColor as string;
         }
 
-        let fac = new FastAverageColor();
+        const fac = new FastAverageColor();
         return fac.getColor(this.imgElem, {
             algorithm: 'dominant',
             mode: 'speed',
@@ -215,7 +215,7 @@ export default class PosterImage {
             return;
         }
 
-        let dims = this.settings.getVirtualDimensions();
+        const dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.borderInnerAspectRatio) { // image wider than canvas
             this.scaleToWidth(dims.posterInnerBorderWidth);
@@ -233,7 +233,7 @@ export default class PosterImage {
             return;
         }
 
-        let dims = this.settings.getVirtualDimensions();
+        const dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.borderInnerAspectRatio) { // image wider than canvas
             this.scaleToHeight(dims.posterInnerBorderHeight);
@@ -251,7 +251,7 @@ export default class PosterImage {
             return;
         }
 
-        let dims = this.settings.getVirtualDimensions();
+        const dims = this.settings.getVirtualDimensions();
 
         if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas
             this.scaleToHeight(dims.posterHeight);

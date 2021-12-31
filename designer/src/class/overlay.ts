@@ -30,9 +30,9 @@ export default class Overlay {
 
         this.clearOverlay();
 
-        let dimensions = this.settings.getVirtualDimensions();
+        const dimensions = this.settings.getVirtualDimensions();
 
-        let svg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${dimensions.canvasWidth}" height="${dimensions.canvasHeight}">
+        const svg = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="${dimensions.canvasWidth}" height="${dimensions.canvasHeight}">
         <defs>
             <mask id="hole">
                 <rect width="${dimensions.canvasWidth}" height="${dimensions.canvasHeight}" fill="white"/>      
