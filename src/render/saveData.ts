@@ -23,4 +23,5 @@ export interface SaveData {
     },
     canvasObjectJsons: string[],
     imageKey: string,
+    imageThumbnailKey: string,
 }

@@ -3,9 +3,8 @@ import { fabric } from 'fabric';
 import eventHub from '../class/posterEventHub';
 import poster from '../class/poster';
 
-import axios from 'axios';
-import Settings from "../class/settings";
 import DropArea from './DropArea';
+import ImageUploader from '../class/imageUploader';
 
 function ImageUploadArea() {
     const previewImgRef = useRef<HTMLImageElement>(null);
@@ -37,8 +36,10 @@ function ImageUploadArea() {
         setFilePresent(true);
         setPercentage(0);
 
-        const imageUploader = new ImageUploader(poster.settings, (progress) => {
-            setPercentage(progress);
+        const imageUploader = new ImageUploader(poster.settings, {
+            onProgress: (progress) => setPercentage(progress),
+            onComplete: (key) => poster.settings.originalImageKey = key,
+            onCancelled: () => eventHub.triggerEvent('imageUploadCancelled'),
         });
         imageUploader.start(file);
 
@@ -115,118 +116,6 @@ function ImageUploadArea() {
             </div>
         </DropArea>
     );
-}
-
-class ImageUploader {
-    readonly API_PATH = "upload-image";
-
-    constructor(settings: Settings, onProgress: (progress: number) => void) {
-        this.settings = settings;
-
-        this.controller = new AbortController();
-        this.progress = 0;
-        this.onProgress = onProgress;
-    }
-
-    settings: Settings;
-    controller: AbortController;
-    progress: number;
-    onProgress: (progress: number) => void;
-
-    async start(file: File) {
-        this.progress = 0;
-
-        // const simulateUpload = () => {
-        //     const interval = setInterval(() => {
-        //         this.progress += 10;
-        //         if (this.progress <= 100) {
-        //             this.updateProgress(this.progress);
-        //         }
-        //     }, 100);
-        //     setTimeout(() => {
-        //         clearInterval(interval);
-        //     }, 1100);
-        // };
-        // simulateUpload();
-        // return;
-
-
-        try {
-            const uploadUrl = await this.getPresignedUrl(file);
-            this.uploadFile(uploadUrl.uploadUrl, file);
-            poster.settings.originalImageKey = uploadUrl.key;
-        } catch (error) {
-            // TODO: handle error
-        }
-    }
-
-    async getPresignedUrl(file: File): Promise<GetUploadUrlResponse> {
-        const response = await axios.get<GetUploadUrlResponse>(this.API_PATH, {
-            signal: this.controller.signal,
-            params: {
-                contentType: file.type,
-            },
-        })
-            .catch((err) => {
-                if (err.name === 'AbortError') {
-                    console.error('Fetch aborted')
-                    eventHub.triggerEvent('imageUploadCancelled');
-                } else {
-                    console.error('Error while getting upload url: ', err)
-                }
-
-                throw err;
-            });
-
-        if (!response) {
-            throw new Error("");
-        }
-
-        return response.data;
-    }
-
-    uploadFile(signedUrl: string, file: File) {
-        axios.put(signedUrl, file, {
-            method: 'PUT',
-            signal: this.controller.signal,
-            headers: {
-                'Content-Type': file.type,
-            },
-            onUploadProgress: (progressEvent) => {
-                const percent = Math.round(progressEvent.loaded / progressEvent.total * 100);
-                this.updateProgress(percent)
-            },
-        })
-            .catch((err) => {
-                if (err.name === 'AbortError') {
-                    console.error('Fetch aborted')
-                    eventHub.triggerEvent('imageUploadCancelled');
-                } else {
-                    console.error('Error while uploading file: ', err)
-                }
-
-                throw err;
-            });
-    }
-
-    updateProgress(percent: number) {
-        this.onProgress(percent);
-        if (percent < 100) {
-            this.progress = percent;
-        }
-        else {
-            eventHub.triggerEvent('imageUploaded');
-        }
-    }
-
-    abort() {
-        this.controller.abort();
-    }
-}
-
-interface GetUploadUrlResponse {
-    uploadUrl: string,
-    key: string,
 }
 
 export default ImageUploadArea;

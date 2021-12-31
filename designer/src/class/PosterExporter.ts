@@ -1,5 +1,6 @@
 import { fabric } from 'fabric';
 import PosterImage from "./image";
+import ImageUploader from './imageUploader';
 import Settings from "./settings";
 import VirtualDimensions from './virtualDimensions';
 
@@ -36,7 +37,66 @@ export default class PosterExporter {
             },
             canvasObjectJsons: this.getCanvasObjectsJson(settings, canvas),
             imageKey: settings.originalImageKey,
+            imageThumbnailKey: await this.uploadImageThumbnail(settings, canvas),
         };
+    }
+
+    async uploadImageThumbnail(settings: Settings, canvas: fabric.Canvas): Promise<string> {
+        const targetMaxSize = 300;
+        const dims = settings.getVirtualDimensions();
+        const longestSide = Math.max(dims.posterWidth, dims.posterHeight);
+        const multiplier = targetMaxSize / longestSide;
+
+        async function cloneCanvas(): Promise<fabric.StaticCanvas> {
+            return new Promise((resolve, reject) => {
+                canvas.clone((clone: fabric.StaticCanvas) => {
+
+                    // remove border lines
+                    clone.getObjects().forEach((obj) => {
+                        if (obj.name === 'border-line') {
+                            clone.remove(obj);
+                        }
+                    })
+
+                    clone.renderAll();
+                    resolve(clone);
+                });
+            });
+        }
+
+        const canvasClone = await cloneCanvas();
+        const dataURL = canvasClone.toDataURL({
+            width: dims.posterWidth,
+            height: dims.posterHeight,
+            left: dims.posterLeft,
+            top: dims.posterTop,
+            format: 'png',
+            multiplier,
+        });
+
+        function dataURLtoFile(dataurl: string, filename: string) {
+
+            const arr = dataurl.split(',');
+            const mime = arr[0].match(/:(.*?);/)![1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+
+            return new File([u8arr], filename, { type: mime });
+        }
+
+        let thumbnailKey = '';
+        const file = dataURLtoFile(dataURL, 'thumbnail.png');
+        const imgUploader = new ImageUploader(settings, {
+            onComplete: (key) => thumbnailKey = key,
+        });
+        await imgUploader.start(file);
+
+        return thumbnailKey;
     }
 
     private getCanvasObjectsJson(settings: Settings, canvas: fabric.Canvas) {
@@ -102,4 +162,5 @@ export interface SaveData {
     },
     canvasObjectJsons: string[],
     imageKey: string,
+    imageThumbnailKey: string,
 }
