@@ -6,7 +6,11 @@ import dynamodb from './util/dynamodb';
 import environment from './util/environment';
 
 export const main = handler(async (event) => {
-	const unparsedPosterId = event.queryStringParameters!['posterId'] as string;
+	const unparsedPosterId = event.queryStringParameters?.['posterId'];
+    if (!unparsedPosterId) {
+        throw new Error('Parameter posterId not specified');
+    }
+
     const posterId = unparsedPosterId.replace('<', '').replace('>', '');
 
     try {
@@ -72,7 +76,7 @@ async function getRenderUrls(renderKeys: RenderKeys) {
 
 interface PosterItem {
     id: string,
-    posterJson: any,
+    posterJson: string,
     fullRenderKey?: string,
     previewRenderKey?: string,
 }

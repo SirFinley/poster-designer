@@ -1,6 +1,6 @@
 import { APIGatewayProxyEventV2 } from "aws-lambda";
 
-export default function handler(lambda: ApiLambda) {
+export default function handler<T>(lambda: ApiLambda<T>) {
   return async function (event: APIGatewayProxyEventV2) {
     let body, statusCode;
 
@@ -27,4 +27,4 @@ export default function handler(lambda: ApiLambda) {
   };
 }
 
-type ApiLambda = (event: APIGatewayProxyEventV2) => Promise<any>;
+type ApiLambda<T> = (event: APIGatewayProxyEventV2) => Promise<T>;

@@ -34,7 +34,7 @@ async function getId() {
 	return base32Id;
 }
 
-async function updateAndIncreaseCounter() {
+async function updateAndIncreaseCounter(): Promise<number> {
 	const itemId = "poster";
 
 	const params = {
@@ -51,7 +51,12 @@ async function updateAndIncreaseCounter() {
 	};
 
 	const result = await dynamodb.update(params);
-	return result!.Attributes!.counts
+	const count = result?.Attributes?.counts;
+	if (!count || typeof count !== 'number') {
+		throw new Error('Unable to retrieve new count value');
+	}
+
+	return count;
 }
 
 async function savePoster(id: string, posterJson: string) {
