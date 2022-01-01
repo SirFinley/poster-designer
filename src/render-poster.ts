@@ -4,9 +4,14 @@ import { updateRenders } from './render/dynamo';
 import handler from './util/handler';
 import dynamodb from './util/dynamodb';
 import environment from './util/environment';
+import { SaveData } from "./render/saveData";
 
 export const main = handler(async (event) => {
-	const unparsedPosterId = event.queryStringParameters!['posterId'] as string;
+    const unparsedPosterId = event.queryStringParameters?.['posterId'];
+    if (!unparsedPosterId) {
+        throw new Error('Parameter posterId not specified');
+    }
+
     const posterId = unparsedPosterId.replace('<', '').replace('>', '');
 
     try {
@@ -15,7 +20,7 @@ export const main = handler(async (event) => {
         return result;
     } catch (error) {
         console.log(error);
-        throw(error);
+        throw (error);
     }
 });
 
@@ -35,10 +40,11 @@ async function getPosterItem(id: string) {
 
 async function render(posterId: string) {
     const item = await getPosterItem(posterId) as PosterItem;
+    const saveData = JSON.parse(item.posterJson) as SaveData;
 
     // already rendered
     if (item.fullRenderKey && item.previewRenderKey) {
-        return await getRenderUrls({
+        return await getRenderUrls(saveData, {
             fullRenderKey: item.fullRenderKey,
             previewRenderKey: item.previewRenderKey
         });
@@ -46,7 +52,6 @@ async function render(posterId: string) {
 
     // save rendered image to s3
     // save thumbnail image to s3
-    const saveData = JSON.parse(item.posterJson);
     const renderKeys = await new Render().render(posterId, saveData);
 
     // copy original image to `${posterId}/originalKey`
@@ -57,22 +62,25 @@ async function render(posterId: string) {
     // delete originalImageKey
 
     // get image urls
-    return await getRenderUrls(renderKeys);
+    return await getRenderUrls(saveData, renderKeys);
 }
 
-async function getRenderUrls(renderKeys: RenderKeys) {
+async function getRenderUrls(saveData: SaveData, renderKeys: RenderKeys) {
     const fullUrl = getDownloadUrl(renderKeys.fullRenderKey);
     const previewUrl = getDownloadUrl(renderKeys.previewRenderKey);
-    await Promise.all([fullUrl, previewUrl]);
+    const clientThumbnailUrl = getDownloadUrl(saveData.imageThumbnailKey);
+    await Promise.all([fullUrl, previewUrl, clientThumbnailUrl]);
+
     return {
-        fullUrl: await fullUrl,
-        previewUrl: await previewUrl,
+        fullRenderUrl: await fullUrl,
+        serverThumbnailUrl: await previewUrl,
+        clientThumbnailUrl: await clientThumbnailUrl,
     }
 }
 
 interface PosterItem {
     id: string,
-    posterJson: any,
+    posterJson: string,
     fullRenderKey?: string,
     previewRenderKey?: string,
 }

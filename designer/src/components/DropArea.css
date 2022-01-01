@@ -1,0 +1,20 @@
+.drop-area {
+  border: 2px dashed #ccc;
+  border-radius: 20px;
+  font-family: sans-serif;
+}
+
+  /* purple */
+  /* background: rgba(155, 50, 155, 0.15); */
+
+.drop-area.drop-highlight {
+  border-color: blue;
+  background: rgba(0, 50, 155, 0.15);
+}
+
+.drop-highlight .upper-canvas{
+  background: rgba(0, 50, 155, 0.15);
+  border: 2px dashed blue;
+  border-radius: 20px;
+  padding: 20px;
+}

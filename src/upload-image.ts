@@ -6,7 +6,11 @@ import environment from './util/environment';
 const URL_EXPIRATION_SECONDS = 5 * 60;
 
 export const main = handler(async (event) => {
-	const contentType = event.queryStringParameters!['contentType'] as string;
+	const contentType = event.queryStringParameters?.['contentType'];
+	if (!contentType) {
+		throw new Error('Parameter contentType not specified');
+	}
+	
 	if (! /image\/.+/.test(contentType)){
 		throw new Error('Invalid content type, must be an image');
 	}
