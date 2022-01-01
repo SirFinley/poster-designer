@@ -13,6 +13,7 @@ export default class SiteStack extends sst.Stack {
 
     this.designerSite = new sst.ReactStaticSite(this, "designer-site", {
       path: "designer",
+      buildCommand: "npm ci && npm run build",
       environment: {
         REACT_APP_API_URL: props.config_appApiUrl,
       },
