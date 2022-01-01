@@ -11,12 +11,10 @@ export default class SiteStack extends sst.Stack {
 
     const certificate = Certificate.fromCertificateArn(this, "rootCert", rootCertArn);
 
-    this.designerSite = new sst.StaticSite(this, "designer-site", {
+    this.designerSite = new sst.ReactStaticSite(this, "designer-site", {
       path: "designer",
-      buildOutput: "dist",
-      buildCommand: "npm ci && npm run build",
       environment: {
-        APP_API_URL: props.config_appApiUrl,
+        REACT_APP_API_URL: props.config_appApiUrl,
       },
       customDomain: {
         domainName: scope.stage === 'prod' ? "designer.visualinkworks.com" : `${scope.stage}-designer.visualinkworks.com`,

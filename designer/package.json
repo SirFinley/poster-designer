@@ -27,7 +27,7 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "sst-env -- react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -51,6 +51,7 @@
     ]
   },
   "devDependencies": {
+    "@serverless-stack/static-site-env": "^0.56.0",
     "@types/fabric": "^4.5.6",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.5",
