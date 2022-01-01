@@ -20,7 +20,7 @@ export default function SavePosterModal() {
     const [disabled, setDisabled] = useState(true);
     const [saved, setSaved] = useState(true);
     const [posterId, setPosterId] = useState('<AAAGGGH>');
-    const [etsyUrl, setEtsyUrl] = useState('');
+    const [etsyUrl, setEtsyUrl] = useState('https://etsy.com/');
     const [copiedId, setCopiedId] = useState(false);
 
 
@@ -72,8 +72,8 @@ export default function SavePosterModal() {
     }
 
     function getEtsyUrl() {
-        // TODO: get etsy url
-        return '#';
+        // TODO: get etsy url configured with settings
+        return etsyUrl;
     }
 
     async function getPostData() {
@@ -147,8 +147,7 @@ export default function SavePosterModal() {
                                                         </Tooltip>
 
                                                         <p id="save-modal-instructions" className="pt-4">
-                                                            <a href="#" className="underline" onClick={onIdClick}>Copy</a>
-                                                            <span> </span>your poster Id above and paste it in the personalization field back in the <a href={etsyUrl}>Etsy listing</a>
+                                                            Copy your poster Id above and paste it in the personalization field back in the <a href={etsyUrl} target="_blank" rel="noreferrer noopener" >Etsy listing</a>
                                                         </p>
                                                     </div>
                                                     :

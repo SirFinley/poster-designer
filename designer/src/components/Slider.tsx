@@ -8,7 +8,7 @@ function NoUiSlider({ setup }: IProps) {
     useEffect(() => {
         const slider = new NoUiSliderClass(sliderRef.current!, 0, 3, 1, 0.001);
         setup(slider);
-    }, [sliderRef])
+    }, [sliderRef]);  // eslint-disable-line react-hooks/exhaustive-deps
     
     return (
         <div ref={sliderRef} className="noUiSlider slider-round"></div>

@@ -5,6 +5,9 @@ import eventHub from './posterEventHub';
 import Settings from "./settings";
 const tinycolor = require('tinycolor2');
 
+const STEP_SIZE = 0.125;
+export { STEP_SIZE };
+
 export default class Border {
     constructor(canvas: fabric.Canvas, settings: Settings, image: PosterImage) {
         this.canvas = canvas;
@@ -15,8 +18,8 @@ export default class Border {
         this.bordersLinked = true;
         this.borderLockedValues = [0, 0];
 
-        this.sideBorderInput = new NoUiSlider(document.createElement('div'), 0, 10, 0, 0.125);
-        this.verticalBorderInput = new NoUiSlider(document.createElement('div'), 0, 10, 0, 0.125);
+        this.sideBorderInput = new NoUiSlider(document.createElement('div'), 0, 10, 0, STEP_SIZE);
+        this.verticalBorderInput = new NoUiSlider(document.createElement('div'), 0, 10, 0, STEP_SIZE);
     }
 
     canvas: fabric.Canvas;
@@ -170,8 +173,8 @@ export default class Border {
         }
 
         const size = this.settings.getRealPosterDimensions();
-        const maxSideBorder = size.width / 2 - 0.125;
-        const maxVerticalBorder = size.height / 2 - 0.125;
+        const maxSideBorder = size.width / 2 - STEP_SIZE;
+        const maxVerticalBorder = size.height / 2 - STEP_SIZE;
 
         this.sideBorderInput.setMax(maxSideBorder);
         this.verticalBorderInput.setMax(maxVerticalBorder);
@@ -215,23 +218,34 @@ export default class Border {
     }
 
     private setSideBorderInput(value: number) {
-        value = value || 0;
-        value = Math.round(value / 0.125) * 0.125;
-        value = clamp(value, this.sideBorderInput.getMin(), this.sideBorderInput.getMax());
+        const oldValue = this.sideBorderInput.get();
+        const newValue = this.getConstrainedBorder(value, this.sideBorderInput);
 
-        this.settings.sideBorder = value;
-        this.sideBorderInput.set(value);
-        eventHub.triggerEvent('borderSettingChanged');
+        this.settings.sideBorder = newValue;
+
+        if (oldValue.toFixed(3) !== newValue.toFixed(3)) { // only trigger if value changed
+            this.sideBorderInput.set(newValue);
+            eventHub.triggerEvent('borderSettingChanged');
+        }
     }
 
     private setVerticalBorderInput(value: number) {
-        value = value || 0;
-        value = Math.round(value / 0.125) * 0.125;
-        value = clamp(value, this.verticalBorderInput.getMin(), this.verticalBorderInput.getMax());
+        const oldValue = this.verticalBorderInput.get();
+        const newValue = this.getConstrainedBorder(value, this.verticalBorderInput);
 
-        this.settings.verticalBorder = value;
-        this.verticalBorderInput.set(value);
-        eventHub.triggerEvent('borderSettingChanged');
+        this.settings.verticalBorder = newValue;
+
+        if (oldValue.toFixed(3) !== newValue.toFixed(3)) { // only trigger if value changed
+            this.verticalBorderInput.set(newValue);
+            eventHub.triggerEvent('borderSettingChanged');
+        }
+    }
+
+    private getConstrainedBorder(value: number, slider: NoUiSlider){
+        value = value || 0;
+        value = Math.round(value / STEP_SIZE) * STEP_SIZE;
+        value = clamp(value, slider.getMin(), slider.getMax());
+        return value;
     }
 
     private crossUpdate(value: number, slider: NoUiSlider, callback: (_: number) => void) {

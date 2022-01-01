@@ -26,7 +26,15 @@ export default class NoUiSliderClass {
     slider: NoUiAPI;
 
     get(): number {
-        return this.slider.get() as number;
+        const value = this.slider.get();
+        if (typeof value === 'string') {
+            return Number(value);
+        }
+        else if (typeof value === 'number') {
+            return value;
+        }
+
+        return 0;
     }
 
     set(value: number) {

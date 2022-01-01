@@ -5,6 +5,7 @@ import NoUiSlider from './Slider';
 import NoUiSliderClass from '../class/noUiSlider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLink, faUnlink } from '@fortawesome/free-solid-svg-icons'
+import { STEP_SIZE } from '../class/border';
 
 function BorderSizes() {
     const fullSlider = useRef(null);
@@ -30,7 +31,7 @@ function BorderSizes() {
                 max: 10,
             },
             start: 0,
-            step: 0.125,
+            step: STEP_SIZE,
         }, false);
         poster.border.sideBorderInput = slider;
 
@@ -46,7 +47,7 @@ function BorderSizes() {
                 max: 10,
             },
             start: 0,
-            step: 0.125,
+            step: STEP_SIZE,
         }, false);
         poster.border.verticalBorderInput = slider;
 

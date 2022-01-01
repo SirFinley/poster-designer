@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, ChangeEvent } from 'react';
+import React, { useState, useEffect, useRef, ChangeEvent, useCallback } from 'react';
 import { fabric } from 'fabric';
 import eventHub from '../class/posterEventHub';
 import poster from '../class/poster';
@@ -13,6 +13,12 @@ function ImageUploadArea() {
     const [percentage, setPercentage] = useState(0);
     const [rendering, setRendering] = useState(true);
 
+    const handleDrop = useCallback((files: FileList) => {
+        const imageInput = fileInputRef.current!;
+        imageInput.files = files;
+        handleFile(files[0]);
+    }, [fileInputRef]);
+
     useEffect(() => {
         const imageInput = fileInputRef.current!;
         poster.image.imageInput = imageInput;
@@ -25,7 +31,7 @@ function ImageUploadArea() {
             onImageCleared.unsubscribe();
             onImageChanged.unsubscribe();
         };
-    }, [previewImgRef])
+    }, [previewImgRef, handleDrop])
 
     function onFileSelect(e: ChangeEvent<HTMLInputElement>) {
         const file = e.target.files![0];
@@ -77,12 +83,6 @@ function ImageUploadArea() {
         }
 
         reader.readAsDataURL(file);
-    }
-
-    function handleDrop(files: FileList) {
-        const imageInput = fileInputRef.current!;
-        imageInput.files = files;
-        handleFile(files[0]);
     }
 
     const uploadComplete = percentage === 100;
