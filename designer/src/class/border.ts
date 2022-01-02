@@ -1,7 +1,6 @@
 import { fabric } from 'fabric';
 import PosterImage from './image';
-import NoUiSlider from './noUiSlider';
-import eventHub from './posterEventHub';
+import eventHub, { EventSubscription } from './posterEventHub';
 import Settings from "./settings";
 const tinycolor = require('tinycolor2');
 
@@ -16,10 +15,9 @@ export default class Border {
 
         this.borderLines = []
         this.bordersLinked = true;
-        this.borderLockedValues = [0, 0];
-
-        this.sideBorderInput = new NoUiSlider(document.createElement('div'), 0, 10, 0, STEP_SIZE);
-        this.verticalBorderInput = new NoUiSlider(document.createElement('div'), 0, 10, 0, STEP_SIZE);
+        this.maxSide = 10;
+        this.maxVertical = 10;
+        this.listeners = [];
     }
 
     canvas: fabric.Canvas;
@@ -28,47 +26,28 @@ export default class Border {
     borderLines: fabric.Line[];
 
     bordersLinked: boolean;
-    borderLockedValues: number[];
-    sideBorderInput: NoUiSlider;
-    verticalBorderInput: NoUiSlider;
-    fullSlider?: HTMLElement;
+
+    maxSide: number;
+    maxVertical: number;
+    listeners: EventSubscription[];
 
     initialize() {
         this.setupEventListeners();
-        this.setInputConstraints();
     }
 
     private setupEventListeners() {
-        eventHub.subscribe('sizeSettingChanged', () => this.drawBorder());
-        eventHub.subscribe('orientationSettingChanged', () => this.drawBorder());
-        eventHub.subscribe('borderSettingChanged', () => this.drawBorder());
-        eventHub.subscribe('imageChanged', () => this.drawBorder());
-        eventHub.subscribe('colorChanged', () => {
-            this.canvas.backgroundColor = this.settings.borderColor;
-            this.drawLines();
-        });
-
-        // update border
-        const refreshBorderValues = () => {
-            this.setInputConstraints();
-            this.setSideBorderInput(this.settings.sideBorder);
-            this.setVerticalBorderInput(this.settings.verticalBorder);
-        }
-        eventHub.subscribe('sizeSettingChanged', refreshBorderValues);
-        eventHub.subscribe('orientationSettingChanged', refreshBorderValues);
+        this.listeners.forEach((listener) => listener.unsubscribe());
+        this.listeners = [
+            eventHub.subscribe('sizeSettingChanged', () => this.drawBorder()),
+            eventHub.subscribe('orientationSettingChanged', () => this.drawBorder()),
+            eventHub.subscribe('borderSettingChanged', () => this.drawBorder()),
+            eventHub.subscribe('imageChanged', () => this.drawBorder()),
+            eventHub.subscribe('colorChanged', () => {
+                this.canvas.backgroundColor = this.settings.borderColor;
+                this.drawLines();
+            }),
+        ];
     }
-
-    onSideBorderSlide() {
-        const value = this.sideBorderInput.get();
-        this.updateSideBorder(value);
-        eventHub.triggerEvent('borderSettingChanged');
-    };
-
-    onVerticalBorderSlide() {
-        const value = this.verticalBorderInput.get();
-        this.updateVerticalBorder(value);
-        eventHub.triggerEvent('borderSettingChanged');
-    };
 
     drawBorder() {
         const dims = this.settings.getVirtualDimensions();
@@ -167,106 +146,58 @@ export default class Border {
         }
     }
 
-    private setInputConstraints() {
-        if (!this.fullSlider) {
-            return;
-        }
-
-        const size = this.settings.getRealPosterDimensions();
-        const maxSideBorder = size.width / 2 - STEP_SIZE;
-        const maxVerticalBorder = size.height / 2 - STEP_SIZE;
-
-        this.sideBorderInput.setMax(maxSideBorder);
-        this.verticalBorderInput.setMax(maxVerticalBorder);
-
-        const maxInches = Math.max(maxSideBorder, maxVerticalBorder);
-        const maxSliderWidth = this.fullSlider.offsetWidth;
-
-        const pixelsPerInch = maxSliderWidth / maxInches;
-
-        if (maxSideBorder > maxVerticalBorder) {
-            this.sideBorderInput.setUiWidth(maxSliderWidth);
-            this.verticalBorderInput.setUiWidth(maxVerticalBorder * pixelsPerInch);
-        }
-        else {
-            this.verticalBorderInput.setUiWidth(maxSliderWidth);
-            this.sideBorderInput.setUiWidth(maxSideBorder * pixelsPerInch);
-        }
-    }
-
-    private updateSideBorder(value: number) {
+    updateSideBorder(value: number) {
         this.setSideBorderInput(value);
-        value = this.sideBorderInput.get();
-
-        this.crossUpdate(value, this.verticalBorderInput, (linkedValue) => this.setVerticalBorderInput(linkedValue));
-        this.setLockedValues();
+        eventHub.triggerEvent('borderSettingChanged');
     }
 
-    private updateVerticalBorder(value: number) {
+    updateVerticalBorder(value: number) {
         this.setVerticalBorderInput(value);
-        value = this.verticalBorderInput.get();
-
-        this.crossUpdate(value, this.sideBorderInput, (linkedValue) => this.setSideBorderInput(linkedValue));
-        this.setLockedValues();
-    }
-
-    private setLockedValues() {
-        this.borderLockedValues = [
-            Number(this.sideBorderInput.get()),
-            Number(this.verticalBorderInput.get())
-        ];
+        eventHub.triggerEvent('borderSettingChanged');
     }
 
     private setSideBorderInput(value: number) {
-        const oldValue = this.sideBorderInput.get();
-        const newValue = this.getConstrainedBorder(value, this.sideBorderInput);
-
-        this.settings.sideBorder = newValue;
+        const oldValue = this.settings.sideBorder;
+        const newValue = this.getConstrainedBorder(value, 0, this.maxSide);
 
         if (oldValue.toFixed(3) !== newValue.toFixed(3)) { // only trigger if value changed
-            this.sideBorderInput.set(newValue);
+            this.settings.sideBorder = newValue;
+            this.crossUpdate(oldValue, newValue, false);
             eventHub.triggerEvent('borderSettingChanged');
         }
     }
 
     private setVerticalBorderInput(value: number) {
-        const oldValue = this.verticalBorderInput.get();
-        const newValue = this.getConstrainedBorder(value, this.verticalBorderInput);
-
-        this.settings.verticalBorder = newValue;
+        const oldValue = this.settings.verticalBorder;
+        const newValue = this.getConstrainedBorder(value, 0, this.maxVertical);
 
         if (oldValue.toFixed(3) !== newValue.toFixed(3)) { // only trigger if value changed
-            this.verticalBorderInput.set(newValue);
+            this.settings.verticalBorder = newValue;
+            this.crossUpdate(oldValue, newValue, true);
             eventHub.triggerEvent('borderSettingChanged');
         }
     }
 
-    private getConstrainedBorder(value: number, slider: NoUiSlider){
+    private getConstrainedBorder(value: number, min: number, max: number) {
         value = value || 0;
         value = Math.round(value / STEP_SIZE) * STEP_SIZE;
-        value = clamp(value, slider.getMin(), slider.getMax());
+        value = clamp(value, min, max);
         return value;
     }
 
-    private crossUpdate(value: number, slider: NoUiSlider, callback: (_: number) => void) {
+    private crossUpdate(oldValue: number, newValue: number, isVertical: boolean) {
+        if (!this.bordersLinked) {
+            return;
+        }
 
-        // If the sliders aren't interlocked, don't
-        // cross-update.
-        if (!this.bordersLinked) return;
-
-        // Select whether to increase or decrease
-        // the other slider value.
-        const a = this.sideBorderInput === slider ? 0 : 1;
-
-        // Invert a
-        const b = a ? 0 : 1;
-
-        // Offset the slider value.
-        value -= this.borderLockedValues[b] - this.borderLockedValues[a];
-
-        // Set the value
-        slider.set(value);
-        callback(value);
+        if (isVertical) {
+            const offset = newValue - oldValue;
+            this.settings.sideBorder = this.getConstrainedBorder(this.settings.sideBorder + offset, 0, this.maxSide);
+        }
+        else {
+            const offset = newValue - oldValue;
+            this.settings.verticalBorder = this.getConstrainedBorder(this.settings.verticalBorder + offset, 0, this.maxVertical);
+        }
     }
 
 }

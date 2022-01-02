@@ -38,6 +38,7 @@ class EventSubscription {
 
 const eventHub = new PosterEventHub();
 export default eventHub;
+export { EventSubscription };
 
 export type PosterEventType = 'sizeSettingChanged'
     | 'orientationSettingChanged'

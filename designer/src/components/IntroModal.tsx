@@ -5,6 +5,7 @@ import { faUpload } from '@fortawesome/free-solid-svg-icons'
 import { Dialog, Transition } from '@headlessui/react';
 import DropArea from './DropArea';
 import poster from '../class/poster';
+import eventHub from '../class/posterEventHub';
 
 export default function ClearPosterModal() {
     const [open, setOpen] = useState(true)
@@ -13,6 +14,11 @@ export default function ClearPosterModal() {
     function onDrop(files: FileList) {
         poster.image.uploadFile(files);
         setOpen(false);
+    }
+
+    function onClose() {
+        setOpen(false);
+        eventHub.triggerEvent('sizeSettingChanged');
     }
 
     return (
@@ -66,7 +72,7 @@ export default function ClearPosterModal() {
                                 <button
                                     type="button"
                                     className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                    onClick={() => setOpen(false)}
+                                    onClick={onClose}
                                 >
                                     Close
                                 </button>

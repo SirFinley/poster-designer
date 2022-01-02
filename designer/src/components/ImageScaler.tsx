@@ -1,51 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { API as NoUiAPI } from 'nouislider';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import poster from '../class/poster';
 import eventHub from '../class/posterEventHub';
-import NoUiSlider from './Slider';
-import NoUiSliderClass from '../class/noUiSlider';
 
 function ImageScaler() {
+    const [sliderValue, setSliderValue] = useState(1);
     const [dpi, setDpi] = useState<number|null>(null);
 
     useEffect(() => {
         const onDpiChanged = eventHub.subscribe('dpiChanged', () => setDpi(poster.image.getDpi()));
+        const onSliderChanged = eventHub.subscribe('dpiChanged', () => {
+            setSliderValue(toSliderScaleValue(poster.settings.imageScaleValue));
+        });
 
         return () => {
             onDpiChanged.unsubscribe();
+            onSliderChanged.unsubscribe();
         }
     });
 
-    function onScaleSetup(slider: NoUiSliderClass) {
-        slider.slider.updateOptions({
-            range: {
-                min: 0,
-                max: 3,
-            },
-            start: 1,
-            step: 0.001,
-        }, false);
-        poster.settings.imageScaleInput = slider;
 
-        slider.slider.on('slide', onScaleImage);
-        function onScaleImage(this: NoUiAPI) {
-            const value = fromSliderScaleValue(this.get() as string);
-            poster.settings.setImageScale(value);
-            eventHub.triggerEvent('imageScaled');
-        }
+    function onScaleImage(value: number) {
+        value = fromSliderScaleValue(value);
+        poster.settings.setImageScale(value);
+        eventHub.triggerEvent('imageScaled');
     }
 
-    function fromSliderScaleValue(sliderValue: string): number {
-        let value = parseFloat(sliderValue) || 1;
-        value = Math.pow(2, value) - 1;
-        return value;
+    function fromSliderScaleValue(imageScale: number): number {
+        return Math.pow(2, imageScale) - 1;
+    }
+
+    function toSliderScaleValue(imageScale: number): number {
+        return Math.log2(imageScale + 1);
     }
 
     return (
         <div className="w-full">
             <label className="text-sm" htmlFor="image-scale">Scale Image <DpiText dpi={dpi}></DpiText></label>
             <div className="mx-2">
-                <NoUiSlider setup={onScaleSetup}></NoUiSlider>
+                <Slider min={0.05} max={3} value={sliderValue} step={0.001} onChange={onScaleImage} />
             </div>
         </div>
     );

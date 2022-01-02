@@ -1,4 +1,3 @@
-import NoUiSliderClass from "./noUiSlider";
 import eventHub, { PosterEventHub } from "./posterEventHub";
 import VirtualDimensions from "./virtualDimensions";
 
@@ -12,12 +11,8 @@ export default class PosterSettings {
     sideBorder: number;
     verticalBorder: number;
 
-    orientationInput: HTMLInputElement;
-
     borderColor: string;
 
-    imageScaleInput?: NoUiSliderClass;
-    imageScaleValueDisplay: HTMLElement;
     imageScaleValue: number;
     originalImageKey: string | null;
 
@@ -32,10 +27,6 @@ export default class PosterSettings {
         this.borderColor = '#ffffff';
         this.imageScaleValue = 1;
         this.originalImageKey = null;
-
-        this.orientationInput = document.getElementById("orientation-input") as HTMLInputElement;
-
-        this.imageScaleValueDisplay = document.getElementById("image-scale-value") as HTMLInputElement;
     }
 
     setBorderColor(color: string) {
@@ -118,12 +109,9 @@ export default class PosterSettings {
 
         if (orientation) {
             this.orientation = orientationOptionsEtsyUrlMap[orientation];
-            this.orientationInput.value = this.orientation;
         }
         if (size) {
             this.size = sizeOptionsEtsyUrlMap[size];
-            // TODO: set size input
-            // this.sizeInput.value = this.size;
         }
 
         this.eventHub.triggerEvent('sizeSettingChanged');
@@ -163,13 +151,7 @@ export default class PosterSettings {
     setImageScale(value: number) {
         value = value || 1;
         this.imageScaleValue = value;
-        this.imageScaleInput?.set(toSliderScaleValue(value));
     }
-}
-
-function toSliderScaleValue(value: number): number {
-    const sliderValue = value;
-    return Math.log2(sliderValue + 1);
 }
 
 export type OrientationOptions = "landscape" | "portrait";

@@ -1,66 +1,60 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 import poster from '../class/poster';
 import eventHub from '../class/posterEventHub';
-import NoUiSlider from './Slider';
-import NoUiSliderClass from '../class/noUiSlider';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLink, faUnlink } from '@fortawesome/free-solid-svg-icons'
 import { STEP_SIZE } from '../class/border';
 
 function BorderSizes() {
-    const fullSlider = useRef(null);
     const [linked, setLinked] = useState(true);
-    const [, setSideBorder] = useState(0);
-    const [, setVerticalBorder] = useState(0);
+    const [sideBorder, setSideBorder] = useState(0);
+    const [maxSide, setMaxSide] = useState(10);
+    const [verticalBorder, setVerticalBorder] = useState(0);
+    const [maxVertical, setMaxVertical] = useState(10);
 
     useEffect(() => {
-        eventHub.subscribe('borderSettingChanged', () => {
-            setSideBorder(poster.settings.sideBorder);
-            setVerticalBorder(poster.settings.verticalBorder);
-        })
+        const onBorderSettingChanged = eventHub.subscribe('borderSettingChanged', refreshBorderValues);
+        const onSizeChanged = eventHub.subscribe('sizeSettingChanged', refreshBorderValues);
+        const onOrientationChanged = eventHub.subscribe('orientationSettingChanged', refreshBorderValues);
 
-        poster.border.fullSlider = fullSlider.current!;
         poster.border.initialize();
         poster.border.drawBorder();
-    }, [fullSlider])
 
-    function onSideBorderSliderSetup(slider: NoUiSliderClass) {
-        slider.slider.updateOptions({
-            range: {
-                min: 0,
-                max: 10,
-            },
-            start: 0,
-            step: STEP_SIZE,
-        }, false);
-        poster.border.sideBorderInput = slider;
+        return () => {
+            onBorderSettingChanged.unsubscribe();
+            onSizeChanged.unsubscribe();
+            onOrientationChanged.unsubscribe();
+        }
+    });
 
-        slider.slider.on('slide', () => {
-            poster.border.onSideBorderSlide();
-        });
+    function refreshBorderValues() {
+        const size = poster.settings.getRealPosterDimensions();
+        const maxSideBorder = size.width / 2 - STEP_SIZE;
+        const maxVerticalBorder = size.height / 2 - STEP_SIZE;
+        poster.border.maxSide = maxSideBorder;
+        poster.border.maxVertical = maxVerticalBorder;
+
+        setMaxSide(maxSideBorder);
+        setSideBorder(poster.settings.sideBorder);
+
+        setMaxVertical(maxVerticalBorder);
+        setVerticalBorder(poster.settings.verticalBorder);
     }
 
-    function onVerticalBorderSliderSetup(slider: NoUiSliderClass) {
-        slider.slider.updateOptions({
-            range: {
-                min: 0,
-                max: 10,
-            },
-            start: 0,
-            step: STEP_SIZE,
-        }, false);
-        poster.border.verticalBorderInput = slider;
+    function onSideBorderChange(value: number) {
+        poster.border.updateSideBorder(value);
+    }
 
-        slider.slider.on('slide', () => {
-            poster.border.onVerticalBorderSlide();
-        });
+    function onVerticalBorderChange(value: number) {
+        poster.border.updateVerticalBorder(value);
     }
 
     function toggleLink() {
         const newLinked = !linked;
         poster.border.bordersLinked = newLinked;
         setLinked(newLinked);
-        console.log('link toggle');
     }
 
     const linkButton = (
@@ -69,27 +63,35 @@ function BorderSizes() {
         </button>
     );
 
+    const maxWidth = Math.max(maxVertical, maxSide);
+    const verticalWidth = maxVertical / maxWidth * 100;
+    const sideWidth = maxSide / maxWidth * 100;
+
     return (
-        <div className="pt-2 flex flex-col flex-wrap place-content-between overflow-auto">
+        <div className="pt-2 flex flex-col flex-wrap place-content-between overflow-auto w-80">
             <div className="mb-2">
                 <label className="text-sm" htmlFor="vertical-border">Top/Bottom Border: {poster.settings.verticalBorder}"</label>
-                <div className="flex">
+                <div className="flex items-center">
                     {linkButton}
-                    <NoUiSlider setup={onVerticalBorderSliderSetup}></NoUiSlider>
+                    <div className="w-full pr-2">
+                        <Slider min={0} max={maxVertical} value={verticalBorder} step={STEP_SIZE} onChange={onVerticalBorderChange} style={{ width: `${verticalWidth}%` }} />
+                    </div>
                 </div>
             </div>
             <div className="mb-0">
                 <label className="text-sm" htmlFor="side-border">Side Border: {poster.settings.sideBorder}"</label>
-                <div className="flex">
+                <div className="flex items-center">
                     {linkButton}
-                    <NoUiSlider setup={onSideBorderSliderSetup}></NoUiSlider>
+                    <div className="w-full pr-2">
+                        <Slider min={0} max={maxSide} value={sideBorder} step={STEP_SIZE} onChange={onSideBorderChange} style={{ width: `${sideWidth}%` }} />
+                    </div>
                 </div>
             </div>
             {/* <!-- used to calculate width for border sliders --> */}
             <div className="h-0 overflow-hidden">
                 <div className="flex">
                     {linkButton}
-                    <div ref={fullSlider} className="noUiSlider w-80" ></div>
+                    <div className="noUiSlider w-72 pr-4" ></div>
                 </div>
             </div>
         </div>
