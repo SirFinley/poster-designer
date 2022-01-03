@@ -6,7 +6,7 @@ import Border from "./border";
 import axios from "axios";
 
 // // configure axios
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://api.visualinkworks.com';
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://dev-api.visualinkworks.com';
 
 class Poster {
     constructor() {
