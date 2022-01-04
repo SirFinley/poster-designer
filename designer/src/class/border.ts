@@ -15,8 +15,6 @@ export default class Border {
 
         this.borderLines = []
         this.bordersLinked = true;
-        this.maxSide = 10;
-        this.maxVertical = 10;
         this.listeners = [];
     }
 
@@ -27,8 +25,15 @@ export default class Border {
 
     bordersLinked: boolean;
 
-    maxSide: number;
-    maxVertical: number;
+    get maxSide(): number {
+        const size = this.settings.getRealPosterDimensions();
+        return size.width / 2 - STEP_SIZE;
+    }
+
+    get maxVertical(): number {
+        const size = this.settings.getRealPosterDimensions();
+        return size.height / 2 - STEP_SIZE;
+    }
     listeners: EventSubscription[];
 
     initialize() {

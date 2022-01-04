@@ -4,12 +4,15 @@ import Overlay from "./overlay";
 import PosterSettings, { SizeOptions } from "./settings";
 import Border from "./border";
 import axios from "axios";
+import { makeAutoObservable } from "mobx";
 
 // // configure axios
 axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://dev-api.visualinkworks.com';
 
 class Poster {
     constructor() {
+        makeAutoObservable(this);
+        
         const canvas = new fabric.Canvas(document.createElement('canvas'));
         this.settings = new PosterSettings(canvas);
         // TODO: read settings from document.referrer

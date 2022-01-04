@@ -1,3 +1,4 @@
+import { makeAutoObservable } from "mobx";
 import eventHub, { PosterEventHub } from "./posterEventHub";
 import VirtualDimensions from "./virtualDimensions";
 
@@ -17,6 +18,8 @@ export default class PosterSettings {
     originalImageKey: string | null;
 
     constructor(canvas: fabric.Canvas) {
+        makeAutoObservable(this);
+        
         this.canvas = canvas;
         this.eventHub = eventHub;
 
