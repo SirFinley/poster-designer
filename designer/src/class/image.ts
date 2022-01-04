@@ -1,6 +1,6 @@
 import { fabric } from 'fabric';
 import FastAverageColor from 'fast-average-color';
-import { action, autorun, makeAutoObservable, makeObservable, observable } from 'mobx';
+import { action, autorun, makeAutoObservable } from 'mobx';
 import Settings from './settings';
 export default class PosterImage {
     constructor(canvas: fabric.Canvas, settings: Settings) {

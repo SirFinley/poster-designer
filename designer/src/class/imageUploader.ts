@@ -37,7 +37,7 @@ export default class ImageUploader {
 
         try {
             const uploadUrl = await this.getPresignedUrl(file);
-            this.uploadFile(uploadUrl.uploadUrl, file);
+            await this.uploadFile(uploadUrl.uploadUrl, file);
             this.options.onComplete(uploadUrl.key);
         } catch (error) {
             // TODO: handle error
@@ -69,8 +69,8 @@ export default class ImageUploader {
         return response.data;
     }
 
-    uploadFile(signedUrl: string, file: File) {
-        axios.put(signedUrl, file, {
+    async uploadFile(signedUrl: string, file: File) {
+        await axios.put(signedUrl, file, {
             method: 'PUT',
             signal: this.controller.signal,
             headers: {

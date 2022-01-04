@@ -34,6 +34,7 @@ const ImageUploadArea = observer(() => {
 
         poster.image.renderStatus = 'none';
         poster.image.uploadStatus = 'none';
+        // TODO: if new image selected while current still uploading, cancel current upload before new one starts
         const imageUploader = new ImageUploader(poster.settings, {
             onProgress: (progress) => setPercentage(progress),
             onComplete: (key) => {
