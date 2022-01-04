@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -12,11 +12,6 @@ const BorderSizes = observer(() => {
     const poster = useContext(PosterContext);
     const settings = poster.settings;
     const border = poster.border;
-
-    useEffect(() => {
-        poster.border.initialize();
-        poster.border.drawBorder();
-    });
 
     function onSideBorderChange(value: number) {
         poster.border.updateSideBorder(value);

@@ -1,22 +1,19 @@
-import { useState, ChangeEvent } from 'react';
+import { ChangeEvent, useContext } from 'react';
 import * as AllSettings from '../class/settings';
-import poster from '../class/poster';
-import eventHub from '../class/posterEventHub';
 import { SizeOptions } from '../class/settings';
 import Select from "./Select";
+import { observer } from 'mobx-react-lite';
+import { PosterContext } from '../util/Context';
 
-function SizeSelect() {
-    const [size, setSize] = useState<SizeOptions>(poster.defaultSize);
+const SizeSelect = observer(() => {
+    const poster = useContext(PosterContext);
+    
     const onSizeInput = (e: ChangeEvent<HTMLSelectElement>) => {
-        const newValue = e.currentTarget.value as SizeOptions;
-        setSize(newValue);
-
-        poster.settings.size = newValue;
-        eventHub.triggerEvent('sizeSettingChanged');
+        poster.settings.size = e.currentTarget.value as SizeOptions;
     }
 
     return (
-        <Select value={size} onChange={onSizeInput} label="Size">
+        <Select value={poster.settings.size} onChange={onSizeInput} label="Size">
             {
                 Object.keys(AllSettings.sizeOptionsDisplayMap).map((key) =>
                     <option key={key} value={key}>{AllSettings.sizeOptionsDisplayMap[key]}</option>
@@ -24,6 +21,6 @@ function SizeSelect() {
             }
         </Select>
     );
-}
+});
 
 export default SizeSelect;

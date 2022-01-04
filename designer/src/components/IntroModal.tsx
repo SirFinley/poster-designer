@@ -1,13 +1,14 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, useContext, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload } from '@fortawesome/free-solid-svg-icons'
 import { Dialog, Transition } from '@headlessui/react';
 import DropArea from './DropArea';
-import poster from '../class/poster';
-import eventHub from '../class/posterEventHub';
+import { observer } from 'mobx-react-lite';
+import { PosterContext } from '../util/Context';
 
-export default function ClearPosterModal() {
+const ClearPosterModal = observer(() => {
+    const poster = useContext(PosterContext);
     const [open, setOpen] = useState(true)
     const emptyRef = useRef(null);
 
@@ -18,7 +19,6 @@ export default function ClearPosterModal() {
 
     function onClose() {
         setOpen(false);
-        eventHub.triggerEvent('sizeSettingChanged');
     }
 
     return (
@@ -83,4 +83,6 @@ export default function ClearPosterModal() {
             </Dialog>
         </Transition.Root>
     )
-}
+});
+
+export default ClearPosterModal;

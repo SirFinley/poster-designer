@@ -1,8 +1,7 @@
-import poster from './class/poster';
 import Canvas from './components/Canvas';
 import IntroModal from './components/IntroModal';
 import Settings from './components/Settings';
-import { PosterContext, SettingsContext } from './util/Context';
+import { poster, PosterContext, SettingsContext } from './util/Context';
 
 function App() {
 

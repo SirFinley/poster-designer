@@ -1,6 +1,5 @@
 import axios from 'axios';
 import Settings from './settings';
-import eventHub from './posterEventHub';
 
 export default class ImageUploader {
     readonly API_PATH = "upload-image";
@@ -96,12 +95,7 @@ export default class ImageUploader {
 
     updateProgress(percent: number) {
         this.options.onProgress?.(percent);
-        if (percent < 100) {
-            this.progress = percent;
-        }
-        else {
-            eventHub.triggerEvent('imageUploaded');
-        }
+        this.progress = percent;
     }
 
     abort() {

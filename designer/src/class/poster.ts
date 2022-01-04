@@ -9,7 +9,7 @@ import { makeAutoObservable } from "mobx";
 // // configure axios
 axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://dev-api.visualinkworks.com';
 
-class Poster {
+export default class Poster {
     constructor() {
         makeAutoObservable(this);
         
@@ -50,6 +50,3 @@ class Poster {
         this.canvas?.renderAll();
     }
 }
-
-const poster = new Poster();
-export default poster;

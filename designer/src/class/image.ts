@@ -13,6 +13,8 @@ export default class PosterImage {
         this.imageAspectRatio = 0;
         this.imageScaleValue = 1;
         this.imgElem = null;
+        this.uploadStatus = 'none';
+        this.renderStatus = 'none';
         this.uploadFile = () => { throw new Error('upload file not implemented'); };
 
         this.setupEventListeners();
@@ -22,53 +24,57 @@ export default class PosterImage {
     settings: Settings;
 
     imageInput?: HTMLInputElement;
-    
+
     image: fabric.Image | null;
     imageAspectRatio: number;
     imgElem: HTMLImageElement | null;
     imageScaleValue: number;
+    uploadStatus: 'none' | 'uploading' | 'uploaded';
+    renderStatus: 'none' | 'rendering' | 'rendered';
 
     uploadFile: (files: FileList) => void;
 
     setupEventListeners() {
-        autorun(() => {
-            if (!this.image) {
-                return;
-            }
-
-            const prevWidth = this.image.getScaledWidth();
-            const prevHeight = this.image.getScaledHeight();
-
-            const dims = this.settings.getVirtualDimensions();
-            const scale = this.imageScaleValue;
-
-            this.scaleToWidth(dims.posterWidth * scale);
-
-            // keep centered on center point
-            const dx = (this.image.getScaledWidth() - prevWidth) / 2;
-            const dy = (this.image.getScaledHeight() - prevHeight) / 2;
-            this.moveImageTo({
-                left: this.image.left! - dx,
-                top: this.image.top! - dy,
-            })
-
-            this.canvas.renderAll();
-        });
+        autorun(() => this.onScaled());
     }
 
-    get dpi() : number|null {
+    onScaled() {
+        if (!this.image) {
+            return;
+        }
+
+        const prevWidth = this.image.getScaledWidth();
+        const prevHeight = this.image.getScaledHeight();
+
+        const dims = this.settings.getVirtualDimensions();
+        const scale = this.imageScaleValue;
+
+        this.scaleToWidth(dims.posterWidth * scale);
+
+        // keep centered on center point
+        const dx = (this.image.getScaledWidth() - prevWidth) / 2;
+        const dy = (this.image.getScaledHeight() - prevHeight) / 2;
+        this.moveImageTo({
+            left: this.image.left! - dx,
+            top: this.image.top! - dy,
+        })
+
+        this.canvas.renderAll();
+    }
+
+    get dpi(): number | null {
         if (!this.image) {
             return null;
         }
 
         // TODO: remove - currently used to make sure dpi gets recomputed when imageScaleValue changes
         console.log(this.imageScaleValue);
-        
+
         const imageRawWidthPixels = this.image.width!;
         const imageScaledWidthPixels = this.image.getScaledWidth();
 
         const posterWidthPixels = this.settings.getVirtualDimensions().posterWidth;
-        const posterWidthInches = this.settings.getRealPosterDimensions().width;
+        const posterWidthInches = this.settings.realPosterDimensions.width;
 
         const ratio = posterWidthPixels / imageScaledWidthPixels;
         return ratio * imageRawWidthPixels / posterWidthInches;
@@ -105,6 +111,8 @@ export default class PosterImage {
         this.settings.setBorderColor(avgColor);
         this.canvas.setBackgroundColor(avgColor, () => { });
         this.canvas.renderAll();
+
+        this.renderStatus = 'rendered';
     }
 
     centerImage() {
@@ -182,6 +190,9 @@ export default class PosterImage {
         if (this.imageInput) {
             this.imageInput.value = '';
         }
+
+        this.renderStatus = 'none';
+        this.uploadStatus = 'none';
     }
 
     getAverageColor() {

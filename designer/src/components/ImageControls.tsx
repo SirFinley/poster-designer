@@ -1,7 +1,10 @@
-import React from 'react';
-import poster from '../class/poster';
+import { observer } from 'mobx-react-lite';
+import React, { useContext } from 'react';
+import { PosterContext } from '../util/Context';
 
-function Settings() {
+const Settings = observer(() => {
+    const poster = useContext(PosterContext);
+
     function onFitToBorders() {
         poster.image.fitImageToBorders();
     }
@@ -33,7 +36,7 @@ function Settings() {
             </div>
         </div>
     );
-}
+});
 
 function ScaleButton(props: IButtonProps) {
     return (

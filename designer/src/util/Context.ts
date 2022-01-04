@@ -1,6 +1,7 @@
 import { createContext } from "react";
-import poster from "../class/poster";
+import Poster from "../class/poster";
 
 
+export const poster = new Poster();
 export const PosterContext = createContext(poster);
 export const SettingsContext = createContext(poster.settings);
