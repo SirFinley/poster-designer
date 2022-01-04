@@ -1,17 +1,19 @@
 import { fabric } from 'fabric';
 import FastAverageColor from 'fast-average-color';
-import { autorun, makeAutoObservable } from 'mobx';
+import { action, autorun, makeAutoObservable, makeObservable, observable } from 'mobx';
 import Settings from './settings';
 export default class PosterImage {
     constructor(canvas: fabric.Canvas, settings: Settings) {
-        makeAutoObservable(this);
+        makeAutoObservable(this, {
+            updateScaleSlider: action,
+        });
 
         this.canvas = canvas;
         this.settings = settings;
 
         this.image = null;
         this.imageAspectRatio = 0;
-        this.imageScaleValue = 1;
+        this.imagePosterRatio = 1;
         this.imgElem = null;
         this.uploadStatus = 'none';
         this.renderStatus = 'none';
@@ -28,7 +30,7 @@ export default class PosterImage {
     image: fabric.Image | null;
     imageAspectRatio: number;
     imgElem: HTMLImageElement | null;
-    imageScaleValue: number;
+    imagePosterRatio: number;
     uploadStatus: 'none' | 'uploading' | 'uploaded';
     renderStatus: 'none' | 'rendering' | 'rendered';
 
@@ -47,7 +49,7 @@ export default class PosterImage {
         const prevHeight = this.image.getScaledHeight();
 
         const dims = this.settings.getVirtualDimensions();
-        const scale = this.imageScaleValue;
+        const scale = this.imagePosterRatio;
 
         this.scaleToWidth(dims.posterWidth * scale);
 
@@ -63,21 +65,14 @@ export default class PosterImage {
     }
 
     get dpi(): number | null {
-        if (!this.image) {
+        if (!this.image || !this.image.width) {
             return null;
         }
 
-        // TODO: remove - currently used to make sure dpi gets recomputed when imageScaleValue changes
-        console.log(this.imageScaleValue);
-
-        const imageRawWidthPixels = this.image.width!;
-        const imageScaledWidthPixels = this.image.getScaledWidth();
-
-        const posterWidthPixels = this.settings.getVirtualDimensions().posterWidth;
+        const imageRawWidthPixels = this.image.width;
         const posterWidthInches = this.settings.realPosterDimensions.width;
 
-        const ratio = posterWidthPixels / imageScaledWidthPixels;
-        return ratio * imageRawWidthPixels / posterWidthInches;
+        return imageRawWidthPixels / posterWidthInches / this.imagePosterRatio;
     }
 
     setNewImage(image: fabric.Image) {
@@ -171,7 +166,7 @@ export default class PosterImage {
             return;
         }
 
-        this.imageScaleValue = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
+        this.imagePosterRatio = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
     }
 
     moveImageTo(coords: ImageCoords) {

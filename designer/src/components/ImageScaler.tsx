@@ -8,7 +8,7 @@ const ImageScaler = observer(() => {
     const poster = useContext(PosterContext);
 
     function onScaleImage(value: number) {
-        poster.image.imageScaleValue = fromSliderScaleValue(value);
+        poster.image.imagePosterRatio = fromSliderScaleValue(value);
     }
 
     function fromSliderScaleValue(imageScale: number): number {
@@ -23,7 +23,7 @@ const ImageScaler = observer(() => {
         <div className="w-full">
             <label className="text-sm" htmlFor="image-scale">Scale Image <DpiText dpi={poster.image.dpi}></DpiText></label>
             <div className="mx-2">
-                <Slider min={0.05} max={3} value={toSliderScaleValue(poster.image.imageScaleValue)} step={0.001} onChange={onScaleImage} />
+                <Slider min={0.05} max={3} value={toSliderScaleValue(poster.image.imagePosterRatio)} step={0.001} onChange={onScaleImage} />
             </div>
         </div>
     );
