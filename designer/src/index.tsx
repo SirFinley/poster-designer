@@ -4,6 +4,8 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+if (!new class { x:any }().hasOwnProperty('x')) throw new Error('Transpiler is not configured correctly');
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
