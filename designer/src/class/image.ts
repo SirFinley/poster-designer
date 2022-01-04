@@ -1,14 +1,17 @@
 import { fabric } from 'fabric';
 import FastAverageColor from 'fast-average-color';
-import eventHub from './posterEventHub';
+import { autorun, makeAutoObservable } from 'mobx';
 import Settings from './settings';
 export default class PosterImage {
     constructor(canvas: fabric.Canvas, settings: Settings) {
+        makeAutoObservable(this);
+
         this.canvas = canvas;
         this.settings = settings;
 
         this.image = null;
         this.imageAspectRatio = 0;
+        this.imageScaleValue = 1;
         this.imgElem = null;
         this.uploadFile = () => { throw new Error('upload file not implemented'); };
 
@@ -19,15 +22,16 @@ export default class PosterImage {
     settings: Settings;
 
     imageInput?: HTMLInputElement;
+    
     image: fabric.Image | null;
     imageAspectRatio: number;
     imgElem: HTMLImageElement | null;
+    imageScaleValue: number;
+
     uploadFile: (files: FileList) => void;
 
     setupEventListeners() {
-
-        // image scaled
-        eventHub.subscribe('imageScaled', () => {
+        autorun(() => {
             if (!this.image) {
                 return;
             }
@@ -36,7 +40,7 @@ export default class PosterImage {
             const prevHeight = this.image.getScaledHeight();
 
             const dims = this.settings.getVirtualDimensions();
-            const scale = this.settings.imageScaleValue;
+            const scale = this.imageScaleValue;
 
             this.scaleToWidth(dims.posterWidth * scale);
 
@@ -50,28 +54,18 @@ export default class PosterImage {
 
             this.canvas.renderAll();
         });
-
-        eventHub.subscribe('sizeSettingChanged', () => this.updateScaleSlider());
-        eventHub.subscribe('orientationSettingChanged', () => this.updateScaleSlider());
-        eventHub.subscribe('imageUploadCancelled', () => this.clearImage());
-        eventHub.subscribe('imageCleared', () => this.clearImage());
-
-        // setup dpi
-        eventHub.subscribe('imageChanged', () => eventHub.triggerEvent('dpiChanged'));
-        eventHub.subscribe('imageCleared', () => eventHub.triggerEvent('dpiChanged'));
-        eventHub.subscribe('imageScaled', () => eventHub.triggerEvent('dpiChanged'));
-        eventHub.subscribe('orientationSettingChanged', () => eventHub.triggerEvent('dpiChanged'));
-        eventHub.subscribe('sizeSettingChanged', () => eventHub.triggerEvent('dpiChanged'));
-
     }
 
-    getDpi() : number|null {
+    get dpi() : number|null {
         if (!this.image) {
             return null;
         }
 
-        const imageScaledWidthPixels = this.image.getScaledWidth();
+        // TODO: remove - currently used to make sure dpi gets recomputed when imageScaleValue changes
+        console.log(this.imageScaleValue);
+        
         const imageRawWidthPixels = this.image.width!;
+        const imageScaledWidthPixels = this.image.getScaledWidth();
 
         const posterWidthPixels = this.settings.getVirtualDimensions().posterWidth;
         const posterWidthInches = this.settings.getRealPosterDimensions().width;
@@ -103,7 +97,6 @@ export default class PosterImage {
             this.updateScaleSlider();
         });
 
-
         this.fitImageToBorders();
         this.canvas.add(image);
         this.canvas.renderAll();
@@ -112,9 +105,6 @@ export default class PosterImage {
         this.settings.setBorderColor(avgColor);
         this.canvas.setBackgroundColor(avgColor, () => { });
         this.canvas.renderAll();
-
-        eventHub.triggerEvent('imageChanged');
-        eventHub.triggerEvent('colorChanged');
     }
 
     centerImage() {
@@ -173,16 +163,13 @@ export default class PosterImage {
             return;
         }
 
-        const scale = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
-        this.settings.setImageScale(scale);
-        eventHub.triggerEvent('dpiChanged');
+        this.imageScaleValue = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
     }
 
     moveImageTo(coords: ImageCoords) {
         this.image?.set(coords);
         this.image?.setCoords();
     }
-
 
     clearImage() {
         if (this.image) {

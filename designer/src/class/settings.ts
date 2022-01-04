@@ -14,12 +14,11 @@ export default class PosterSettings {
 
     borderColor: string;
 
-    imageScaleValue: number;
     originalImageKey: string | null;
 
     constructor(canvas: fabric.Canvas) {
         makeAutoObservable(this);
-        
+
         this.canvas = canvas;
         this.eventHub = eventHub;
 
@@ -28,7 +27,6 @@ export default class PosterSettings {
         this.sideBorder = 0;
         this.verticalBorder = 0;
         this.borderColor = '#ffffff';
-        this.imageScaleValue = 1;
         this.originalImageKey = null;
     }
 
@@ -149,11 +147,6 @@ export default class PosterSettings {
         else {
             return height / width;
         }
-    }
-
-    setImageScale(value: number) {
-        value = value || 1;
-        this.imageScaleValue = value;
     }
 }
 

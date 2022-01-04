@@ -1,30 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import poster from '../class/poster';
-import eventHub from '../class/posterEventHub';
+import { PosterContext } from '../util/Context';
+import { observer } from 'mobx-react-lite';
 
-function ImageScaler() {
-    const [sliderValue, setSliderValue] = useState(1);
-    const [dpi, setDpi] = useState<number|null>(null);
-
-    useEffect(() => {
-        const onDpiChanged = eventHub.subscribe('dpiChanged', () => setDpi(poster.image.getDpi()));
-        const onSliderChanged = eventHub.subscribe('dpiChanged', () => {
-            setSliderValue(toSliderScaleValue(poster.settings.imageScaleValue));
-        });
-
-        return () => {
-            onDpiChanged.unsubscribe();
-            onSliderChanged.unsubscribe();
-        }
-    });
-
+const ImageScaler = observer(() => {
+    const poster = useContext(PosterContext);
 
     function onScaleImage(value: number) {
-        value = fromSliderScaleValue(value);
-        poster.settings.setImageScale(value);
-        eventHub.triggerEvent('imageScaled');
+        poster.image.imageScaleValue = fromSliderScaleValue(value);
     }
 
     function fromSliderScaleValue(imageScale: number): number {
@@ -37,13 +21,13 @@ function ImageScaler() {
 
     return (
         <div className="w-full">
-            <label className="text-sm" htmlFor="image-scale">Scale Image <DpiText dpi={dpi}></DpiText></label>
+            <label className="text-sm" htmlFor="image-scale">Scale Image <DpiText dpi={poster.image.dpi}></DpiText></label>
             <div className="mx-2">
-                <Slider min={0.05} max={3} value={sliderValue} step={0.001} onChange={onScaleImage} />
+                <Slider min={0.05} max={3} value={toSliderScaleValue(poster.image.imageScaleValue)} step={0.001} onChange={onScaleImage} />
             </div>
         </div>
     );
-}
+});
 
 function DpiText({dpi} : DpiTextProps) {
     if (!dpi) {
