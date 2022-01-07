@@ -1,6 +1,7 @@
 import { fabric } from 'fabric';
 import PosterImage from "./image";
 import ImageUploader from './imageUploader';
+import PosterRender from './posterRender';
 import Settings from "./settings";
 import VirtualDimensions from './virtualDimensions';
 
@@ -43,36 +44,7 @@ export default class PosterExporter {
 
     async uploadImageThumbnail(settings: Settings, canvas: fabric.Canvas): Promise<string> {
         const targetMaxSize = 300;
-        const dims = settings.getVirtualDimensions();
-        const longestSide = Math.max(dims.posterWidth, dims.posterHeight);
-        const multiplier = targetMaxSize / longestSide;
-
-        async function cloneCanvas(): Promise<fabric.StaticCanvas> {
-            return new Promise((resolve, reject) => {
-                canvas.clone((clone: fabric.StaticCanvas) => {
-
-                    // remove border lines
-                    clone.getObjects().forEach((obj) => {
-                        if (obj.name === 'border-line') {
-                            clone.remove(obj);
-                        }
-                    })
-
-                    clone.renderAll();
-                    resolve(clone);
-                });
-            });
-        }
-
-        const canvasClone = await cloneCanvas();
-        const dataURL = canvasClone.toDataURL({
-            width: dims.posterWidth,
-            height: dims.posterHeight,
-            left: dims.posterLeft,
-            top: dims.posterTop,
-            format: 'png',
-            multiplier,
-        });
+        const dataURL = await new PosterRender().uploadImageThumbnail(settings, canvas, targetMaxSize);
 
         function dataURLtoFile(dataurl: string, filename: string) {
 
