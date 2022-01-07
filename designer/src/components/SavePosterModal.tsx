@@ -1,13 +1,13 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useContext, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Dialog, Transition } from '@headlessui/react';
-import eventHub from '../class/posterEventHub';
-import poster from '../class/poster';
 import axios from "axios";
 import PosterExporter from '../class/PosterExporter';
 import Tooltip from './Tooltip';
+import { observer } from 'mobx-react-lite';
+import { PosterContext } from '../util/Context';
 
 const API_PATH = "save-poster";
 
@@ -15,27 +15,16 @@ interface SavePosterResponse {
     id: string,
 };
 
-export default function SavePosterModal() {
+const SavePosterModal = observer(() => {
+    const poster = useContext(PosterContext);
     const [open, setOpen] = useState(false)
-    const [disabled, setDisabled] = useState(true);
     const [saved, setSaved] = useState(true);
     const [posterId, setPosterId] = useState('<AAAGGGH>');
     const [etsyUrl, setEtsyUrl] = useState('https://etsy.com/');
     const [copiedId, setCopiedId] = useState(false);
 
-
     const cancelButtonRef = useRef(null)
-
-    useEffect(() => {
-        const onImageUploaded = eventHub.subscribe('imageUploaded', () => setDisabled(false));
-        const onImageChanged = eventHub.subscribe('imageChanged', () => setDisabled(true));
-        const onImageCleared = eventHub.subscribe('imageCleared', () => setDisabled(true));
-        return () => {
-            onImageUploaded.unsubscribe();
-            onImageChanged.unsubscribe();
-            onImageCleared.unsubscribe();
-        }
-    })
+    const disabled = poster.image.uploadStatus !== 'uploaded';
 
     function onSave() {
         setOpen(true);
@@ -173,6 +162,8 @@ export default function SavePosterModal() {
             </Transition.Root>
         </Fragment>
     )
-}
+});
+
+export default SavePosterModal;
 
 

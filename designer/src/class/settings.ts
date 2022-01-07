@@ -1,9 +1,8 @@
-import eventHub, { PosterEventHub } from "./posterEventHub";
+import { makeAutoObservable } from "mobx";
 import VirtualDimensions from "./virtualDimensions";
 
 export default class PosterSettings {
     canvas: fabric.Canvas;
-    eventHub: PosterEventHub;
 
     orientation: OrientationOptions;
     size: SizeOptions;
@@ -13,19 +12,18 @@ export default class PosterSettings {
 
     borderColor: string;
 
-    imageScaleValue: number;
     originalImageKey: string | null;
 
     constructor(canvas: fabric.Canvas) {
+        makeAutoObservable(this);
+
         this.canvas = canvas;
-        this.eventHub = eventHub;
 
         this.orientation = 'portrait';
         this.size = '8.5x11';
         this.sideBorder = 0;
         this.verticalBorder = 0;
         this.borderColor = '#ffffff';
-        this.imageScaleValue = 1;
         this.originalImageKey = null;
     }
 
@@ -60,7 +58,7 @@ export default class PosterSettings {
         const posterTop = canvasVerticalMargin;
         const posterBottom = canvasVerticalMargin + posterHeight;
 
-        const realPosterDimensions = this.getRealPosterDimensions();
+        const realPosterDimensions = this.realPosterDimensions;
         const inchesPerPixel = realPosterDimensions.width / posterWidth;
 
         const borderWidth = this.sideBorder / inchesPerPixel;
@@ -113,12 +111,9 @@ export default class PosterSettings {
         if (size) {
             this.size = sizeOptionsEtsyUrlMap[size];
         }
-
-        this.eventHub.triggerEvent('sizeSettingChanged');
-        this.eventHub.triggerEvent('orientationSettingChanged');
     }
 
-    getRealPosterDimensions(): RealPosterDimensions {
+    get realPosterDimensions(): RealPosterDimensions {
         const width = parseFloat(this.size.split('x')[0]);
         const height = parseFloat(this.size.split('x')[1]);
 
@@ -146,11 +141,6 @@ export default class PosterSettings {
         else {
             return height / width;
         }
-    }
-
-    setImageScale(value: number) {
-        value = value || 1;
-        this.imageScaleValue = value;
     }
 }
 

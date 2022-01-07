@@ -1,15 +1,22 @@
 import { fabric } from 'fabric';
 import FastAverageColor from 'fast-average-color';
-import eventHub from './posterEventHub';
+import { action, autorun, makeAutoObservable } from 'mobx';
 import Settings from './settings';
 export default class PosterImage {
     constructor(canvas: fabric.Canvas, settings: Settings) {
+        makeAutoObservable(this, {
+            updateScaleSlider: action,
+        });
+
         this.canvas = canvas;
         this.settings = settings;
 
         this.image = null;
         this.imageAspectRatio = 0;
+        this.imagePosterRatio = 1;
         this.imgElem = null;
+        this.uploadStatus = 'none';
+        this.renderStatus = 'none';
         this.uploadFile = () => { throw new Error('upload file not implemented'); };
 
         this.setupEventListeners();
@@ -19,65 +26,53 @@ export default class PosterImage {
     settings: Settings;
 
     imageInput?: HTMLInputElement;
+
     image: fabric.Image | null;
     imageAspectRatio: number;
     imgElem: HTMLImageElement | null;
+    imagePosterRatio: number;
+    uploadStatus: 'none' | 'uploading' | 'uploaded';
+    renderStatus: 'none' | 'rendering' | 'rendered';
+
     uploadFile: (files: FileList) => void;
 
     setupEventListeners() {
-
-        // image scaled
-        eventHub.subscribe('imageScaled', () => {
-            if (!this.image) {
-                return;
-            }
-
-            const prevWidth = this.image.getScaledWidth();
-            const prevHeight = this.image.getScaledHeight();
-
-            const dims = this.settings.getVirtualDimensions();
-            const scale = this.settings.imageScaleValue;
-
-            this.scaleToWidth(dims.posterWidth * scale);
-
-            // keep centered on center point
-            const dx = (this.image.getScaledWidth() - prevWidth) / 2;
-            const dy = (this.image.getScaledHeight() - prevHeight) / 2;
-            this.moveImageTo({
-                left: this.image.left! - dx,
-                top: this.image.top! - dy,
-            })
-
-            this.canvas.renderAll();
-        });
-
-        eventHub.subscribe('sizeSettingChanged', () => this.updateScaleSlider());
-        eventHub.subscribe('orientationSettingChanged', () => this.updateScaleSlider());
-        eventHub.subscribe('imageUploadCancelled', () => this.clearImage());
-        eventHub.subscribe('imageCleared', () => this.clearImage());
-
-        // setup dpi
-        eventHub.subscribe('imageChanged', () => eventHub.triggerEvent('dpiChanged'));
-        eventHub.subscribe('imageCleared', () => eventHub.triggerEvent('dpiChanged'));
-        eventHub.subscribe('imageScaled', () => eventHub.triggerEvent('dpiChanged'));
-        eventHub.subscribe('orientationSettingChanged', () => eventHub.triggerEvent('dpiChanged'));
-        eventHub.subscribe('sizeSettingChanged', () => eventHub.triggerEvent('dpiChanged'));
-
+        autorun(() => this.onScaled());
     }
 
-    getDpi() : number|null {
+    onScaled() {
         if (!this.image) {
+            return;
+        }
+
+        const prevWidth = this.image.getScaledWidth();
+        const prevHeight = this.image.getScaledHeight();
+
+        const dims = this.settings.getVirtualDimensions();
+        const scale = this.imagePosterRatio;
+
+        this.scaleToWidth(dims.posterWidth * scale);
+
+        // keep centered on center point
+        const dx = (this.image.getScaledWidth() - prevWidth) / 2;
+        const dy = (this.image.getScaledHeight() - prevHeight) / 2;
+        this.moveImageTo({
+            left: this.image.left! - dx,
+            top: this.image.top! - dy,
+        })
+
+        this.canvas.renderAll();
+    }
+
+    get dpi(): number | null {
+        if (!this.image || !this.image.width) {
             return null;
         }
 
-        const imageScaledWidthPixels = this.image.getScaledWidth();
-        const imageRawWidthPixels = this.image.width!;
+        const imageRawWidthPixels = this.image.width;
+        const posterWidthInches = this.settings.realPosterDimensions.width;
 
-        const posterWidthPixels = this.settings.getVirtualDimensions().posterWidth;
-        const posterWidthInches = this.settings.getRealPosterDimensions().width;
-
-        const ratio = posterWidthPixels / imageScaledWidthPixels;
-        return ratio * imageRawWidthPixels / posterWidthInches;
+        return imageRawWidthPixels / posterWidthInches / this.imagePosterRatio;
     }
 
     setNewImage(image: fabric.Image) {
@@ -103,7 +98,6 @@ export default class PosterImage {
             this.updateScaleSlider();
         });
 
-
         this.fitImageToBorders();
         this.canvas.add(image);
         this.canvas.renderAll();
@@ -113,8 +107,7 @@ export default class PosterImage {
         this.canvas.setBackgroundColor(avgColor, () => { });
         this.canvas.renderAll();
 
-        eventHub.triggerEvent('imageChanged');
-        eventHub.triggerEvent('colorChanged');
+        this.renderStatus = 'rendered';
     }
 
     centerImage() {
@@ -173,16 +166,13 @@ export default class PosterImage {
             return;
         }
 
-        const scale = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
-        this.settings.setImageScale(scale);
-        eventHub.triggerEvent('dpiChanged');
+        this.imagePosterRatio = this.image.getScaledWidth() / this.settings.getVirtualDimensions().posterWidth;
     }
 
     moveImageTo(coords: ImageCoords) {
         this.image?.set(coords);
         this.image?.setCoords();
     }
-
 
     clearImage() {
         if (this.image) {
@@ -195,6 +185,9 @@ export default class PosterImage {
         if (this.imageInput) {
             this.imageInput.value = '';
         }
+
+        this.renderStatus = 'none';
+        this.uploadStatus = 'none';
     }
 
     getAverageColor() {

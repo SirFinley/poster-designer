@@ -1,47 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
-import poster from '../class/poster';
-import eventHub from '../class/posterEventHub';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLink, faUnlink } from '@fortawesome/free-solid-svg-icons'
 import { STEP_SIZE } from '../class/border';
+import { observer } from 'mobx-react-lite';
+import { PosterContext } from '../util/Context';
 
-function BorderSizes() {
+const BorderSizes = observer(() => {
     const [linked, setLinked] = useState(true);
-    const [sideBorder, setSideBorder] = useState(0);
-    const [maxSide, setMaxSide] = useState(10);
-    const [verticalBorder, setVerticalBorder] = useState(0);
-    const [maxVertical, setMaxVertical] = useState(10);
-
-    useEffect(() => {
-        const onBorderSettingChanged = eventHub.subscribe('borderSettingChanged', refreshBorderValues);
-        const onSizeChanged = eventHub.subscribe('sizeSettingChanged', refreshBorderValues);
-        const onOrientationChanged = eventHub.subscribe('orientationSettingChanged', refreshBorderValues);
-
-        poster.border.initialize();
-        poster.border.drawBorder();
-
-        return () => {
-            onBorderSettingChanged.unsubscribe();
-            onSizeChanged.unsubscribe();
-            onOrientationChanged.unsubscribe();
-        }
-    });
-
-    function refreshBorderValues() {
-        const size = poster.settings.getRealPosterDimensions();
-        const maxSideBorder = size.width / 2 - STEP_SIZE;
-        const maxVerticalBorder = size.height / 2 - STEP_SIZE;
-        poster.border.maxSide = maxSideBorder;
-        poster.border.maxVertical = maxVerticalBorder;
-
-        setMaxSide(maxSideBorder);
-        setSideBorder(poster.settings.sideBorder);
-
-        setMaxVertical(maxVerticalBorder);
-        setVerticalBorder(poster.settings.verticalBorder);
-    }
+    const poster = useContext(PosterContext);
+    const settings = poster.settings;
+    const border = poster.border;
 
     function onSideBorderChange(value: number) {
         poster.border.updateSideBorder(value);
@@ -63,9 +33,9 @@ function BorderSizes() {
         </button>
     );
 
-    const maxWidth = Math.max(maxVertical, maxSide);
-    const verticalWidth = maxVertical / maxWidth * 100;
-    const sideWidth = maxSide / maxWidth * 100;
+    const maxWidth = Math.max(border.maxVertical, border.maxSide);
+    const verticalWidth = border.maxVertical / maxWidth * 100;
+    const sideWidth = border.maxSide / maxWidth * 100;
 
     return (
         <div className="pt-2 flex flex-col flex-wrap place-content-between overflow-auto w-80">
@@ -74,7 +44,7 @@ function BorderSizes() {
                 <div className="flex items-center">
                     {linkButton}
                     <div className="w-full pr-2">
-                        <Slider min={0} max={maxVertical} value={verticalBorder} step={STEP_SIZE} onChange={onVerticalBorderChange} style={{ width: `${verticalWidth}%` }} />
+                        <Slider min={0} max={border.maxVertical} value={settings.verticalBorder} step={STEP_SIZE} onChange={onVerticalBorderChange} style={{ width: `${verticalWidth}%` }} />
                     </div>
                 </div>
             </div>
@@ -83,7 +53,7 @@ function BorderSizes() {
                 <div className="flex items-center">
                     {linkButton}
                     <div className="w-full pr-2">
-                        <Slider min={0} max={maxSide} value={sideBorder} step={STEP_SIZE} onChange={onSideBorderChange} style={{ width: `${sideWidth}%` }} />
+                        <Slider min={0} max={border.maxSide} value={settings.sideBorder} step={STEP_SIZE} onChange={onSideBorderChange} style={{ width: `${sideWidth}%` }} />
                     </div>
                 </div>
             </div>
@@ -96,6 +66,6 @@ function BorderSizes() {
             </div>
         </div>
     );
-}
+});
 
 export default BorderSizes;

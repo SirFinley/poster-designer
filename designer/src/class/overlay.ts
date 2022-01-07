@@ -1,6 +1,6 @@
 import { fabric } from "fabric";
+import { autorun } from "mobx";
 import Settings from "./settings";
-import eventHub from "./posterEventHub";
 
 export default class Overlay {
     constructor(canvas: fabric.Canvas, settings: Settings) {
@@ -9,9 +9,7 @@ export default class Overlay {
 
         this.overlayPath = new fabric.Path();
 
-        this.drawOverlay();
-        eventHub.subscribe('sizeSettingChanged', () => this.drawOverlay());
-        eventHub.subscribe('orientationSettingChanged', () => this.drawOverlay());
+        autorun(() => this.drawOverlay());
     }
 
     canvas: fabric.Canvas;

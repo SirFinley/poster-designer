@@ -1,6 +1,6 @@
 import { fabric } from 'fabric';
+import { autorun } from 'mobx';
 import PosterImage from './image';
-import eventHub, { EventSubscription } from './posterEventHub';
 import Settings from "./settings";
 const tinycolor = require('tinycolor2');
 
@@ -15,9 +15,8 @@ export default class Border {
 
         this.borderLines = []
         this.bordersLinked = true;
-        this.maxSide = 10;
-        this.maxVertical = 10;
-        this.listeners = [];
+
+        this.setupEffects();
     }
 
     canvas: fabric.Canvas;
@@ -27,26 +26,22 @@ export default class Border {
 
     bordersLinked: boolean;
 
-    maxSide: number;
-    maxVertical: number;
-    listeners: EventSubscription[];
-
-    initialize() {
-        this.setupEventListeners();
+    get maxSide(): number {
+        const size = this.settings.realPosterDimensions;
+        return size.width / 2 - STEP_SIZE;
     }
 
-    private setupEventListeners() {
-        this.listeners.forEach((listener) => listener.unsubscribe());
-        this.listeners = [
-            eventHub.subscribe('sizeSettingChanged', () => this.drawBorder()),
-            eventHub.subscribe('orientationSettingChanged', () => this.drawBorder()),
-            eventHub.subscribe('borderSettingChanged', () => this.drawBorder()),
-            eventHub.subscribe('imageChanged', () => this.drawBorder()),
-            eventHub.subscribe('colorChanged', () => {
-                this.canvas.backgroundColor = this.settings.borderColor;
-                this.drawLines();
-            }),
-        ];
+    get maxVertical(): number {
+        const size = this.settings.realPosterDimensions;
+        return size.height / 2 - STEP_SIZE;
+    }
+
+    private setupEffects() {
+        autorun(() => {
+            console.log('draw border');
+            
+            this.drawBorder();
+        });
     }
 
     drawBorder() {
@@ -63,7 +58,6 @@ export default class Border {
         if (this.posterImage.image) {
             this.posterImage.image.clipPath = innerPath;
         }
-        this.canvas.renderAll();
 
         this.drawLines();
     }
@@ -148,12 +142,10 @@ export default class Border {
 
     updateSideBorder(value: number) {
         this.setSideBorderInput(value);
-        eventHub.triggerEvent('borderSettingChanged');
     }
 
     updateVerticalBorder(value: number) {
         this.setVerticalBorderInput(value);
-        eventHub.triggerEvent('borderSettingChanged');
     }
 
     private setSideBorderInput(value: number) {
@@ -163,7 +155,6 @@ export default class Border {
         if (oldValue.toFixed(3) !== newValue.toFixed(3)) { // only trigger if value changed
             this.settings.sideBorder = newValue;
             this.crossUpdate(oldValue, newValue, false);
-            eventHub.triggerEvent('borderSettingChanged');
         }
     }
 
@@ -174,7 +165,6 @@ export default class Border {
         if (oldValue.toFixed(3) !== newValue.toFixed(3)) { // only trigger if value changed
             this.settings.verticalBorder = newValue;
             this.crossUpdate(oldValue, newValue, true);
-            eventHub.triggerEvent('borderSettingChanged');
         }
     }
 

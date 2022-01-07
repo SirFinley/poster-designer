@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useRef, ChangeEvent, useCallback } from 'react';
+import React, { useState, useEffect, useRef, ChangeEvent, useCallback, useContext } from 'react';
 import { fabric } from 'fabric';
-import eventHub from '../class/posterEventHub';
-import poster from '../class/poster';
 
 import DropArea from './DropArea';
 import ImageUploader from '../class/imageUploader';
+import { PosterContext } from '../util/Context';
+import { observer } from 'mobx-react-lite';
 
-function ImageUploadArea() {
+const ImageUploadArea = observer(() => {
+    const poster = useContext(PosterContext);
     const previewImgRef = useRef<HTMLImageElement>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [filePresent, setFilePresent] = useState(false);
     const [percentage, setPercentage] = useState(0);
-    const [rendering, setRendering] = useState(true);
 
     const handleDrop = useCallback((files: FileList) => {
         const imageInput = fileInputRef.current!;
@@ -20,17 +19,9 @@ function ImageUploadArea() {
     }, [fileInputRef]);
 
     useEffect(() => {
-        const imageInput = fileInputRef.current!;
-        poster.image.imageInput = imageInput;
+        poster.image.imageInput = fileInputRef.current!;
         poster.image.uploadFile = handleDrop;
 
-        const onImageCleared = eventHub.subscribe('imageCleared', () => setFilePresent(false));
-        const onImageChanged = eventHub.subscribe('imageChanged', () => setRendering(false));
-
-        return function cancel() {
-            onImageCleared.unsubscribe();
-            onImageChanged.unsubscribe();
-        };
     }, [previewImgRef, handleDrop])
 
     function onFileSelect(e: ChangeEvent<HTMLInputElement>) {
@@ -39,14 +30,18 @@ function ImageUploadArea() {
     }
 
     function handleFile(file: File) {
-        eventHub.triggerEvent('imageChanged');
-        setFilePresent(true);
         setPercentage(0);
 
+        poster.image.renderStatus = 'none';
+        poster.image.uploadStatus = 'none';
+        // TODO: if new image selected while current still uploading, cancel current upload before new one starts
         const imageUploader = new ImageUploader(poster.settings, {
             onProgress: (progress) => setPercentage(progress),
-            onComplete: (key) => poster.settings.originalImageKey = key,
-            onCancelled: () => eventHub.triggerEvent('imageUploadCancelled'),
+            onComplete: (key) => {
+                poster.settings.originalImageKey = key;
+                poster.image.uploadStatus = 'uploaded';
+            },
+            onCancelled: () => poster.image.uploadStatus = 'none',
         });
         imageUploader.start(file);
 
@@ -57,17 +52,7 @@ function ImageUploadArea() {
 
         const reader = new FileReader();
 
-        const onImageUploadCancelled = eventHub.subscribe('imageUploadCancelled', abortReader);
-        const onImageCleared = eventHub.subscribe('imageCleared', abortReader);
-        function abortReader() {
-            reader.abort();
-            imageUploader.abort();
-        }
-
         reader.onload = (event) => {
-            onImageUploadCancelled.unsubscribe();
-            onImageCleared.unsubscribe();
-
             const src = event.target!.result as string;
 
             const imgElem = previewImgRef.current!;
@@ -75,17 +60,18 @@ function ImageUploadArea() {
             imgElem.onload = () => {
                 const image = new fabric.Image(imgElem)
                 poster.image.setNewImage(image);
-                setRendering(false);
             };
             poster.image.imgElem = imgElem;
 
-            setRendering(true);
+            poster.image.renderStatus = 'rendering';
         }
 
         reader.readAsDataURL(file);
     }
 
     const uploadComplete = percentage === 100;
+    const filePresent = !!poster.image.image;
+    const rendering = poster.image.renderStatus === 'rendering';
 
     return (
         <DropArea onDrop={handleDrop} >
@@ -117,6 +103,6 @@ function ImageUploadArea() {
             </div>
         </DropArea>
     );
-}
+});
 
 export default ImageUploadArea;

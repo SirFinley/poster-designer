@@ -1,16 +1,18 @@
-import React, { useEffect, useRef } from 'react';
-import poster from '../class/poster';
-import eventHub from '../class/posterEventHub';
+import React, { useContext, useEffect, useRef } from 'react';
 import { fabric } from 'fabric';
 import DropArea from './DropArea';
+import { observer } from 'mobx-react-lite';
+import { PosterContext } from '../util/Context';
+import Poster from '../class/poster';
 
-function Canvas() {
+const Canvas = observer(() => {
+    const poster = useContext(PosterContext);
     const canvasWrapper = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const canvas = initCanvas();
 
-        const canvasResizeObserver = new ResizeObserver((entries) => resizeCanvas(canvas, entries));
+        const canvasResizeObserver = new ResizeObserver((entries) => resizeCanvas(poster, canvas, entries));
         canvasResizeObserver.observe(canvasWrapper.current!);
         poster.setCanvas(canvas);
     }, [canvasWrapper])
@@ -39,9 +41,9 @@ function Canvas() {
             </DropArea>
         </div>
     );
-}
+});
 
-function resizeCanvas(canvas: fabric.Canvas, entries: ResizeObserverEntry[]) {
+function resizeCanvas(poster: Poster, canvas: fabric.Canvas, entries: ResizeObserverEntry[]) {
     if (entries.length !== 1) {
         console.error('invalid number of entries');
         return;
@@ -60,7 +62,7 @@ function resizeCanvas(canvas: fabric.Canvas, entries: ResizeObserverEntry[]) {
         const oldInchesFromLeft = (image.image.left! - oldDims.posterLeft) * oldDims.inchesPerPixel;
         const oldInchesFromTop = (image.image.top! - oldDims.posterTop) * oldDims.inchesPerPixel;
 
-        eventHub.triggerEvent('imageScaled'); // scale image to canvas
+        poster.image.onScaled();
 
         const newLeft = (oldInchesFromLeft / newDims.inchesPerPixel) + newDims.posterLeft;
         const newTop = (oldInchesFromTop / newDims.inchesPerPixel) + newDims.posterTop;

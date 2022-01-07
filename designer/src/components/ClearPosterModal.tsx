@@ -1,17 +1,19 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, useContext, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { ExclamationIcon } from '@heroicons/react/outline';
-import eventHub from '../class/posterEventHub';
+import { PosterContext } from '../util/Context';
+import { observer } from 'mobx-react-lite';
 
-export default function ClearPosterModal() {
+const ClearPosterModal = observer(() => {
+    const poster = useContext(PosterContext);
     const [open, setOpen] = useState(false)
 
     const cancelButtonRef = useRef(null)
 
     function onClear() {
         setOpen(false);
-        eventHub.triggerEvent('imageCleared');
+        poster.image.clearImage();
     }
 
     return (
@@ -91,4 +93,6 @@ export default function ClearPosterModal() {
             </Transition.Root>
         </Fragment>
     )
-}
+});
+
+export default ClearPosterModal;

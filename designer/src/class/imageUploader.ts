@@ -1,6 +1,5 @@
 import axios from 'axios';
 import Settings from './settings';
-import eventHub from './posterEventHub';
 
 export default class ImageUploader {
     readonly API_PATH = "upload-image";
@@ -38,7 +37,7 @@ export default class ImageUploader {
 
         try {
             const uploadUrl = await this.getPresignedUrl(file);
-            this.uploadFile(uploadUrl.uploadUrl, file);
+            await this.uploadFile(uploadUrl.uploadUrl, file);
             this.options.onComplete(uploadUrl.key);
         } catch (error) {
             // TODO: handle error
@@ -70,8 +69,8 @@ export default class ImageUploader {
         return response.data;
     }
 
-    uploadFile(signedUrl: string, file: File) {
-        axios.put(signedUrl, file, {
+    async uploadFile(signedUrl: string, file: File) {
+        await axios.put(signedUrl, file, {
             method: 'PUT',
             signal: this.controller.signal,
             headers: {
@@ -96,12 +95,7 @@ export default class ImageUploader {
 
     updateProgress(percent: number) {
         this.options.onProgress?.(percent);
-        if (percent < 100) {
-            this.progress = percent;
-        }
-        else {
-            eventHub.triggerEvent('imageUploaded');
-        }
+        this.progress = percent;
     }
 
     abort() {
