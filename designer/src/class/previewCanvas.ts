@@ -20,12 +20,15 @@ export default class PreviewCanvas {
         const canvas = this.canvas;
         canvas.clear();
 
-        this.setBackgroundImage(demoArea);
-        this.setForegroundImage(demoArea);
-
         this.setMovementConstraints(demoArea);
 
-        this.addPoster(demoArea);
+        await Promise.all([
+            this.setBackgroundImage(demoArea),
+            this.setForegroundImage(demoArea),
+            this.addPoster(demoArea),
+        ]);
+
+        // TODO: mark done - disable loading indicator
     }
 
     private async addPoster(demoArea: IDemoArea) {
@@ -37,29 +40,32 @@ export default class PreviewCanvas {
 
         const dataURL = await new PosterRender().getDataURL(this.poster.settings, this.poster.canvas!, maxSide * multiplier);
 
+        const bounds = demoArea.bounds;
         const imageOptions: fabric.IImageOptions = {
-            left: 0,
-            top: 0,
+            left: (bounds.left + bounds.right - pxWidth) / 2,
+            top: (bounds.top + bounds.bottom - pxHeight) / 2,
             scaleX: 1 / multiplier,
             scaleY: 1 / multiplier,
         };
 
-        fabric.Image.fromURL(dataURL, (img) => {
-            // disable controls for scaling/rotation
-            img.setControlsVisibility({
-                mtr: false,
-                tl: false,
-                mt: false,
-                tr: false,
-                mr: false,
-                br: false,
-                mb: false,
-                bl: false,
-                ml: false,
-            });
-            
-            this.canvas.add(img);
-        }, imageOptions);
+        const img = await loadFabricImage(dataURL);
+
+        // disable controls for scaling/rotation
+        img.setControlsVisibility({
+            mtr: false,
+            tl: false,
+            mt: false,
+            tr: false,
+            mr: false,
+            br: false,
+            mb: false,
+            bl: false,
+            ml: false,
+        });
+
+        img.setOptions(imageOptions);
+
+        this.canvas.add(img);
     }
 
     private setMovementConstraints(demoArea: IDemoArea) {
@@ -82,24 +88,24 @@ export default class PreviewCanvas {
         return Math.min(Math.max(num, min), max);
       };
 
-    private setBackgroundImage(demoArea: IDemoArea) {
+    private async setBackgroundImage(demoArea: IDemoArea) {
         // already set
         if (this.canvas.backgroundImage) {
             return;
         }
 
-        this.canvas.setBackgroundImage(demoArea.backgroundImgUrl, () => {
+        this.canvas.setBackgroundImage(await demoArea.backgroundImg, () => {
             this.canvas.renderAll();
         });
     }
 
-    private setForegroundImage(demoArea: IDemoArea) {
+    private async setForegroundImage(demoArea: IDemoArea) {
         // already set
         if (this.canvas.overlayImage) {
             return;
         }
 
-        this.canvas.setOverlayImage(demoArea.foregroundImgUrl, () => {
+        this.canvas.setOverlayImage(await demoArea.foregroundImg, () => {
             this.canvas.renderAll();
         });
     }
@@ -107,11 +113,21 @@ export default class PreviewCanvas {
 }
 
 interface IDemoArea {
-    backgroundImgUrl: string,
-    foregroundImgUrl: string,
+    backgroundImg: AsyncFabricImage,
+    foregroundImg: AsyncFabricImage,
     ppi: number, // pixels per inch
     bounds: IDemoAreaBounds,
 }
+
+function loadFabricImage(url: string): AsyncFabricImage {
+    return new Promise((resolve) => {
+        fabric.Image.fromURL(url, (img) => {
+            resolve(img);
+        });
+    });
+}
+
+type AsyncFabricImage = Promise<fabric.Image>;
 
 interface IDemoAreaBounds {
     left: number,
@@ -121,8 +137,8 @@ interface IDemoAreaBounds {
 }
 
 const demo01: IDemoArea = {
-    backgroundImgUrl: room01Background,
-    foregroundImgUrl: room01Foreground,
+    backgroundImg: loadFabricImage(room01Background),
+    foregroundImg: loadFabricImage(room01Foreground),
     ppi: 12,
     bounds: {
         left: 0,
