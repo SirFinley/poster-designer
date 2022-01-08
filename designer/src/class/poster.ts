@@ -5,6 +5,7 @@ import PosterSettings, { SizeOptions } from "./settings";
 import Border from "./border";
 import axios from "axios";
 import { makeAutoObservable } from "mobx";
+import PreviewCanvas from "./previewCanvas";
 
 // // configure axios
 axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://dev-api.visualinkworks.com';
@@ -14,6 +15,7 @@ export default class Poster {
         makeAutoObservable(this);
         
         const canvas = new fabric.Canvas(document.createElement('canvas'));
+        this.previewCanvas = new PreviewCanvas(this, new fabric.Canvas(document.createElement('canvas')));
         this.settings = new PosterSettings(canvas);
         // TODO: read settings from document.referrer
         // readSettingsFromUrl(document.referrer);
@@ -32,6 +34,7 @@ export default class Poster {
     }
 
     canvas?: fabric.Canvas;
+    previewCanvas: PreviewCanvas;
     settings: PosterSettings;
     overlay: Overlay;
     image: PosterImage;
@@ -48,5 +51,9 @@ export default class Poster {
         this.overlay.drawOverlay();
         this.border.drawBorder();
         this.canvas?.renderAll();
+    }
+
+    setPreviewCanvas(canvas: fabric.Canvas) {
+        this.previewCanvas.canvas = canvas;
     }
 }

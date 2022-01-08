@@ -44,7 +44,7 @@ export default class PosterExporter {
 
     async uploadImageThumbnail(settings: Settings, canvas: fabric.Canvas): Promise<string> {
         const targetMaxSize = 300;
-        const dataURL = await new PosterRender().uploadImageThumbnail(settings, canvas, targetMaxSize);
+        const dataURL = await new PosterRender().getDataURL(settings, canvas, targetMaxSize);
 
         function dataURLtoFile(dataurl: string, filename: string) {
 

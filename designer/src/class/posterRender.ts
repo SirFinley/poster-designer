@@ -3,7 +3,7 @@ import Settings from "./settings";
 
 export default class PosterRender {
 
-    async uploadImageThumbnail(settings: Settings, canvas: fabric.Canvas, targetMaxSize: number): Promise<string> {
+    async getDataURL(settings: Settings, canvas: fabric.Canvas, targetMaxSize: number): Promise<string> {
         const dims = settings.getVirtualDimensions();
         const longestSide = Math.max(dims.posterWidth, dims.posterHeight);
         const multiplier = targetMaxSize / longestSide;
@@ -21,7 +21,7 @@ export default class PosterRender {
 
                     clone.renderAll();
                     resolve(clone);
-                });
+                }, ['name']);
             });
         }
 

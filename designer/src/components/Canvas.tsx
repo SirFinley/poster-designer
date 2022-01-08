@@ -6,7 +6,7 @@ import { PosterContext } from '../util/Context';
 import Poster from '../class/poster';
 
 const Canvas = observer(() => {
-    const [designMode, setDesignMode] = useState(true);
+    const [designMode, setDesignMode] = useState<'design' | 'preview'>('design');
     const poster = useContext(PosterContext);
     const canvasWrapper = useRef<HTMLDivElement>(null);
     const designCanvasId = 'design-canvas';
@@ -14,13 +14,14 @@ const Canvas = observer(() => {
 
     useEffect(() => {
         console.log(designCanvasId);
-        
+
         const designCanvas = initDesignCanvas();
         const previewCanvas = initPreviewCanvas();
 
         const canvasResizeObserver = new ResizeObserver((entries) => resizeCanvases(poster, designCanvas, previewCanvas, entries));
         canvasResizeObserver.observe(canvasWrapper.current!);
         poster.setCanvas(designCanvas);
+        poster.setPreviewCanvas(previewCanvas);
     }, [canvasWrapper])
 
     const initDesignCanvas = () => {
@@ -42,14 +43,6 @@ const Canvas = observer(() => {
             height: 400,
         });
 
-        canvas.add(new fabric.Rect({
-            left: 20,
-            top: 20,
-            width: 100,
-            height: 100,
-            fill: '#ff0000',
-        }));
-
         // enforce uniform scaling
         canvas.uniformScaling = true;
         canvas.uniScaleKey = '';
@@ -61,22 +54,32 @@ const Canvas = observer(() => {
         poster.image.uploadFile(files);
     }
 
+    function toggleMode() {
+        if (designMode === 'design') {
+            setDesignMode('preview');
+            poster.previewCanvas.drawCanvas();
+        }
+        else if (designMode === 'preview') {
+            setDesignMode('design');
+        }
+    }
+
     return (
         <div ref={canvasWrapper} style={{ minWidth: '200px' }} className="relative">
             <DropArea onDrop={onDrop} unstyled>
 
-                <AbsoluteToggle show={designMode}>
+                <AbsoluteToggle show={designMode === 'design'}>
                     <canvas id={designCanvasId} ></canvas>
                 </AbsoluteToggle>
 
-                <AbsoluteToggle show={!designMode}>
+                <AbsoluteToggle show={designMode === 'preview'}>
                     <canvas id={previewCanvasId} ></canvas>
                 </AbsoluteToggle>
             </DropArea>
             <div>
-                <button onClick={() => setDesignMode(!designMode)}
+                <button onClick={toggleMode}
                     className="absolute right-3 top-3 p-2 rounded-lg shadow-md shadow-gray-600 text-white bg-green-500 hover:bg-green-600 transition font-bold" >
-                        { designMode ? 'Preview' : 'Design' }
+                    {designMode === 'design' ? 'Preview' : 'Design'}
                 </button>
             </div>
         </div>
@@ -84,7 +87,7 @@ const Canvas = observer(() => {
 });
 
 function AbsoluteToggle(props: any) {
-    return <div className={`${props.show ? '' : 'hidden'}`}>{ props.children }</div>
+    return <div className={`${props.show ? '' : 'hidden'}`}>{props.children}</div>
 }
 
 
