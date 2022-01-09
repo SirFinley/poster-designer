@@ -81,6 +81,12 @@ export default class PreviewCanvas {
             top: (bounds.top + bounds.bottom - pxHeight) / 2,
             scaleX: 1 / multiplier,
             scaleY: 1 / multiplier,
+            shadow: new fabric.Shadow({
+                color: '#888',
+                blur: 10,
+                offsetX: -10,
+                offsetY: 5,
+            }),
             ...options,
         };
 
