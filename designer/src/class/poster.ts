@@ -4,7 +4,7 @@ import Overlay from "./overlay";
 import PosterSettings, { SizeOptions } from "./settings";
 import Border from "./border";
 import axios from "axios";
-import { makeAutoObservable } from "mobx";
+import { makeAutoObservable, autorun, when } from "mobx";
 import PreviewCanvas from "./previewCanvas";
 
 // // configure axios
@@ -28,6 +28,45 @@ export default class Poster {
 
         this.defaultSize = '8.5x11';
         this.readSettingsFromUrl();
+        this.autorunPreview();
+    }
+
+    private autorunPreview() {
+        const onError = () => {
+            console.log('mobx onerror');
+            
+            try {
+                when(() => !this.previewCanvas.updating, async () => {
+                    await this.previewCanvas.updatePoster();
+                }, {
+                    timeout: 100,
+                });
+            } catch (error) {
+                onError();
+            }
+        };
+
+        autorun(() => {
+            // access observables to force this effect to run
+            let forceObservation: any = this.image.dpi;
+            forceObservation = this.settings.borderColor;
+            forceObservation = this.settings.getVirtualDimensions();
+            forceObservation = this.settings.realPosterDimensions;
+
+            // effect
+            // only update if preview not already updating - issues with duplicate images occurs otherwise
+            try {
+                when(() => !this.previewCanvas.updating, async () => {
+                    await this.previewCanvas.updatePoster();
+                }, {
+                    timeout: 100,
+                });
+            } catch (error) {
+                onError();
+            }
+        }, {
+            delay: 100,
+        });
     }
 
     readSettingsFromUrl() {

@@ -38,9 +38,9 @@ export default class Border {
 
     private setupEffects() {
         autorun(() => {
-            console.log('draw border');
-            
             this.drawBorder();
+        }, {
+            delay: 50,
         });
     }
 
