@@ -13,7 +13,7 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://dev-api.visua
 export default class Poster {
     constructor() {
         makeAutoObservable(this);
-        
+
         const canvas = new fabric.Canvas(document.createElement('canvas'));
         this.previewCanvas = new PreviewCanvas(this, new fabric.Canvas(document.createElement('canvas')));
         this.settings = new PosterSettings(canvas);
@@ -27,49 +27,9 @@ export default class Poster {
         // const render = new Render(image, canvas, settings);
 
         this.defaultSize = '8.5x11';
+        this.designMode = 'design';
         this.readSettingsFromUrl();
         this.autorunPreview();
-    }
-
-    private autorunPreview() {
-        const onError = () => {
-            console.log('mobx onerror');
-            
-            try {
-                when(() => !this.previewCanvas.updating, async () => {
-                    await this.previewCanvas.updatePoster();
-                }, {
-                    timeout: 100,
-                });
-            } catch (error) {
-                onError();
-            }
-        };
-
-        autorun(() => {
-            // access observables to force this effect to run
-            let forceObservation: any = this.image.dpi;
-            forceObservation = this.settings.borderColor;
-            forceObservation = this.settings.getVirtualDimensions();
-            forceObservation = this.settings.realPosterDimensions;
-
-            // effect
-            // only update if preview not already updating - issues with duplicate images occurs otherwise
-            try {
-                when(() => !this.previewCanvas.updating, async () => {
-                    await this.previewCanvas.updatePoster();
-                }, {
-                    timeout: 100,
-                });
-            } catch (error) {
-                onError();
-            }
-        }, {
-            delay: 100,
-        });
-    }
-
-    readSettingsFromUrl() {
     }
 
     canvas?: fabric.Canvas;
@@ -79,6 +39,38 @@ export default class Poster {
     image: PosterImage;
     border: Border;
     defaultSize: SizeOptions;
+    designMode: 'design' | 'preview';
+
+    private autorunPreview() {
+        setInterval(() => {
+            const previewer = this.previewCanvas;
+            // ensure only one instance of updatePoster is running at a time, 
+            // otherwise issues occur such as duplicate posters in the preview 
+            if (!previewer.updating && previewer.needsUpdate) {
+                previewer.needsUpdate = false;
+                previewer.updating = true;
+                previewer.updatePoster();
+            }
+        }, 50);
+
+        autorun(() => {
+            // access observables to force this effect to run
+            let forceObservation: any = this.image.dpi;
+            forceObservation = this.settings.borderColor;
+            forceObservation = this.settings.getVirtualDimensions();
+            forceObservation = this.settings.realPosterDimensions;
+
+            if (this.designMode == 'preview') { // only update in preview mode
+                this.previewCanvas.needsUpdate = true;
+            }
+        }, {
+            // delay: 100,
+            scheduler: run => {setTimeout(run, 50); console.log('schedule');}
+        });
+    }
+
+    readSettingsFromUrl() {
+    }
 
     setCanvas(canvas: fabric.Canvas) {
         this.canvas = canvas;

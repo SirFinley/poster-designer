@@ -6,7 +6,6 @@ import { PosterContext } from '../util/Context';
 import Poster from '../class/poster';
 
 const Canvas = observer(() => {
-    const [designMode, setDesignMode] = useState<'design' | 'preview'>('design');
     const poster = useContext(PosterContext);
     const canvasWrapper = useRef<HTMLDivElement>(null);
     const designCanvasId = 'design-canvas';
@@ -55,12 +54,12 @@ const Canvas = observer(() => {
     }
 
     function toggleMode() {
-        if (designMode === 'design') {
-            setDesignMode('preview');
+        if (poster.designMode === 'design') {
+            poster.designMode = 'preview';
             poster.previewCanvas.drawCanvas();
         }
-        else if (designMode === 'preview') {
-            setDesignMode('design');
+        else if (poster.designMode === 'preview') {
+            poster.designMode = 'design';
         }
     }
 
@@ -68,18 +67,18 @@ const Canvas = observer(() => {
         <div ref={canvasWrapper} style={{ minWidth: '200px' }} className="relative">
             <DropArea onDrop={onDrop} unstyled>
 
-                <AbsoluteToggle show={designMode === 'design'}>
+                <AbsoluteToggle show={poster.designMode === 'design'}>
                     <canvas id={designCanvasId} ></canvas>
                 </AbsoluteToggle>
 
-                <AbsoluteToggle show={designMode === 'preview'}>
+                <AbsoluteToggle show={poster.designMode === 'preview'}>
                     <canvas id={previewCanvasId} ></canvas>
                 </AbsoluteToggle>
             </DropArea>
             <div>
                 <button onClick={toggleMode}
                     className="absolute right-3 top-3 p-2 rounded-lg shadow-md shadow-gray-600 text-white bg-green-500 hover:bg-green-600 transition font-bold" >
-                    {designMode === 'design' ? 'Preview' : 'Design'}
+                    {poster.designMode === 'design' ? 'Preview' : 'Design'}
                 </button>
             </div>
         </div>

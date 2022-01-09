@@ -10,12 +10,14 @@ export default class PreviewCanvas {
         this.poster = poster;
         this.canvas = canvas;
         this.updating = false;
+        this.needsUpdate = false;
     }
 
     poster: Poster;
     canvas: fabric.Canvas;
     image?: fabric.Image;
     updating: boolean;
+    needsUpdate: boolean;
 
     async drawCanvas() {
         const demoArea = demo01;
@@ -35,8 +37,6 @@ export default class PreviewCanvas {
     }
 
     async updatePoster() {
-        this.updating = true;
-
         const demoArea = demo01;
         const oldImage = this.image
 
