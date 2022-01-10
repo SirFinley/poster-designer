@@ -20,6 +20,7 @@ export default class PreviewCanvas {
     needsUpdate: boolean;
 
     async drawCanvas() {
+        this.updating = true;
         const demoArea = demo01;
 
         const canvas = this.canvas;
@@ -34,9 +35,12 @@ export default class PreviewCanvas {
         ]);
 
         // TODO: mark done - disable loading indicator
+        this.updating = false;
     }
 
     async updatePoster() {
+        this.updating = true;
+        
         const demoArea = demo01;
         const oldImage = this.image
 
