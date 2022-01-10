@@ -34,7 +34,6 @@ const SavePosterModal = observer(() => {
 
     function onIdClick() {
         copyId();
-        console.log('copied');
     }
 
     async function upload() {
@@ -56,7 +55,6 @@ const SavePosterModal = observer(() => {
             const id = response.data.id
             setPosterId(id);
             setEtsyUrl(getEtsyUrl());
-            console.log('poster saved with id ' + id);
         }
     }
 

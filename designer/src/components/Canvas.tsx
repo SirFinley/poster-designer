@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { fabric } from 'fabric';
 import DropArea from './DropArea';
 import { observer } from 'mobx-react-lite';
@@ -12,8 +12,6 @@ const Canvas = observer(() => {
     const previewCanvasId = 'preview-canvas';
 
     useEffect(() => {
-        console.log(designCanvasId);
-
         const designCanvas = initDesignCanvas();
         const previewCanvas = initPreviewCanvas();
 
@@ -21,7 +19,7 @@ const Canvas = observer(() => {
         canvasResizeObserver.observe(canvasWrapper.current!);
         poster.setCanvas(designCanvas);
         poster.setPreviewCanvas(previewCanvas);
-    }, [canvasWrapper])
+    }, [canvasWrapper, poster])
 
     const initDesignCanvas = () => {
         const canvas = new fabric.Canvas(designCanvasId, {

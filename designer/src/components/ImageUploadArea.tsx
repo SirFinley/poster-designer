@@ -12,24 +12,7 @@ const ImageUploadArea = observer(() => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [percentage, setPercentage] = useState(0);
 
-    const handleDrop = useCallback((files: FileList) => {
-        const imageInput = fileInputRef.current!;
-        imageInput.files = files;
-        handleFile(files[0]);
-    }, [fileInputRef]);
-
-    useEffect(() => {
-        poster.image.imageInput = fileInputRef.current!;
-        poster.image.uploadFile = handleDrop;
-
-    }, [previewImgRef, handleDrop])
-
-    function onFileSelect(e: ChangeEvent<HTMLInputElement>) {
-        const file = e.target.files![0];
-        handleFile(file);
-    }
-
-    function handleFile(file: File) {
+    const handleFile = useCallback((file: File) => {
         setPercentage(0);
 
         poster.image.renderStatus = 'none';
@@ -67,6 +50,23 @@ const ImageUploadArea = observer(() => {
         }
 
         reader.readAsDataURL(file);
+    }, [poster.image, poster.settings]);
+
+    const handleDrop = useCallback((files: FileList) => {
+        const imageInput = fileInputRef.current!;
+        imageInput.files = files;
+        handleFile(files[0]);
+    }, [fileInputRef, handleFile]);
+
+    useEffect(() => {
+        poster.image.imageInput = fileInputRef.current!;
+        poster.image.uploadFile = handleDrop;
+
+    }, [previewImgRef, handleDrop, poster.image]);
+
+    function onFileSelect(e: ChangeEvent<HTMLInputElement>) {
+        const file = e.target.files![0];
+        handleFile(file);
     }
 
     const uploadComplete = percentage === 100;

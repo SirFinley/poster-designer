@@ -4,7 +4,7 @@ import Overlay from "./overlay";
 import PosterSettings, { SizeOptions } from "./settings";
 import Border from "./border";
 import axios from "axios";
-import { makeAutoObservable, autorun, when } from "mobx";
+import { makeAutoObservable, autorun } from "mobx";
 import PreviewCanvas from "./previewCanvas";
 
 // // configure axios
@@ -60,12 +60,12 @@ export default class Poster {
             forceObservation = this.settings.getVirtualDimensions();
             forceObservation = this.settings.realPosterDimensions;
 
-            if (this.designMode == 'preview') { // only update in preview mode
+            if (this.designMode === 'preview') { // only update in preview mode
                 this.previewCanvas.needsUpdate = true;
             }
         }, {
             // delay: 100,
-            scheduler: run => {setTimeout(run, 50); console.log('schedule');}
+            scheduler: (run) => {setTimeout(run, 50);}
         });
     }
 

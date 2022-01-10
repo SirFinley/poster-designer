@@ -153,23 +153,23 @@ const orientationOptionsEtsyUrlMap: Record<string, OrientationOptions> = {
 
 export type SizeOptions = keyof typeof sizeOptionsDisplayMap;
 export const sizeOptionsDisplayMap: Record<string, string> = {
-    '8.5x11': '8.5"x11"',
-    '11x17': '11"x17"',
-    // '8x24': '8"x24"',       // 1:3
-    // '12x24': '12"x24"',     // 1:2
-    // '16x24': '16"x24"',     // 2:3
-    '18x24': '18"x24"',     // 3:4
+    '8x10': '8"x10"',
+    '12x18': '12"x18"',
+    '12x24': '12"x24"',
+    '12x36': '12"x36"',
+    '18x24': '18"x24"',
+    '24x30': '24"x30"',
     '24x36': '24"x36"',
 };
 
 // TODO: etsy - replace keys with etsy variation id
 const sizeOptionsEtsyUrlMap: Record<string, SizeOptions> = {
-    '8.5x11': '8.5x11',
-    '11x17': '11x17',
-    // '8x24': '8x24',
-    // '12x24': '12x24',
-    // '16x24': '16x24',
+    '8x10': '8x10',
+    '12x18': '12x18',
+    '12x24': '12x24',
+    '12x36': '12x36',
     '18x24': '18x24',
+    '24x30': '24x30',
     '24x36': '24x36',
 };
 
