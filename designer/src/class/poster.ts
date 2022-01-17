@@ -81,6 +81,7 @@ export default class Poster {
     setCanvas(canvas: fabric.Canvas) {
         this.canvas = canvas;
         this.settings.canvas = canvas;
+        canvas.setBackgroundColor(this.settings.borderColor, () => undefined);
         this.overlay.canvas = canvas;
         this.image.canvas = canvas;
         this.border.canvas = canvas;
