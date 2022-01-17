@@ -66,6 +66,9 @@ export default class Poster {
             forceObservation = this.settings.getVirtualDimensions();
             forceObservation = this.settings.realPosterDimensions;
 
+            // eslint-disable-next-line
+            forceObservation = true;
+
             if (this.designMode === 'preview') { // only update in preview mode
                 this.previewCanvas.needsUpdate = true;
             }
