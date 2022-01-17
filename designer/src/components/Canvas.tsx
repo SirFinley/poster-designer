@@ -8,17 +8,34 @@ import Poster from '../class/poster';
 const Canvas = observer(() => {
     const poster = useContext(PosterContext);
     const canvasWrapper = useRef<HTMLDivElement>(null);
+    const designCanvasId = 'design-canvas';
+    const previewCanvasId = 'preview-canvas';
 
     useEffect(() => {
-        const canvas = initCanvas();
+        const designCanvas = initDesignCanvas();
+        const previewCanvas = initPreviewCanvas();
 
-        const canvasResizeObserver = new ResizeObserver((entries) => resizeCanvas(poster, canvas, entries));
+        const canvasResizeObserver = new ResizeObserver((entries) => resizeCanvases(poster, designCanvas, previewCanvas, entries));
         canvasResizeObserver.observe(canvasWrapper.current!);
-        poster.setCanvas(canvas);
-    }, [canvasWrapper])
+        poster.setCanvas(designCanvas);
+        poster.setPreviewCanvas(previewCanvas);
+    }, [canvasWrapper, poster])
 
-    const initCanvas = () => {
-        const canvas = new fabric.Canvas('fabric-canvas', {
+    const initDesignCanvas = () => {
+        const canvas = new fabric.Canvas(designCanvasId, {
+            width: 400,
+            height: 400,
+        });
+
+        // enforce uniform scaling
+        canvas.uniformScaling = true;
+        canvas.uniScaleKey = '';
+
+        return canvas;
+    }
+
+    const initPreviewCanvas = () => {
+        const canvas = new fabric.Canvas(previewCanvasId, {
             width: 400,
             height: 400,
         });
@@ -34,21 +51,55 @@ const Canvas = observer(() => {
         poster.image.uploadFile(files);
     }
 
+    function toggleMode() {
+        if (poster.designMode === 'design') {
+            poster.designMode = 'preview';
+            poster.previewCanvas.drawCanvas();
+        }
+        else if (poster.designMode === 'preview') {
+            poster.designMode = 'design';
+        }
+    }
+
     return (
-        <div ref={canvasWrapper} className="flex-grow flex-1 self-stretch" style={{ minWidth: '200px' }}>
+        <div ref={canvasWrapper} style={{ minWidth: '200px' }} className="relative">
             <DropArea onDrop={onDrop} unstyled>
-                <canvas id="fabric-canvas"> </canvas>
+
+                <AbsoluteToggle show={poster.designMode === 'design'}>
+                    <canvas id={designCanvasId} ></canvas>
+                </AbsoluteToggle>
+
+                <AbsoluteToggle show={poster.designMode === 'preview'}>
+                    <canvas id={previewCanvasId} ></canvas>
+                </AbsoluteToggle>
             </DropArea>
+            <div>
+                <button onClick={toggleMode}
+                    className="absolute right-3 top-3 p-2 rounded-lg shadow-md shadow-gray-600 text-white bg-green-500 hover:bg-green-600 transition font-bold" >
+                    {poster.designMode === 'design' ? 'Preview' : 'Design'}
+                </button>
+            </div>
         </div>
     );
 });
 
-function resizeCanvas(poster: Poster, canvas: fabric.Canvas, entries: ResizeObserverEntry[]) {
+function AbsoluteToggle(props: any) {
+    return <div className={`${props.show ? '' : 'hidden'}`}>{props.children}</div>
+}
+
+
+function resizeCanvases(poster: Poster, designCanvas: fabric.Canvas, previewCanvas: fabric.Canvas, entries: ResizeObserverEntry[]) {
     if (entries.length !== 1) {
         console.error('invalid number of entries');
         return;
     }
+
     const canvasParent = entries[0].contentRect;
+    resizeDesignCanvas(poster, designCanvas, canvasParent);
+    resizePreviewCanvas(previewCanvas, canvasParent);
+}
+
+function resizeDesignCanvas(poster: Poster, canvas: fabric.Canvas, canvasParent: DOMRectReadOnly) {
     const settings = poster.settings;
     const image = poster.image;
 
@@ -74,6 +125,12 @@ function resizeCanvas(poster: Poster, canvas: fabric.Canvas, entries: ResizeObse
 
     poster.overlay.drawOverlay();
     poster.border.drawBorder();
+    canvas.renderAll();
+}
+
+function resizePreviewCanvas(canvas: fabric.Canvas, canvasParent: DOMRectReadOnly) {
+    canvas.setWidth(canvasParent.width);
+    canvas.setHeight(canvasParent.height);
     canvas.renderAll();
 }
 

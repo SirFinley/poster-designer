@@ -4,9 +4,13 @@ import Settings from './components/Settings';
 import { poster, PosterContext, SettingsContext } from './util/Context';
 
 function App() {
+  const style: React.CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: '1fr auto',
+  }
 
   return (
-    <div className="flex min-h-full p-8 gap-2">
+    <div className="min-h-full p-2 gap-2" style={style}>
 
       <PosterContext.Provider value={poster}>
         <SettingsContext.Provider value={poster.settings}>

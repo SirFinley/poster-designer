@@ -1,17 +1,22 @@
 import { fabric } from 'fabric';
 import FastAverageColor from 'fast-average-color';
 import { action, autorun, makeAutoObservable } from 'mobx';
+import Poster from './poster';
 import Settings from './settings';
+
+const SVG_DPI = 600;
 export default class PosterImage {
-    constructor(canvas: fabric.Canvas, settings: Settings) {
+    constructor(poster: Poster, canvas: fabric.Canvas, settings: Settings) {
         makeAutoObservable(this, {
             updateScaleSlider: action,
         });
 
+        this.poster = poster;
         this.canvas = canvas;
         this.settings = settings;
 
         this.image = null;
+        this.isSvg = false;
         this.imageAspectRatio = 0;
         this.imagePosterRatio = 1;
         this.imgElem = null;
@@ -22,11 +27,13 @@ export default class PosterImage {
         this.setupEventListeners();
     }
 
+    poster: Poster;
     canvas: fabric.Canvas;
     settings: Settings;
 
     imageInput?: HTMLInputElement;
 
+    isSvg: boolean;
     image: fabric.Image | null;
     imageAspectRatio: number;
     imgElem: HTMLImageElement | null;
@@ -67,6 +74,10 @@ export default class PosterImage {
     get dpi(): number | null {
         if (!this.image || !this.image.width) {
             return null;
+        }
+
+        if (this.isSvg) {
+            return SVG_DPI;
         }
 
         const imageRawWidthPixels = this.image.width;
@@ -127,6 +138,7 @@ export default class PosterImage {
         });
 
         this.canvas.renderAll();
+        this.poster.updatePreview();
     }
 
     centerImageVertical() {
@@ -143,6 +155,7 @@ export default class PosterImage {
         });
 
         this.canvas.renderAll();
+        this.poster.updatePreview();
     }
 
     centerImageHorizontal() {
@@ -159,6 +172,7 @@ export default class PosterImage {
         });
 
         this.canvas.renderAll();
+        this.poster.updatePreview();
     }
 
     updateScaleSlider() {

@@ -21,7 +21,7 @@ const ImageScaler = observer(() => {
 
     return (
         <div className="w-full">
-            <label className="text-sm" htmlFor="image-scale">Scale Image <DpiText dpi={poster.image.dpi}></DpiText></label>
+            <label className="text-sm" htmlFor="image-scale">Scale Image <DpiText dpi={poster.image.dpi}></DpiText></label> {/* TODO: display info tooltip if svg */}
             <div className="mx-2">
                 <Slider min={0.05} max={3} value={toSliderScaleValue(poster.image.imagePosterRatio)} step={0.001} onChange={onScaleImage} />
             </div>
