@@ -22,7 +22,7 @@ export default class Poster {
         // settings.readSettingsFromUrl(window.location.toString());
 
         this.overlay = new Overlay(canvas, this.settings);
-        this.image = new PosterImage(canvas, this.settings);
+        this.image = new PosterImage(this, canvas, this.settings);
         this.border = new Border(canvas, this.settings, this.image);
         // const render = new Render(image, canvas, settings);
 
@@ -40,6 +40,12 @@ export default class Poster {
     border: Border;
     defaultSize: SizeOptions;
     designMode: 'design' | 'preview';
+
+    updatePreview() {
+        if (this.designMode === 'preview') { // only update in preview mode
+            this.previewCanvas.needsUpdate = true;
+        }
+    }
 
     private autorunPreview() {
         setInterval(() => {

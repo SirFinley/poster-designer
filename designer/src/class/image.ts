@@ -1,13 +1,15 @@
 import { fabric } from 'fabric';
 import FastAverageColor from 'fast-average-color';
 import { action, autorun, makeAutoObservable } from 'mobx';
+import Poster from './poster';
 import Settings from './settings';
 export default class PosterImage {
-    constructor(canvas: fabric.Canvas, settings: Settings) {
+    constructor(poster: Poster, canvas: fabric.Canvas, settings: Settings) {
         makeAutoObservable(this, {
             updateScaleSlider: action,
         });
 
+        this.poster = poster;
         this.canvas = canvas;
         this.settings = settings;
 
@@ -22,6 +24,7 @@ export default class PosterImage {
         this.setupEventListeners();
     }
 
+    poster: Poster;
     canvas: fabric.Canvas;
     settings: Settings;
 
@@ -127,6 +130,7 @@ export default class PosterImage {
         });
 
         this.canvas.renderAll();
+        this.poster.updatePreview();
     }
 
     centerImageVertical() {
@@ -143,6 +147,7 @@ export default class PosterImage {
         });
 
         this.canvas.renderAll();
+        this.poster.updatePreview();
     }
 
     centerImageHorizontal() {
@@ -159,6 +164,7 @@ export default class PosterImage {
         });
 
         this.canvas.renderAll();
+        this.poster.updatePreview();
     }
 
     updateScaleSlider() {

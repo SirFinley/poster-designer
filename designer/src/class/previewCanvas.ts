@@ -91,10 +91,12 @@ export default class PreviewCanvas {
                 offsetX: -10,
                 offsetY: 5,
             }),
+            hasBorders: false,
             ...options,
         };
 
         const img = await loadFabricImage(dataURL);
+
 
         // disable controls for scaling/rotation
         img.setControlsVisibility({
