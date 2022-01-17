@@ -32,6 +32,8 @@ const ImageUploadArea = observer(() => {
         if (!/image\//.test(file.type)) {
             return;
         }
+ 
+        poster.image.isSvg = /image\/svg/.test(file.type);
 
         const reader = new FileReader();
 
