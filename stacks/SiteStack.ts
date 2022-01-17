@@ -1,5 +1,5 @@
 import * as sst from "@serverless-stack/resources";
-import { Certificate } from "@aws-cdk/aws-certificatemanager";
+import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
 import { rootCertArn } from './Constants';
 

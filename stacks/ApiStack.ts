@@ -1,6 +1,6 @@
 import * as sst from "@serverless-stack/resources";
-import { LayerVersion } from '@aws-cdk/aws-lambda';
-import { Certificate } from "@aws-cdk/aws-certificatemanager";
+import { LayerVersion } from 'aws-cdk-lib/aws-lambda';
+import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
 import { rootCertArn } from './Constants';
 

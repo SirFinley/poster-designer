@@ -9,21 +9,23 @@
     "deploy": "sst deploy",
     "remove": "sst remove"
   },
+  "jest": {
+    "testMatch": ["<rootDir>/test/**/*.ts"]
+  },
   "eslintConfig": {
     "extends": [
       "serverless-stack"
     ]
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.138.0",
     "@tsconfig/node14": "^1.0.1",
     "@types/aws-lambda": "^8.10.70",
     "@types/node": "<15.0.0"
   },
   "dependencies": {
-    "@aws-cdk/core": "1.138.0",
-    "@serverless-stack/cli": "0.57.4",
-    "@serverless-stack/resources": "0.57.4",
+    "@serverless-stack/cli": "0.59.1",
+    "@serverless-stack/resources": "0.59.1",
+    "aws-cdk-lib": "2.7.0",
     "canvas": "^2.8.0",
     "hi-base32": "^0.5.1"
   }

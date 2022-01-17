@@ -1,5 +1,5 @@
 import * as sst from "@serverless-stack/resources";
-import { HttpMethods } from "@aws-cdk/aws-s3";
+import { HttpMethods } from "aws-cdk-lib/aws-s3";
 
 export default class StorageStack extends sst.Stack {
     // Public reference to the table
