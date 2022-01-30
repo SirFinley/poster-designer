@@ -79,12 +79,13 @@ const ImageUploadArea = observer(() => {
         <DropArea onDrop={handleDrop} >
             <div className='p-3'>
                 <form className="m-0">
-                    <label htmlFor="photo-input">Drag and drop your poster image here or in the editor</label>
-                    <input type="file" accept="image/*"
-                        className="block w-full cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-transparent text-sm rounded-lg"
-                        aria-describedby="user_avatar_help"
-                        onChange={onFileSelect}
-                        ref={fileInputRef}></input>
+                    <label>Drag and drop your poster image here or in the editor
+                        <input type="file" accept="image/*"
+                            className="block w-full cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 focus:outline-none focus:border-transparent text-sm rounded-lg"
+                            onChange={onFileSelect}
+                            ref={fileInputRef}>
+                        </input>
+                    </label>
 
                     <div className={`flex p-2 ${!filePresent && 'hidden'}`}>
                         <img ref={previewImgRef} alt="" className={`w-20 h-20 object-scale-down ${rendering && 'hidden'}`} ></img>

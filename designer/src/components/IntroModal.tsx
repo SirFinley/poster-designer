@@ -1,5 +1,5 @@
 /* This example requires Tailwind CSS v2.0+ */
-import { Fragment, useContext, useRef, useState } from 'react';
+import { ChangeEvent, Fragment, useContext, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUpload } from '@fortawesome/free-solid-svg-icons'
 import { Dialog, Transition } from '@headlessui/react';
@@ -15,6 +15,13 @@ const ClearPosterModal = observer(() => {
     function onDrop(files: FileList) {
         poster.image.uploadFile(files);
         setOpen(false);
+    }
+
+    function onFileSelect(e: ChangeEvent<HTMLInputElement>) {
+        const files = e.target.files;
+        if (files) {
+            onDrop(files);
+        }
     }
 
     function onClose() {
@@ -53,18 +60,23 @@ const ClearPosterModal = observer(() => {
                     >
                         <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                             <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                <div className="sm:flex sm:items-start">
-                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                        <div className="mt-2">
-                                            <DropArea onDrop={onDrop}>
-                                                <div className="text-center pt-8" >
-                                                    <FontAwesomeIcon icon={faUpload} className='text-blue-500 fa-5x' ></FontAwesomeIcon>
-                                                    <p className="p-4">
-                                                        Drag and drop your image here or upload from the side menu
-                                                    </p>
-                                                </div>
-                                            </DropArea>
-                                        </div>
+                                <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                    <div className="mt-2">
+                                        <DropArea onDrop={onDrop}>
+                                            <div className="text-center" >
+                                                <label className="block p-4">
+                                                    <FontAwesomeIcon icon={faUpload} className='text-blue-500 fa-5x mt-8' ></FontAwesomeIcon>
+                                                    <div className="p-4">
+                                                        <p className="w-full"> Tap here to choose and upload your image </p>
+                                                    </div>
+                                                    <input type="file" accept="image/*"
+                                                        className="hidden"
+                                                        onChange={onFileSelect}
+                                                    >
+                                                    </input>
+                                                </label>
+                                            </div>
+                                        </DropArea>
                                     </div>
                                 </div>
                             </div>
