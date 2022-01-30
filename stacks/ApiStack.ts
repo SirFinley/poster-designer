@@ -4,7 +4,7 @@ import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
 import { rootCertArn } from './Constants';
 
-const canvasLayerArn = 'arn:aws:lambda:us-east-1:606735259578:layer:canvas-nodejs:1';
+const sharpLayerArn = 'arn:aws:lambda:us-east-1:606735259578:layer:sharp:1';
 
 export default class ApiStack extends sst.Stack {
     // Public reference to the API
@@ -14,7 +14,7 @@ export default class ApiStack extends sst.Stack {
         super(scope, id, props);
 
         const { countsTable, postersTable, bucket } = props.config;
-        const canvasLayer = LayerVersion.fromLayerVersionArn(this, "CanvasLayer", canvasLayerArn);
+        const canvasLayer = LayerVersion.fromLayerVersionArn(this, "SharpLayer", sharpLayerArn);
         const certificate = Certificate.fromCertificateArn(this, "rootCert", rootCertArn);
 
         const apiDomain = 'api.visualinkworks.com';
@@ -42,7 +42,7 @@ export default class ApiStack extends sst.Stack {
                     function: {
                         handler: "src/render-poster.main",
                         timeout: 5 * 60,
-                        bundle: { externalModules: ['canvas'] },
+                        bundle: { externalModules: ['sharp'] },
                         layers: [canvasLayer],
                         memorySize: 10240,
                     },

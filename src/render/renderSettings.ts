@@ -17,5 +17,20 @@ export default interface RenderSettings {
         width: number,
         height: number,
         backgroundColor: string,
-    }
+    },
+    isSvg: boolean,
+    svgScaledBy: number,
+    extract: {
+        left: number,
+        top: number,
+        width: number,
+        height: number,
+    },
+    extend: {
+        top: number,
+        bottom: number,
+        left: number,
+        right: number,
+        background: string,
+    },
 }

@@ -1,4 +1,5 @@
-import { Canvas, createCanvas, loadImage } from 'canvas';
+import sharp from 'sharp';
+import axios from 'axios';
 
 import { SaveData } from "./saveData";
 import RenderSettings from './renderSettings';
@@ -22,7 +23,8 @@ export default class Render {
 
         let allMultiplier = 1;
         // if svg, scale everything to reach target dpi
-        if (/\.svg/.test(saveData.imageKey)) {
+        const isSvg = /\.svg/.test(saveData.imageKey);
+        if (isSvg) {
             allMultiplier = svgTargetDpi / imagePixelsPerInch;
         }
 
@@ -56,11 +58,31 @@ export default class Render {
             height: Math.round(allMultiplier * image.height),
         };
 
+        const cropWidthInches = image.cropWidth / canvasPixelsPerInch;
+        const cropHeightInches = image.cropHeight / canvasPixelsPerInch;
+        const extract = {
+            left: borders.leftWidth - Math.round(allMultiplier * oldInchesFromLeft * imagePixelsPerInch),
+            top: borders.topWidth - Math.round(allMultiplier * oldInchesFromTop * imagePixelsPerInch),
+            width: Math.round(allMultiplier * cropWidthInches * imagePixelsPerInch),
+            height: Math.round(allMultiplier * cropHeightInches * imagePixelsPerInch),
+        };
+        const extend = {
+            top: Math.round(Math.max(0, (canvas.height - extract.height)/2)),
+            bottom: Math.round(Math.max(0, (canvas.height - extract.height)/2)),
+            left: Math.round(Math.max(0, (canvas.width - extract.width)/2)),
+            right: Math.round(Math.max(0, (canvas.width - extract.width)/2)),
+            background: saveData.borders.color,
+        };
+
         return {
             borders,
             canvas,
             image: newImage,
             imgUrl: await this.getImageUrl(saveData),
+            isSvg,
+            extract,
+            extend,
+            svgScaledBy: allMultiplier,
         };
     }
 
@@ -71,39 +93,42 @@ export default class Render {
     async render(id: string, saveData: SaveData): Promise<RenderKeys> {
         const renderSettings = await this.getRenderSettings(saveData);
 
-        const canvas = createCanvas(renderSettings.canvas.width, renderSettings.canvas.height);
-        const context = canvas.getContext('2d', { alpha: false, });
+        const response = await axios.get(renderSettings.imgUrl, { responseType: 'arraybuffer' });
+        const imgBuffer = Buffer.from(response.data, 'utf-8');
 
-        // fill canvas with background color
-        context.fillStyle = renderSettings.canvas.backgroundColor;
-        context.fillRect(0, 0, canvas.width, canvas.height);
+        let main;
+        if (renderSettings.isSvg) {
+            const metadata = await sharp(imgBuffer).metadata();
+            console.log('density: ' + metadata.density);
+            const density = renderSettings.svgScaledBy * metadata.density;
+            main = sharp(imgBuffer, {
+                density,
+                limitInputPixels: false,
+            });
+        
+            main = main.resize({
+                width: renderSettings.image.width,
+                height: renderSettings.image.height,
+            });
+        }
+        else {
+            main = sharp(imgBuffer, {
+                limitInputPixels: false,
+            });
+        }
 
-
-        // draw image
-        const image = await loadImage(renderSettings.imgUrl);
-        image.width = renderSettings.image.width;
-        image.height = renderSettings.image.height;
-        context.drawImage(image, renderSettings.image.left, renderSettings.image.top, renderSettings.image.width, renderSettings.image.height);
-
-
-        // draw borders
-        const borders = renderSettings.borders;
-        context.fillStyle = borders.color;
-        context.fillRect(0, 0, canvas.width, borders.topWidth); // top
-        context.fillRect(0, canvas.height - borders.bottomWidth, canvas.width, borders.bottomWidth); // bottom
-
-        const sidesHeight = canvas.height - (borders.topWidth + borders.bottomWidth);
-        context.fillRect(0, borders.topWidth, borders.leftWidth, sidesHeight); // left
-        context.fillRect(canvas.width - borders.rightWidth, borders.topWidth, borders.rightWidth, sidesHeight); // right
+        const outBuffer = await main.extract(renderSettings.extract)
+            .extend(renderSettings.extend)
+            .toFormat('png')
+            .toBuffer();
 
         // save full render
         const fullRenderKey = `${id}/full-render.png`;
-        await uploadImage(canvas.toBuffer(), fullRenderKey);
+        await uploadImage(outBuffer, fullRenderKey);
 
         // save preview-render
-        const previewCanvas = this.getPreviewCanvas(canvas);
         const previewRenderKey = `${id}/preview-render.png`;
-        await uploadImage(previewCanvas.toBuffer(), previewRenderKey);
+        await uploadImage(outBuffer, previewRenderKey);
 
         return {
             fullRenderKey,
@@ -111,18 +136,6 @@ export default class Render {
         };
     }
 
-    getPreviewCanvas(otherCanvas: Canvas) {
-        const maxSide = 300;
-        const scale = maxSide / Math.max(otherCanvas.width, otherCanvas.height);
-
-        const canvas = createCanvas(otherCanvas.width * scale, otherCanvas.height * scale);
-        const context = canvas.getContext('2d', { alpha: false });
-
-        context.scale(scale, scale);
-        context.drawImage(otherCanvas, 0, 0);
-
-        return canvas;
-    }
 }
 
 export interface RenderKeys {

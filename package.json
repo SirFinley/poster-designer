@@ -10,7 +10,9 @@
     "remove": "sst remove"
   },
   "jest": {
-    "testMatch": ["<rootDir>/test/**/*.ts"]
+    "testMatch": [
+      "<rootDir>/test/**/*.ts"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -20,13 +22,15 @@
   "devDependencies": {
     "@tsconfig/node14": "^1.0.1",
     "@types/aws-lambda": "^8.10.70",
-    "@types/node": "<15.0.0"
+    "@types/node": "<15.0.0",
+    "@types/sharp": "^0.29.5"
   },
   "dependencies": {
     "@serverless-stack/cli": "0.59.1",
     "@serverless-stack/resources": "0.59.1",
     "aws-cdk-lib": "2.7.0",
-    "canvas": "^2.8.0",
-    "hi-base32": "^0.5.1"
+    "axios": "^0.25.0",
+    "hi-base32": "^0.5.1",
+    "sharp": "^0.29.3"
   }
 }

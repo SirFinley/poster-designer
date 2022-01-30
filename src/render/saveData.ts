@@ -20,6 +20,8 @@ export interface SaveData {
         height: number,
         scaleX: number,
         scaleY: number,
+        cropWidth: number,
+        cropHeight: number,
     },
     canvasObjectJsons: string[],
     imageKey: string,
