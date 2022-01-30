@@ -4,6 +4,7 @@ import DropArea from './DropArea';
 import { observer } from 'mobx-react-lite';
 import { PosterContext } from '../util/Context';
 import Poster from '../class/poster';
+import './Canvas.css';
 
 const Canvas = observer(() => {
     const poster = useContext(PosterContext);
@@ -62,7 +63,7 @@ const Canvas = observer(() => {
     }
 
     return (
-        <div ref={canvasWrapper} style={{ minWidth: '200px' }} className="relative">
+        <div ref={canvasWrapper} className="canvas-wrapper relative">
             <DropArea onDrop={onDrop} unstyled>
 
                 <AbsoluteToggle show={poster.designMode === 'design'}>

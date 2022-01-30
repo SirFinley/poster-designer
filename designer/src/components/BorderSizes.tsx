@@ -38,7 +38,7 @@ const BorderSizes = observer(() => {
     const sideWidth = border.maxSide / maxWidth * 100;
 
     return (
-        <div className="pt-2 flex flex-col flex-wrap place-content-between overflow-auto w-80">
+        <div className="pt-2 flex flex-col flex-wrap place-content-between w-80">
             <div className="mb-2">
                 <label className="text-sm" htmlFor="vertical-border">Top/Bottom Border: {poster.settings.verticalBorder}"</label>
                 <div className="flex items-center">

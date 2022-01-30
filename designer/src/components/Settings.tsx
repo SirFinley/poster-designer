@@ -7,10 +7,11 @@ import ImageControls from './ImageControls';
 import ImageUploadArea from './ImageUploadArea';
 import ClearPosterModal from './ClearPosterModal';
 import SavePosterModal from './SavePosterModal';
+import './Settings.css';
 
 function Settings() {
     return (
-        <div className="flex flex-col gap-2 max-w-sm">
+        <div className="settings flex flex-col gap-2 max-w-sm" >
             <h2 className="font-bold text-lg">Settings</h2>
 
             <SizeSelect></SizeSelect>
@@ -27,6 +28,8 @@ function Settings() {
                 <ClearPosterModal></ClearPosterModal>
                 <SavePosterModal></SavePosterModal>
             </div>
+            {/* empty space for mobile */}
+            <div className="p-10"></div>
         </div>
     );
 }
