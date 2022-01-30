@@ -12,6 +12,7 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://dev-api.visua
 
 export default class Poster {
     constructor() {
+        (fabric as any).perfLimitSizeTotal = 16 * 1048576; // 10 MegaPixel
         makeAutoObservable(this);
 
         const canvas = new fabric.Canvas(document.createElement('canvas'));
