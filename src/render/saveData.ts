@@ -20,6 +20,7 @@ export interface SaveData {
         height: number,
         scaleX: number,
         scaleY: number,
+        // TODO: remove cropWidth?
         cropWidth: number,
         cropHeight: number,
     },
