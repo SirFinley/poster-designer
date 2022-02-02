@@ -94,7 +94,7 @@ export default class SvgRenderer {
         const imgBuffer = Buffer.from(response.data, 'utf-8');
 
         const metadata = await sharp(imgBuffer).metadata();
-        const density = renderSettings.svgScaledBy * metadata.density;
+        const density = renderSettings.svgScaledBy * (metadata.density || 72);
         return sharp(imgBuffer, {
             density,
             limitInputPixels: false,

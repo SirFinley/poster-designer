@@ -1,3 +1,5 @@
+import sharp from "sharp";
+
 import { SaveData } from "./saveData";
 import { uploadImage } from './s3';
 import SvgRenderer from "./svgRenderer";
@@ -6,7 +8,6 @@ export default class Render {
 
     async render(id: string, saveData: SaveData): Promise<RenderKeys> {
         let pipeline;
-        // if svg, scale everything to reach target dpi
         const isSvg = /\.svg/.test(saveData.imageKey);
         if (isSvg) {
             pipeline = await new SvgRenderer().render(id, saveData);
@@ -15,17 +16,24 @@ export default class Render {
             pipeline = await new RasterRenderer().render(id, saveData);
         }
 
-        const outBuffer = await pipeline
+        const fullRenderBuffer = await pipeline
+            .toFormat('png')
+            .toBuffer();
+
+        const previewRenderBuffer = await sharp(fullRenderBuffer)
+            .resize(300, 300, {
+                fit: 'inside',
+            })
             .toFormat('png')
             .toBuffer();
 
         // save full render
         const fullRenderKey = `${id}/full-render.png`;
-        await uploadImage(outBuffer, fullRenderKey);
+        await uploadImage(fullRenderBuffer, fullRenderKey);
 
         // save preview-render
         const previewRenderKey = `${id}/preview-render.png`;
-        await uploadImage(outBuffer, previewRenderKey);
+        await uploadImage(previewRenderBuffer, previewRenderKey);
 
         return {
             fullRenderKey,
