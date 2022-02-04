@@ -32,6 +32,17 @@ const SavePosterModal = observer(() => {
         upload();
     }
 
+    function addToCart(id: string) {
+        window.top?.postMessage(
+            JSON.stringify({
+                message: "poster.addToCart",
+                posterId: id,
+                // TODO: post url to thumbnail
+            }), 
+            document.referrer,
+        );
+    }
+
     function onIdClick() {
         copyId();
     }
@@ -54,6 +65,7 @@ const SavePosterModal = observer(() => {
             setSaved(true);
             const id = response.data.id
             setPosterId(id);
+            addToCart(id);
             setEtsyUrl(getEtsyUrl());
         }
     }
