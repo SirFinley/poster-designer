@@ -13,6 +13,7 @@ const API_PATH = "save-poster";
 
 interface SavePosterResponse {
     id: string,
+    thumbnailUrl: string,
 };
 
 const SavePosterModal = observer(() => {
@@ -32,12 +33,12 @@ const SavePosterModal = observer(() => {
         upload();
     }
 
-    function addToCart(id: string) {
+    function addToCart(id: string, thumbnailUrl: string) {
         window.top?.postMessage(
             JSON.stringify({
                 message: "poster.addToCart",
                 posterId: id,
-                // TODO: post url to thumbnail
+                thumbnailUrl,
             }), 
             document.referrer,
         );
@@ -63,9 +64,10 @@ const SavePosterModal = observer(() => {
 
         if (response) {
             setSaved(true);
-            const id = response.data.id
+            const id = response.data.id;
+            const thumbnailUrl = response.data.thumbnailUrl;
             setPosterId(id);
-            addToCart(id);
+            addToCart(id, thumbnailUrl);
             setEtsyUrl(getEtsyUrl());
         }
     }

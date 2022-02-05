@@ -11,6 +11,7 @@ export const main = handler(async (event) => {
 
 	return {
 		id,
+		// TODO: return thumbnail url
 	};
 });
 
