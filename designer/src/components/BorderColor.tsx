@@ -14,7 +14,7 @@ const BorderColor = observer(() => {
 
     return (
         <div>
-            <label className="text-sm" htmlFor="border-color">Border Color</label>
+            <label>Border Color</label>
             <div>
                 <input type="color" className="shadow-md border-1 w-12 h-12" value={poster.settings.borderColor} onInput={onBorderColorInput}></input>
             </div>

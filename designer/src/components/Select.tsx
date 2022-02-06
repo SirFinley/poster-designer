@@ -5,7 +5,7 @@ function Select(props: IProps) {
     const id = "select-frm-" + props.label; 
     return (
         <div>
-            <label className="text-sm" htmlFor={id}>{props.label}</label>
+            <label htmlFor={id}>{props.label}</label>
             <div className="h-12">
                 <select id={id} className="rounded-md shadow-md w-full pl-3 h-full border-2 border-gray-50" value={props.value} onChange={props.onChange}>
                     {
