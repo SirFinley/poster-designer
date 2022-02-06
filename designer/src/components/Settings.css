@@ -7,6 +7,5 @@
 @screen sm {
   .settings {
     height: 100%;
-    margin-left: 0.5rem;
   }
 }

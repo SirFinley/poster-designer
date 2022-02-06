@@ -11,7 +11,7 @@ import './Settings.css';
 
 function Settings() {
     return (
-        <div className="settings flex flex-col gap-2 max-w-sm" >
+        <div className="settings flex flex-col gap-2 md:w-[24rem] lg:min-w-[28rem] p-1" >
             <SizeSelect></SizeSelect>
             <OrientationSelect></OrientationSelect>
 
