@@ -16,39 +16,52 @@ const ImageScaler = observer(() => {
     return Math.pow(2, imageScale) - 1;
   }
 
+  const SCALE_STEP = 0.001;
+  const BUTTON_STEP = SCALE_STEP * 10;
+  const SCALE_MIN = 0.1;
+  const SCALE_MAX = 2.5;
+
   function toSliderScaleValue(imageScale: number): number {
     return Math.log2(imageScale + 1);
   }
 
-  function addToScale(amount: number) {
-    const sliderValue = toSliderScaleValue(poster.image.imagePosterRatio);
-    onScaleImage(sliderValue + amount);
+  function constrainSliderValue(value: number): number {
+    return Math.max(SCALE_MIN, Math.min(SCALE_MAX, value));
   }
 
-  const SCALE_STEP = 0.001;
-  const BUTTON_STEP = SCALE_STEP * 10;
+  function addToScale(amount: number) {
+    const sliderValue = toSliderScaleValue(poster.image.imagePosterRatio);
+    const constrainedValue = constrainSliderValue(sliderValue + amount);
+    onScaleImage(constrainedValue);
+  }
 
   return (
     <div className="w-full">
       <label className="" htmlFor="image-scale">
         Scale Image <DpiText dpi={poster.image.dpi}></DpiText>
-      </label>{" "}
+      </label>
       {/* TODO: display info tooltip if svg, info icon, text: "SVG images will be printed at 600 dpi" */}
       <div className="flex flex-row items-center">
         <div className="w-full">
           <Slider
-            min={0.1}
-            max={3}
+            min={SCALE_MIN}
+            max={SCALE_MAX}
             value={toSliderScaleValue(poster.image.imagePosterRatio)}
             step={SCALE_STEP}
             onChange={onScaleImage}
           />
         </div>
         <div className="flex items-center gap-2 ml-2 text-lg">
-          <button className="p-2 border-2 rounded-md" onClick={() => addToScale(-BUTTON_STEP)}>
+          <button
+            className="p-2 border-2 rounded-md"
+            onClick={() => addToScale(-BUTTON_STEP)}
+          >
             <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
           </button>
-          <button className="p-2 border-2 rounded-md" onClick={() => addToScale(BUTTON_STEP)}>
+          <button
+            className="p-2 border-2 rounded-md"
+            onClick={() => addToScale(BUTTON_STEP)}
+          >
             <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
           </button>
         </div>

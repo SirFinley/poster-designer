@@ -5,7 +5,6 @@ import BorderColor from './BorderColor';
 import ImageScaler from './ImageScaler';
 import ImageControls from './ImageControls';
 import ImageUploadArea from './ImageUploadArea';
-import ClearPosterModal from './ClearPosterModal';
 import SavePosterModal from './SavePosterModal';
 import './Settings.css';
 
@@ -22,12 +21,9 @@ function Settings() {
             <ImageControls></ImageControls>
             <ImageUploadArea></ImageUploadArea>
 
-            <div className="flex justify-items-end justify-around">
-                <ClearPosterModal></ClearPosterModal>
-                <SavePosterModal></SavePosterModal>
-            </div>
+            <SavePosterModal></SavePosterModal>
             {/* empty space for mobile */}
-            <div className="p-10"></div>
+            <div className="p-5"></div>
         </div>
     );
 }

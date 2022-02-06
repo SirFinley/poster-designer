@@ -20,6 +20,8 @@ export default class PosterImage {
         this.imageAspectRatio = 0;
         this.imagePosterRatio = 1;
         this.imgElem = null;
+        this.fileName = '';
+        this.uploadProgress = 0;
         this.uploadStatus = 'none';
         this.renderStatus = 'none';
         this.uploadFile = () => { throw new Error('upload file not implemented'); };
@@ -31,13 +33,13 @@ export default class PosterImage {
     canvas: fabric.Canvas;
     settings: Settings;
 
-    imageInput?: HTMLInputElement;
-
     isSvg: boolean;
     image: fabric.Image | null;
     imageAspectRatio: number;
     imgElem: HTMLImageElement | null;
     imagePosterRatio: number;
+    fileName: string;
+    uploadProgress: number;
     uploadStatus: 'none' | 'uploading' | 'uploaded';
     renderStatus: 'none' | 'rendering' | 'rendered';
 
@@ -196,10 +198,7 @@ export default class PosterImage {
             this.canvas.renderAll();
         }
 
-        if (this.imageInput) {
-            this.imageInput.value = '';
-        }
-
+        this.fileName = '';
         this.renderStatus = 'none';
         this.uploadStatus = 'none';
     }

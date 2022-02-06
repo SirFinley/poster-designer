@@ -34,9 +34,13 @@ const Settings = observer(() => {
 
   return (
     <div>
-      <div className="flex flex-col gap-y-1">
-        <ScaleButton onClick={fitToBorders}>Fit In Borders</ScaleButton>
-        <ScaleButton onClick={fillBorders}>Fill Up Borders</ScaleButton>
+      <div className="flex flex-row gap-1">
+        <ScaleButton onClick={fitToBorders}>
+          <span className="underline">Fit</span> To Borders
+        </ScaleButton>
+        <ScaleButton onClick={fillBorders}>
+          <span className="underline">Fill</span> Borders
+        </ScaleButton>
       </div>
       <label>Align</label>
       <div className="flex flex-row gap-1">
@@ -69,7 +73,7 @@ function MoveButton(props: IButtonProps) {
 function ScaleButton(props: IButtonProps) {
   return (
     <button
-      className="p-2 rounded text-white bg-blue-500 hover:bg-blue-600 transition font-bold"
+      className="w-full p-2 border-2 rounded transition font-bold bg-gray-100 hover:bg-slate-200 drop-shadow-sm cursor-pointer text-center"
       onClick={props.onClick}
     >
       {props.children}
