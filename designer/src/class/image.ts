@@ -253,24 +253,6 @@ export default class PosterImage {
         this.canvas.renderAll();
     }
 
-    fillPoster() {
-        if (!this.image) {
-            return;
-        }
-
-        const dims = this.settings.getVirtualDimensions();
-
-        if (this.imageAspectRatio >= dims.posterAspectRatio) { // image wider than canvas
-            this.scaleToHeight(dims.posterHeight);
-        }
-        else { // image taller than poster
-            this.scaleToWidth(dims.posterWidth);
-        }
-
-        this.centerImage();
-        this.canvas.renderAll();
-    }
-
     scaleToWidth(width: number) {
         if (!this.image) {
             return;

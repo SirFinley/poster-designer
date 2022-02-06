@@ -11,9 +11,6 @@ const Settings = observer(() => {
   function fillBorders() {
     poster.image.fillBorders();
   }
-  function fillPoster() {
-    poster.image.fillPoster();
-  }
 
   function centerVertical() {
     poster.image.centerImageVertical();
@@ -38,9 +35,8 @@ const Settings = observer(() => {
   return (
     <div>
       <div className="flex flex-col gap-y-1">
-        <ScaleButton onClick={fitToBorders}>Fit To Borders</ScaleButton>
-        <ScaleButton onClick={fillBorders}>Fill Borders</ScaleButton>
-        <ScaleButton onClick={fillPoster}>Fill Canvas</ScaleButton>
+        <ScaleButton onClick={fitToBorders}>Fit In Borders</ScaleButton>
+        <ScaleButton onClick={fillBorders}>Fill Up Borders</ScaleButton>
       </div>
       <label htmlFor="">Align</label>
       <div className="flex flex-row gap-1">

@@ -34,7 +34,7 @@ const BorderSizes = observer(() => {
           <button className="p-2" onClick={() => addToBorder(-STEP_SIZE)}>
             <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
           </button>
-          <div className="w-12 text-center text-base">{settings.border.toFixed(3)}</div>
+          <div className="w-12 text-center text-base">{settings.border.toFixed(3) + '"'}</div>
           <button className="p-2" onClick={() => addToBorder(STEP_SIZE)}>
             <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
           </button>
