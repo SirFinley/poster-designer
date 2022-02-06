@@ -151,10 +151,6 @@ const orientationOptionsEtsyUrlMap: Record<string, OrientationOptions> = {
 
 export type SizeOptions = keyof typeof sizeOptionsDisplayMap;
 export const sizeOptionsDisplayMap: Record<string, string> = {
-    '8x10': '8"x10"',
-    '12x18': '12"x18"',
-    '12x24': '12"x24"',
-    '12x36': '12"x36"',
     '18x24': '18"x24"',
     '24x30': '24"x30"',
     '24x36': '24"x36"',
@@ -162,10 +158,6 @@ export const sizeOptionsDisplayMap: Record<string, string> = {
 
 // TODO: etsy - replace keys with etsy variation id
 const sizeOptionsEtsyUrlMap: Record<string, SizeOptions> = {
-    '8x10': '8x10',
-    '12x18': '12x18',
-    '12x24': '12x24',
-    '12x36': '12x36',
     '18x24': '18x24',
     '24x30': '24x30',
     '24x36': '24x36',
