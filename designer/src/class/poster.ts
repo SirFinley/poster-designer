@@ -42,6 +42,10 @@ export default class Poster {
     defaultSize: SizeOptions;
     designMode: 'design' | 'preview';
 
+    get hasImage() {
+        return this.image.uploadStatus !== 'none' || this.image.renderStatus !== 'none';
+    }
+
     updatePreview() {
         if (this.designMode === 'preview') { // only update in preview mode
             this.previewCanvas.needsUpdate = true;
