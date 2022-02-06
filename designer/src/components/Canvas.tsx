@@ -73,7 +73,7 @@ const Canvas = observer(() => {
   }
 
   return (
-    <div ref={canvasWrapper} className="canvas-wrapper relative">
+    <div ref={canvasWrapper} className="canvas-wrapper relative overflow-hidden">
       <DropArea onDrop={onDrop} unstyled>
         {!poster.hasImage ? (
           <label className="absolute z-10 w-full h-full flex items-center justify-center">

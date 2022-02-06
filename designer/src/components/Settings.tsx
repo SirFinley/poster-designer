@@ -12,8 +12,6 @@ import './Settings.css';
 function Settings() {
     return (
         <div className="settings flex flex-col gap-2 max-w-sm" >
-            <h2 className="font-bold text-lg">Settings</h2>
-
             <SizeSelect></SizeSelect>
             <OrientationSelect></OrientationSelect>
 

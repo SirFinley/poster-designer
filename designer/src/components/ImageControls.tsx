@@ -38,7 +38,7 @@ const Settings = observer(() => {
         <ScaleButton onClick={fitToBorders}>Fit In Borders</ScaleButton>
         <ScaleButton onClick={fillBorders}>Fill Up Borders</ScaleButton>
       </div>
-      <label htmlFor="">Align</label>
+      <label>Align</label>
       <div className="flex flex-row gap-1">
         <MoveButton onClick={centerVertical}>
           <div className="text-center -mt-2">⧮</div>
