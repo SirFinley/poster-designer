@@ -14,7 +14,6 @@ export default class Border {
         this.posterImage = image;
 
         this.borderLines = []
-        this.bordersLinked = true;
 
         this.setupEffects();
     }
@@ -24,16 +23,9 @@ export default class Border {
     posterImage: PosterImage;
     borderLines: fabric.Line[];
 
-    bordersLinked: boolean;
-
-    get maxSide(): number {
+    get maxBorder(): number {
         const size = this.settings.realPosterDimensions;
-        return size.width / 2 - STEP_SIZE;
-    }
-
-    get maxVertical(): number {
-        const size = this.settings.realPosterDimensions;
-        return size.height / 2 - STEP_SIZE;
+        return Math.min(size.width, size.height) / 2 - STEP_SIZE;
     }
 
     private setupEffects() {
@@ -70,7 +62,7 @@ export default class Border {
 
         const invertedBackgroundColor = this.getContrastingColor(this.settings.borderColor) || 'black';
         function createLine(points: number[], lineOptions?: fabric.ILineOptions) {
-            return new fabric.Line(points, {
+             const line = new fabric.Line(points, {
                 strokeWidth: 1,
                 stroke: invertedBackgroundColor,
                 opacity: 0.8,
@@ -79,8 +71,12 @@ export default class Border {
                 // evented: false,
                 padding: 5, // increase selectable area
                 name: 'border-line',
+                hasBorders: false,
+                hasControls: false,
                 ...lineOptions,
             });
+
+            return line;
         }
 
         const leftLine = createLine([dims.posterLeftBorder, 0, dims.posterLeftBorder, dims.canvasHeight], { lockMovementY: true });
@@ -92,7 +88,7 @@ export default class Border {
             const target = (options.transform as any).target;
             const dx = target.left - dims.posterLeft;
             const inches = dx * dims.inchesPerPixel;
-            this.updateSideBorder(inches);
+            this.updateBorder(inches);
             this.drawBorder();
         })
 
@@ -100,7 +96,7 @@ export default class Border {
             const target = (options.transform as any).target;
             const dx = dims.posterRight - target.left;
             const inches = dx * dims.inchesPerPixel;
-            this.updateSideBorder(inches);
+            this.updateBorder(inches);
             this.drawBorder();
         })
 
@@ -108,7 +104,7 @@ export default class Border {
             const target = (options.transform as any).target;
             const dx = target.top - dims.posterTop;
             const inches = dx * dims.inchesPerPixel;
-            this.updateVerticalBorder(inches);
+            this.updateBorder(inches);
             this.drawBorder();
         })
 
@@ -116,7 +112,7 @@ export default class Border {
             const target = (options.transform as any).target;
             const dx = dims.posterBottom - target.top;
             const inches = dx * dims.inchesPerPixel;
-            this.updateVerticalBorder(inches);
+            this.updateBorder(inches);
             this.drawBorder();
         })
 
@@ -140,31 +136,12 @@ export default class Border {
         }
     }
 
-    updateSideBorder(value: number) {
-        this.setSideBorderInput(value);
-    }
-
-    updateVerticalBorder(value: number) {
-        this.setVerticalBorderInput(value);
-    }
-
-    private setSideBorderInput(value: number) {
-        const oldValue = this.settings.sideBorder;
-        const newValue = this.getConstrainedBorder(value, 0, this.maxSide);
+    updateBorder(value: number) {
+        const oldValue = this.settings.border;
+        const newValue = this.getConstrainedBorder(value, 0, this.maxBorder);
 
         if (oldValue.toFixed(3) !== newValue.toFixed(3)) { // only trigger if value changed
-            this.settings.sideBorder = newValue;
-            this.crossUpdate(oldValue, newValue, false);
-        }
-    }
-
-    private setVerticalBorderInput(value: number) {
-        const oldValue = this.settings.verticalBorder;
-        const newValue = this.getConstrainedBorder(value, 0, this.maxVertical);
-
-        if (oldValue.toFixed(3) !== newValue.toFixed(3)) { // only trigger if value changed
-            this.settings.verticalBorder = newValue;
-            this.crossUpdate(oldValue, newValue, true);
+            this.settings.border = newValue;
         }
     }
 
@@ -173,21 +150,6 @@ export default class Border {
         value = Math.round(value / STEP_SIZE) * STEP_SIZE;
         value = clamp(value, min, max);
         return value;
-    }
-
-    private crossUpdate(oldValue: number, newValue: number, isVertical: boolean) {
-        if (!this.bordersLinked) {
-            return;
-        }
-
-        if (isVertical) {
-            const offset = newValue - oldValue;
-            this.settings.sideBorder = this.getConstrainedBorder(this.settings.sideBorder + offset, 0, this.maxSide);
-        }
-        else {
-            const offset = newValue - oldValue;
-            this.settings.verticalBorder = this.getConstrainedBorder(this.settings.verticalBorder + offset, 0, this.maxVertical);
-        }
     }
 
 }

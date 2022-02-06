@@ -7,8 +7,7 @@ export default class PosterSettings {
     orientation: OrientationOptions;
     size: SizeOptions;
 
-    sideBorder: number;
-    verticalBorder: number;
+    border: number;
 
     borderColor: string;
 
@@ -21,8 +20,7 @@ export default class PosterSettings {
 
         this.orientation = 'portrait';
         this.size = '8.5x11';
-        this.sideBorder = 0;
-        this.verticalBorder = 0;
+        this.border = 0;
         this.borderColor = '#ffffff';
         this.originalImageKey = null;
     }
@@ -61,8 +59,8 @@ export default class PosterSettings {
         const realPosterDimensions = this.realPosterDimensions;
         const inchesPerPixel = realPosterDimensions.width / posterWidth;
 
-        const borderWidth = this.sideBorder / inchesPerPixel;
-        const borderHeight = this.verticalBorder / inchesPerPixel;
+        const borderWidth = this.border / inchesPerPixel;
+        const borderHeight = this.border / inchesPerPixel;
         const posterLeftBorder = posterLeft + borderWidth;
         const posterRightBorder = posterRight - borderWidth;
         const posterTopBorder = posterTop + borderHeight;
