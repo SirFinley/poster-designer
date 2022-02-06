@@ -34,7 +34,7 @@ const ImageScaler = observer(() => {
         Scale Image <DpiText dpi={poster.image.dpi}></DpiText>
       </label>{" "}
       {/* TODO: display info tooltip if svg, info icon, text: "SVG images will be printed at 600 dpi" */}
-      <div className="flex flex-row items-center px-2">
+      <div className="flex flex-row items-center">
         <div className="w-full">
           <Slider
             min={0.1}
@@ -44,7 +44,7 @@ const ImageScaler = observer(() => {
             onChange={onScaleImage}
           />
         </div>
-        <div className="flex items-center gap-2 pl-2 text-lg">
+        <div className="flex items-center gap-2 ml-2 text-lg">
           <button className="p-2 border-2 rounded-md" onClick={() => addToScale(-BUTTON_STEP)}>
             <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
           </button>

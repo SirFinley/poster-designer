@@ -289,6 +289,64 @@ export default class PosterImage {
         this.updateScaleSlider();
     }
 
+    alignLeft() {
+        if (!this.image) {
+            return;
+        }
+
+        const dims = this.settings.getVirtualDimensions();
+        this.moveImageTo({
+            left: dims.posterLeftBorder,
+        });
+
+        this.canvas.renderAll();
+        this.poster.updatePreview();
+    }
+
+    alignRight() {
+        if (!this.image) {
+            return;
+        }
+
+        const dims = this.settings.getVirtualDimensions();
+        const scaledImageWidth = this.image.getScaledWidth();
+        this.moveImageTo({
+            left: dims.posterRightBorder - scaledImageWidth,
+        });
+
+        this.canvas.renderAll();
+        this.poster.updatePreview();
+    }
+
+    alignTop() {
+        if (!this.image) {
+            return;
+        }
+
+        const dims = this.settings.getVirtualDimensions();
+        this.moveImageTo({
+            top: dims.posterTopBorder,
+        });
+
+        this.canvas.renderAll();
+        this.poster.updatePreview();
+    }
+
+    alignBottom() {
+        if (!this.image) {
+            return;
+        }
+
+        const dims = this.settings.getVirtualDimensions();
+        const scaledImageHeight = this.image.getScaledHeight();
+        this.moveImageTo({
+            top: dims.posterBottomBorder - scaledImageHeight,
+        });
+
+        this.canvas.renderAll();
+        this.poster.updatePreview();
+    }
+
 }
 
 interface ImageCoords {
