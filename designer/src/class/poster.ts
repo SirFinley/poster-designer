@@ -1,7 +1,7 @@
 import { fabric } from "fabric";
 import PosterImage from "./image";
 import Overlay from "./overlay";
-import PosterSettings, { SizeOptions } from "./settings";
+import PosterSettings, { SizeOptions, sizes } from "./settings";
 import Border from "./border";
 import axios from "axios";
 import { makeAutoObservable, autorun } from "mobx";
@@ -27,7 +27,7 @@ export default class Poster {
         this.border = new Border(canvas, this.settings, this.image);
         // const render = new Render(image, canvas, settings);
 
-        this.defaultSize = '8.5x11';
+        this.defaultSize = sizes[0];
         this.designMode = 'design';
         this.readSettingsFromUrl();
         this.autorunPreview();
@@ -84,6 +84,9 @@ export default class Poster {
     }
 
     readSettingsFromUrl() {
+        const url = new URL(document.URL);
+        const params = new URLSearchParams(url.searchParams);
+        this.settings.configureFromSearchParams(params);
     }
 
     setCanvas(canvas: fabric.Canvas) {

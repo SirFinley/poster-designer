@@ -18,20 +18,17 @@ const ImageUploadArea = observer(() => {
   const poster = useContext(PosterContext);
   const previewImgRef = useRef<HTMLImageElement>(null);
   const percentage = poster.image.uploadProgress;
-  function setPercentage(progress: number) {
-    poster.image.uploadProgress = progress;
-  }
 
   const handleFile = useCallback(
     (file: File) => {
-      setPercentage(0);
+      poster.image.uploadProgress = 0;
 
       poster.image.fileName = file.name;
       poster.image.renderStatus = "none";
       poster.image.uploadStatus = "none";
       // TODO: if new image selected while current still uploading, cancel current upload before new one starts
       const imageUploader = new ImageUploader(poster.settings, {
-        onProgress: (progress) => setPercentage(progress),
+        onProgress: (progress) => poster.image.uploadProgress = progress,
         onComplete: (key) => {
           poster.settings.originalImageKey = key;
           poster.image.uploadStatus = "uploaded";

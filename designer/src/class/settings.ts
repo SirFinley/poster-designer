@@ -1,6 +1,9 @@
 import { makeAutoObservable } from "mobx";
 import VirtualDimensions from "./virtualDimensions";
 
+const defaultSize = '18x24';
+const defaultOrientation = 'portrait';
+
 export default class PosterSettings {
     canvas: fabric.Canvas;
 
@@ -18,8 +21,8 @@ export default class PosterSettings {
 
         this.canvas = canvas;
 
-        this.orientation = 'portrait';
-        this.size = '8.5x11';
+        this.orientation = defaultOrientation;
+        this.size = defaultSize;
         this.border = 0;
         this.borderColor = '#ffffff';
         this.originalImageKey = null;
@@ -104,10 +107,21 @@ export default class PosterSettings {
         const size = url.searchParams.get('size');
 
         if (orientation) {
-            this.orientation = orientationOptionsEtsyUrlMap[orientation];
+            this.orientation = orientationOptionsEtsyUrlMap[orientation] || defaultOrientation;
         }
         if (size) {
-            this.size = sizeOptionsEtsyUrlMap[size];
+            this.size = sizeOptionsEtsyUrlMap[size] || defaultSize;
+        }
+    }
+
+    configureFromSearchParams(params: URLSearchParams) {
+        const size = validateSize(params.get('size')?.replaceAll('"', ''));
+        if (size) {
+            this.size = size;
+        }
+        const orientation = validateOrientation(params.get('orientation'));
+        if (orientation) {
+            this.orientation = orientation;
         }
     }
 
@@ -142,19 +156,35 @@ export default class PosterSettings {
     }
 }
 
-export type OrientationOptions = "landscape" | "portrait";
+function validateSize(value: string|null|undefined): SizeOptions|null {
+    if (sizes.includes(value as SizeOptions)) {
+        return value as SizeOptions;
+    }
+    return null;
+}
+
+function validateOrientation(value: string|null|undefined): OrientationOptions|null {
+    if (orientations.includes(value as OrientationOptions)) {
+        return value as OrientationOptions;
+    }
+    return null;
+}
+
+export const orientations = ['landscape', 'portrait'] as const;
+export type OrientationOptions = typeof orientations[number];
 // TODO: etsy - replace keys with etsy variation id
 const orientationOptionsEtsyUrlMap: Record<string, OrientationOptions> = {
     'landscape': 'landscape',
     'portrait': 'portrait',
 }
 
-export type SizeOptions = keyof typeof sizeOptionsDisplayMap;
-export const sizeOptionsDisplayMap: Record<string, string> = {
-    '18x24': '18"x24"',
-    '24x30': '24"x30"',
-    '24x36': '24"x36"',
-};
+export const sizes = ['18x24', '24x30', '24x36'] as const;
+export type SizeOptions = typeof sizes[number];
+export const sizeOptionsDisplayMap = new Map<SizeOptions, string>([
+    ['18x24', '18"x24"'],
+    ['24x30', '24"x30"'],
+    ['24x36', '24"x36"'],
+]);
 
 // TODO: etsy - replace keys with etsy variation id
 const sizeOptionsEtsyUrlMap: Record<string, SizeOptions> = {
@@ -170,7 +200,7 @@ interface RealPosterDimensions {
 
 // validation
 (function validateSizeOptions() {
-    if (Object.keys(sizeOptionsEtsyUrlMap).length !== Object.keys(sizeOptionsDisplayMap).length) {
+    if (Object.keys(sizeOptionsEtsyUrlMap).length !== sizeOptionsDisplayMap.size) {
         console.error('etsy size options mismatch');
     }
 })();

@@ -15,8 +15,8 @@ const SizeSelect = observer(() => {
     return (
         <Select value={poster.settings.size} onChange={onSizeInput} label="Size">
             {
-                Object.keys(AllSettings.sizeOptionsDisplayMap).map((key) =>
-                    <option key={key} value={key}>{AllSettings.sizeOptionsDisplayMap[key]}</option>
+                Array.from(AllSettings.sizeOptionsDisplayMap).map(([key, value]) =>
+                    <option key={key} value={key}>{value}</option>
                 )
             }
         </Select>
