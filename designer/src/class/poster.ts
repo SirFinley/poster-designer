@@ -1,3 +1,4 @@
+import { isMobile } from "react-device-detect";
 import { fabric } from "fabric";
 import PosterImage from "./image";
 import Overlay from "./overlay";
@@ -12,7 +13,13 @@ axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://dev-api.visua
 
 export default class Poster {
     constructor() {
-        (fabric as any).perfLimitSizeTotal = 16 * 1048576; // 10 MegaPixel
+        const megapixel = 1048576;
+        if (isMobile) {
+            (fabric as any).perfLimitSizeTotal = 4 * megapixel;
+        }
+        else {
+            (fabric as any).perfLimitSizeTotal = 16 * megapixel;
+        }
         makeAutoObservable(this);
 
         const canvas = new fabric.Canvas(document.createElement('canvas'));

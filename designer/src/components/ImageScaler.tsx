@@ -38,7 +38,7 @@ const ImageScaler = observer(() => {
   return (
     <div className="w-full">
       <label>
-        Scale Image <DpiText dpi={poster.image.dpi}></DpiText>
+        Scale Image: <DpiText dpi={poster.image.dpi}></DpiText>
       </label>
       {/* TODO: display info tooltip if svg, info icon, text: "SVG images will be printed at 600 dpi" */}
       <div className="flex flex-row items-center gap-2 text-lg">
@@ -74,7 +74,7 @@ function DpiText({ dpi }: DpiTextProps) {
     color = "text-green-500";
   }
 
-  const dpiText = ` - ${dpi.toFixed(0)} DPI`;
+  const dpiText = `${dpi.toFixed(0)} DPI`;
   return <span className={`font-semibold ${color}`}>{dpiText}</span>;
 }
 
