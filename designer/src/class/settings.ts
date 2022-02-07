@@ -119,7 +119,7 @@ export default class PosterSettings {
         if (size) {
             this.size = size;
         }
-        const orientation = validateOrientation(params.get('orientation'));
+        const orientation = validateOrientation(params.get('orientation')?.toLowerCase());
         if (orientation) {
             this.orientation = orientation;
         }

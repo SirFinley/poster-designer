@@ -1,31 +1,40 @@
-import SizeSelect from './SizeSelect';
-import OrientationSelect from './OrientationSelect';
-import BorderSizes from './BorderSizes';
-import BorderColor from './BorderColor';
-import ImageScaler from './ImageScaler';
-import ImageControls from './ImageControls';
-import ImageUploadArea from './ImageUploadArea';
-import SavePosterModal from './SavePosterModal';
-import './Settings.css';
+import SizeSelect from "./SizeSelect";
+import OrientationSelect from "./OrientationSelect";
+import BorderSizes from "./BorderSizes";
+import BorderColor from "./BorderColor";
+import ImageScaler from "./ImageScaler";
+import ImageControls from "./ImageControls";
+import ImageUploadArea from "./ImageUploadArea";
+import SavePosterModal from "./SavePosterModal";
+import "./Settings.css";
+import { useContext } from "react";
+import { PosterContext } from "../util/Context";
+import AddToCartButton from "./AddToCartButton";
 
 function Settings() {
-    return (
-        <div className="settings flex flex-col gap-2 md:w-[24rem] lg:min-w-[28rem] p-1" >
-            <SizeSelect></SizeSelect>
-            <OrientationSelect></OrientationSelect>
+  const poster = useContext(PosterContext);
 
-            <BorderSizes></BorderSizes>
-            <BorderColor></BorderColor>
+  return (
+    <div className="settings flex flex-col gap-2 md:w-[24rem] lg:min-w-[28rem] p-1">
+      <SizeSelect></SizeSelect>
+      <OrientationSelect></OrientationSelect>
 
-            <ImageScaler></ImageScaler>
-            <ImageControls></ImageControls>
-            <ImageUploadArea></ImageUploadArea>
+      <BorderSizes></BorderSizes>
+      <BorderColor></BorderColor>
 
-            <SavePosterModal></SavePosterModal>
-            {/* empty space for mobile */}
-            <div className="p-5"></div>
-        </div>
-    );
+      <ImageScaler></ImageScaler>
+      <ImageControls></ImageControls>
+      <ImageUploadArea></ImageUploadArea>
+
+      {poster.shopify ? (
+        <AddToCartButton></AddToCartButton>
+      ) : (
+        <SavePosterModal></SavePosterModal>
+      )}
+      {/* empty space for mobile */}
+      <div className="p-5"></div>
+    </div>
+  );
 }
 
 export default Settings;

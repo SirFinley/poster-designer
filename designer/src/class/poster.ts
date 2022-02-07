@@ -36,6 +36,7 @@ export default class Poster {
 
         this.defaultSize = sizes[0];
         this.designMode = 'design';
+        this.shopify = false;
         this.readSettingsFromUrl();
         this.autorunPreview();
     }
@@ -48,6 +49,7 @@ export default class Poster {
     border: Border;
     defaultSize: SizeOptions;
     designMode: 'design' | 'preview';
+    shopify: boolean;
 
     get hasImage() {
         return this.image.uploadStatus !== 'none' || this.image.renderStatus !== 'none';
@@ -94,6 +96,7 @@ export default class Poster {
         const url = new URL(document.URL);
         const params = new URLSearchParams(url.searchParams);
         this.settings.configureFromSearchParams(params);
+        this.shopify = params.get('shopify') === '1';
     }
 
     setCanvas(canvas: fabric.Canvas) {

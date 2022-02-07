@@ -1,4 +1,3 @@
-/* This example requires Tailwind CSS v2.0+ */
 import { Fragment, useContext, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
@@ -33,17 +32,6 @@ const SavePosterModal = observer(() => {
         upload();
     }
 
-    function addToCart(id: string, thumbnailUrl: string) {
-        window.top?.postMessage(
-            JSON.stringify({
-                message: "poster.addToCart",
-                posterId: id,
-                thumbnailUrl,
-            }), 
-            document.referrer,
-        );
-    }
-
     function onIdClick() {
         copyId();
     }
@@ -65,9 +53,7 @@ const SavePosterModal = observer(() => {
         if (response) {
             setSaved(true);
             const id = response.data.id;
-            const thumbnailUrl = response.data.thumbnailUrl;
             setPosterId(id);
-            addToCart(id, thumbnailUrl);
             setEtsyUrl(getEtsyUrl());
         }
     }
