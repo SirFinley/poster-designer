@@ -37,34 +37,24 @@ const ImageScaler = observer(() => {
 
   return (
     <div className="w-full">
-      <label className="" htmlFor="image-scale">
+      <label>
         Scale Image <DpiText dpi={poster.image.dpi}></DpiText>
       </label>
       {/* TODO: display info tooltip if svg, info icon, text: "SVG images will be printed at 600 dpi" */}
-      <div className="flex flex-row items-center">
-        <div className="w-full">
-          <Slider
-            min={SCALE_MIN}
-            max={SCALE_MAX}
-            value={toSliderScaleValue(poster.image.imagePosterRatio)}
-            step={SCALE_STEP}
-            onChange={onScaleImage}
-          />
-        </div>
-        <div className="flex items-center gap-2 ml-2 text-lg">
-          <button
-            className="p-2 border-2 rounded-md"
-            onClick={() => addToScale(-BUTTON_STEP)}
-          >
-            <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
-          </button>
-          <button
-            className="p-2 border-2 rounded-md"
-            onClick={() => addToScale(BUTTON_STEP)}
-          >
-            <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
-          </button>
-        </div>
+      <div className="flex flex-row items-center gap-2 text-lg">
+        <button className="p-2" onClick={() => addToScale(-BUTTON_STEP)}>
+          <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
+        </button>
+        <Slider
+          min={SCALE_MIN}
+          max={SCALE_MAX}
+          value={toSliderScaleValue(poster.image.imagePosterRatio)}
+          step={SCALE_STEP}
+          onChange={onScaleImage}
+        />
+        <button className="p-2" onClick={() => addToScale(BUTTON_STEP)}>
+          <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+        </button>
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ const BorderSizes = observer(() => {
 
   return (
     <div>
-      <label>Border Size: (Inches)</label>
+      <label>Border Size</label>
       <div className="flex w-full items-center">
         <Slider
           min={0}
