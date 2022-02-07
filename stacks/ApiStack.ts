@@ -13,7 +13,7 @@ export default class ApiStack extends sst.Stack {
     constructor(scope: sst.App, id: string, props: ApiProps) {
         super(scope, id, props);
 
-        const { countsTable, postersTable, bucket } = props.config;
+        const { countsTable, postersTable, bucket, thumbnailBucket } = props.config;
         const canvasLayer = LayerVersion.fromLayerVersionArn(this, "SharpLayer", sharpLayerArn);
         const certificate = Certificate.fromCertificateArn(this, "rootCert", rootCertArn);
 
@@ -32,6 +32,8 @@ export default class ApiStack extends sst.Stack {
                     COUNTS_TABLE_NAME: countsTable.tableName,
                     POSTERS_TABLE_NAME: postersTable.tableName,
                     BUCKET_NAME: bucket.bucketName,
+                    THUMBNAIL_BUCKET_NAME: thumbnailBucket.bucketName,
+                    THUMBNAIL_BUCKET_REGION: this.region,
                     REGION: this.region,
                 },
             },
@@ -54,6 +56,7 @@ export default class ApiStack extends sst.Stack {
         this.api.attachPermissions([countsTable]);
         this.api.attachPermissions([postersTable]);
         this.api.attachPermissions([bucket]);
+        this.api.attachPermissions([thumbnailBucket]);
 
         // Show the API endpoint in the output
         this.addOutputs({
@@ -68,5 +71,6 @@ interface ApiProps extends sst.StackProps {
         countsTable: sst.Table,
         postersTable: sst.Table,
         bucket: sst.Bucket,
+        thumbnailBucket: sst.Bucket,
     },
 }

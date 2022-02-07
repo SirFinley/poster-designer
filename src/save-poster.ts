@@ -1,3 +1,4 @@
+import { S3 } from 'aws-sdk';
 import * as base32 from 'hi-base32';
 import handler from './util/handler';
 import dynamodb from './util/dynamodb';
@@ -6,12 +7,14 @@ import environment from './util/environment';
 export const main = handler(async (event) => {
 	const posterJson = event.body as string;
 
+	const thumbnailUrl = getThumbnailUrl(posterJson);
+	
 	const id = await getId();
 	await savePoster(id, posterJson);
 
 	return {
 		id,
-		// TODO: return thumbnail url
+		thumbnailUrl: await thumbnailUrl,
 	};
 });
 
@@ -71,3 +74,23 @@ async function savePoster(id: string, posterJson: string) {
 
 	await dynamodb.put(params);
 }
+async function getThumbnailUrl(posterJson: string): Promise<string> {
+	const key = JSON.parse(posterJson).imageThumbnailKey as string;
+
+	const s3 = new S3();
+	const request: S3.CopyObjectRequest = {
+		Bucket: environment.thumbnailBucketName,
+		CopySource: `/${environment.bucketName}/${key}`,
+		Key: key,
+	};
+
+	try {
+		const result = await s3.copyObject(request).promise();
+		console.log(result.CopyObjectResult);
+	} catch (error) {
+		console.log(error);
+	}
+
+	return `https://${environment.thumbnailBucketName}.s3.amazonaws.com/${key}`;
+}
+

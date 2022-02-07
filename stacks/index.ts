@@ -15,6 +15,7 @@ export default function main(app: sst.App): void {
       countsTable: storageStack.countsTable,
       postersTable: storageStack.postersTable,
       bucket: storageStack.bucket,
+      thumbnailBucket: storageStack.thumbnailBucket,
     },
   });
 

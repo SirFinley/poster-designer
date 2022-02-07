@@ -6,6 +6,7 @@ export default class StorageStack extends sst.Stack {
     countsTable: sst.Table;
     postersTable: sst.Table;
     bucket: sst.Bucket;
+    thumbnailBucket: sst.Bucket;
 
     constructor(scope: sst.App, id: string, props?: sst.StackProps) {
         super(scope, id, props);
@@ -38,6 +39,13 @@ export default class StorageStack extends sst.Stack {
                         allowedMethods: [HttpMethods.GET, HttpMethods.PUT],
                     },
                 ],
+            },
+        });
+
+        this.thumbnailBucket = new sst.Bucket(this, "Thumbnails", {
+            s3Bucket: {
+                publicReadAccess: true,
+                websiteIndexDocument: 'index.html',
             },
         });
     }
