@@ -2,7 +2,7 @@ import React, { ChangeEvent, useContext, useEffect, useRef } from "react";
 import { fabric } from "fabric";
 import DropArea from "./DropArea";
 import { observer } from "mobx-react-lite";
-import { PosterContext } from "../util/Context";
+import { poster, PosterContext } from "../util/Context";
 import Poster from "../class/poster";
 import "./Canvas.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -195,6 +195,7 @@ function resizePreviewCanvas(
   canvas.setWidth(canvasParent.width);
   canvas.setHeight(canvasParent.height);
   canvas.renderAll();
+  poster.previewCanvas.resize();
 }
 
 export default Canvas;
