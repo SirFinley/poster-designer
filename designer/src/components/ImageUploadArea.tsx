@@ -1,21 +1,15 @@
-import React, {
-  useEffect,
-  useRef,
-  ChangeEvent,
-  useCallback,
-  useContext,
-} from "react";
+import React, { useEffect, useRef, ChangeEvent, useCallback } from "react";
 import { fabric } from "fabric";
 
 import DropArea from "./DropArea";
 import ImageUploader from "../class/imageUploader";
-import { PosterContext } from "../util/Context";
+import { usePoster } from "../util/hooks";
 import { observer } from "mobx-react-lite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 
 const ImageUploadArea = observer(() => {
-  const poster = useContext(PosterContext);
+  const poster = usePoster();
   const previewImgRef = useRef<HTMLImageElement>(null);
   const percentage = poster.image.uploadProgress;
 
@@ -28,7 +22,7 @@ const ImageUploadArea = observer(() => {
       poster.image.uploadStatus = "none";
       // TODO: if new image selected while current still uploading, cancel current upload before new one starts
       const imageUploader = new ImageUploader(poster.settings, {
-        onProgress: (progress) => poster.image.uploadProgress = progress,
+        onProgress: (progress) => (poster.image.uploadProgress = progress),
         onComplete: (key) => {
           poster.settings.originalImageKey = key;
           poster.image.uploadStatus = "uploaded";

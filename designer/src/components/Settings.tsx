@@ -7,12 +7,11 @@ import ImageControls from "./ImageControls";
 import ImageUploadArea from "./ImageUploadArea";
 import SavePosterModal from "./SavePosterModal";
 import "./Settings.css";
-import { useContext } from "react";
-import { PosterContext } from "../util/Context";
+import { usePoster} from '../util/hooks';
 import AddToCartButton from "./AddToCartButton";
 
 function Settings() {
-  const poster = useContext(PosterContext);
+  const poster = usePoster();
 
   return (
     <div className="settings flex flex-col gap-2 md:w-[24rem] lg:min-w-[28rem] p-1">

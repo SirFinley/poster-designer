@@ -1,9 +1,9 @@
 import { observer } from "mobx-react-lite";
-import React, { useContext } from "react";
-import { PosterContext } from "../util/Context";
+import React from "react";
+import { usePoster} from '../util/hooks';
 
 const Settings = observer(() => {
-  const poster = useContext(PosterContext);
+  const poster = usePoster();
 
   function fitToBorders() {
     poster.image.fitImageToBorders();

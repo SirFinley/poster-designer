@@ -1,4 +1,4 @@
-import { Fragment, useContext, useRef, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Dialog, Transition } from '@headlessui/react';
@@ -6,7 +6,7 @@ import axios from "axios";
 import PosterExporter from '../class/PosterExporter';
 import Tooltip from './Tooltip';
 import { observer } from 'mobx-react-lite';
-import { PosterContext } from '../util/Context';
+import { usePoster} from '../util/hooks';
 
 const API_PATH = "save-poster";
 
@@ -16,7 +16,7 @@ interface SavePosterResponse {
 };
 
 const SavePosterModal = observer(() => {
-    const poster = useContext(PosterContext);
+    const poster = usePoster();
     const [open, setOpen] = useState(false)
     const [saved, setSaved] = useState(true);
     const [posterId, setPosterId] = useState('<AAAGGGH>');

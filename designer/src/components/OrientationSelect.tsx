@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react-lite';
-import { ChangeEvent, useContext } from 'react';
+import { ChangeEvent } from 'react';
 import { OrientationOptions } from '../class/settings';
-import { PosterContext } from '../util/Context';
+import { usePoster} from '../util/hooks';
 import Select from "./Select";
 
 const OrientationSelect = observer(() => {
-    const poster = useContext(PosterContext);
+    const poster = usePoster();
 
     function onOrientationInput(e: ChangeEvent<HTMLSelectElement>) {
         const orientation = e.currentTarget.value as OrientationOptions;

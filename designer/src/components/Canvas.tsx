@@ -1,15 +1,15 @@
-import React, { ChangeEvent, useContext, useEffect, useRef } from "react";
+import React, { ChangeEvent, useEffect, useRef } from "react";
 import { fabric } from "fabric";
 import DropArea from "./DropArea";
 import { observer } from "mobx-react-lite";
-import { poster, PosterContext } from "../util/Context";
+import { usePoster } from "../util/hooks";
 import Poster from "../class/poster";
 import "./Canvas.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 
 const Canvas = observer(() => {
-  const poster = useContext(PosterContext);
+  const poster = usePoster();
   const canvasWrapper = useRef<HTMLDivElement>(null);
   const designCanvasId = "design-canvas";
   const previewCanvasId = "preview-canvas";
@@ -150,7 +150,7 @@ function resizeCanvases(
 
   const canvasParent = entries[0].contentRect;
   resizeDesignCanvas(poster, designCanvas, canvasParent);
-  resizePreviewCanvas(previewCanvas, canvasParent);
+  resizePreviewCanvas(poster, previewCanvas, canvasParent);
 }
 
 function resizeDesignCanvas(
@@ -189,6 +189,7 @@ function resizeDesignCanvas(
 }
 
 function resizePreviewCanvas(
+  poster: Poster,
   canvas: fabric.Canvas,
   canvasParent: DOMRectReadOnly
 ) {

@@ -1,12 +1,11 @@
-import React, { useContext } from "react";
-import { PosterContext } from "../util/Context";
+import { usePoster} from '../util/hooks';
 import { observer } from "mobx-react-lite";
 import Slider from "./Slider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 
 const ImageScaler = observer(() => {
-  const poster = useContext(PosterContext);
+  const poster = usePoster();
 
   function onScaleImage(value: number) {
     poster.image.imagePosterRatio = fromSliderScaleValue(value);

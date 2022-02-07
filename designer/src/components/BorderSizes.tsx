@@ -1,13 +1,12 @@
-import { useContext } from "react";
 import { STEP_SIZE } from "../class/border";
 import { observer } from "mobx-react-lite";
-import { PosterContext } from "../util/Context";
+import { usePoster} from '../util/hooks';
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Slider from './Slider';
 
 const BorderSizes = observer(() => {
-  const poster = useContext(PosterContext);
+  const poster = usePoster();
   const settings = poster.settings;
   const border = poster.border;
 

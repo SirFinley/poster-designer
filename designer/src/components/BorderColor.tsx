@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react-lite';
-import { FormEvent, useContext } from 'react';
-import { PosterContext } from '../util/Context';
+import { FormEvent } from 'react';
+import { usePoster} from '../util/hooks';
 
 const BorderColor = observer(() => {
-    const poster = useContext(PosterContext);
+    const poster = usePoster();
 
     function onBorderColorInput(e: FormEvent<HTMLInputElement>) {
         const color = e.currentTarget.value;
