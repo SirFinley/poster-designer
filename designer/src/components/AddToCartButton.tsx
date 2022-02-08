@@ -5,7 +5,8 @@ import { Dialog, Transition } from '@headlessui/react';
 import axios from "axios";
 import PosterExporter from '../class/PosterExporter';
 import { observer } from 'mobx-react-lite';
-import { usePoster} from '../util/hooks';
+import { usePoster } from '../util/hooks';
+import { postMessage } from '../util';
 
 const API_PATH = "save-poster";
 
@@ -27,14 +28,19 @@ const AddToCartButton = observer(() => {
     }
 
     function addToCart(id: string, thumbnailUrl: string) {
-        window.top?.postMessage(
-            JSON.stringify({
-                message: "poster.addToCart",
+        const sides = poster.settings.size.split('x');
+        const size = `${sides[0]}"x${sides[1]}"`;
+        postMessage({
+            type: "poster.addToCart",
+            data: {
                 posterId: id,
                 thumbnailUrl,
-            }), 
-            document.referrer,
-        );
+                options: [
+                    {name: 'Size', value: size},
+                    {name: 'Orientation', value: poster.settings.orientation},
+                ]
+            }
+        });
     }
 
     async function upload() {

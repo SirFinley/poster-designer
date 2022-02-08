@@ -94,9 +94,12 @@ export default class Poster {
 
     readSettingsFromUrl() {
         const url = new URL(document.URL);
-        const params = new URLSearchParams(url.searchParams);
-        this.settings.configureFromSearchParams(params);
-        this.shopify = params.get('shopify') === '1';
+        if (url.hash) {
+            const hash = url.hash.replace('#', '');
+            const params = new URLSearchParams(hash);
+            this.settings.configureFromSearchParams(params);
+            this.shopify = params.get('shopify') === '1';
+        }
     }
 
     setCanvas(canvas: fabric.Canvas) {
