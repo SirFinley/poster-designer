@@ -6,7 +6,7 @@ import Settings from "./settings";
 import VirtualDimensions from './virtualDimensions';
 
 export default class PosterExporter {
-    async getSaveData(settings: Settings, canvas: fabric.Canvas, posterImage: PosterImage): Promise<SaveData> {
+    async getSaveData(settings: Settings, canvas: fabric.Canvas, posterImage: PosterImage, idType: 'autoinc'|'guid'): Promise<SaveData> {
         if (!settings.originalImageKey) {
             throw Error('image key not found');
         }
@@ -16,6 +16,7 @@ export default class PosterExporter {
         fabric.Object.NUM_FRACTION_DIGITS = 17;
 
         return {
+            idType,
             version: 1,
             size: settings.size,
             orientation: settings.orientation,
@@ -114,6 +115,7 @@ export default class PosterExporter {
 }
 
 export interface SaveData {
+    idType: 'autoinc'|'guid',
     version: number,
     size: string,
     orientation: string,

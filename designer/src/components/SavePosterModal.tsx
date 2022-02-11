@@ -64,7 +64,7 @@ const SavePosterModal = observer(() => {
     }
 
     async function getPostData() {
-        return await new PosterExporter().getSaveData(poster.settings, poster.settings.canvas, poster.image);
+        return await new PosterExporter().getSaveData(poster.settings, poster.settings.canvas, poster.image, 'autoinc');
     }
 
     function copyId() {

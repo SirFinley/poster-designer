@@ -1,5 +1,6 @@
 import { S3 } from 'aws-sdk';
 import * as base32 from 'hi-base32';
+import { randomUUID } from 'crypto';
 import handler from './util/handler';
 import dynamodb from './util/dynamodb';
 import environment from './util/environment';
@@ -9,7 +10,7 @@ export const main = handler(async (event) => {
 
 	const thumbnailUrl = getThumbnailUrl(posterJson);
 	
-	const id = await getId();
+	const id = await getId(posterJson);
 	await savePoster(id, posterJson);
 
 	return {
@@ -18,7 +19,12 @@ export const main = handler(async (event) => {
 	};
 });
 
-async function getId() {
+async function getId(posterJson: string) {
+	const saveData = JSON.parse(posterJson);
+	if (saveData.idType === 'guid') {
+		return randomUUID();
+	}
+
 	function randByte() {
 		return Math.round(Math.random() * 256); // random last byte
 	}
