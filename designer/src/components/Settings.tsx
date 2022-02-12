@@ -9,8 +9,9 @@ import SavePosterModal from "./SavePosterModal";
 import "./Settings.css";
 import { usePoster} from '../util/hooks';
 import AddToCartButton from "./AddToCartButton";
+import { observer } from "mobx-react-lite";
 
-function Settings() {
+const Settings = observer(() => {
   const poster = usePoster();
 
   return (
@@ -34,6 +35,6 @@ function Settings() {
       <div className="p-5"></div>
     </div>
   );
-}
+});
 
 export default Settings;
