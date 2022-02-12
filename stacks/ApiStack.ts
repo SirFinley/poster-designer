@@ -39,6 +39,7 @@ export default class ApiStack extends sst.Stack {
             },
             routes: {
                 "GET    /upload-image": "src/upload-image.main",
+                "GET    /load-poster": "src/load-poster.main",
                 "POST   /save-poster": "src/save-poster.main",
                 "GET    /render-poster": {
                     function: {

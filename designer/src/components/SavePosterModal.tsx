@@ -19,7 +19,7 @@ const SavePosterModal = observer(() => {
     const poster = usePoster();
     const [open, setOpen] = useState(false)
     const [saved, setSaved] = useState(true);
-    const [posterId, setPosterId] = useState('<AAAGGGH>');
+    const [posterId, setPosterId] = useState('AAAGGGH');
     const [etsyUrl, setEtsyUrl] = useState('https://etsy.com/');
     const [copiedId, setCopiedId] = useState(false);
 
@@ -40,6 +40,9 @@ const SavePosterModal = observer(() => {
         const data = await getPostData();
         const response = await axios.post<SavePosterResponse>(API_PATH, data, {
             method: 'POST',
+            params: {
+                posterId: poster.posterId,
+            },
         })
             .catch((err) => {
                 if (err.name === 'AbortError') {
@@ -53,6 +56,7 @@ const SavePosterModal = observer(() => {
         if (response) {
             setSaved(true);
             const id = response.data.id;
+            poster.posterId = id;
             setPosterId(id);
             setEtsyUrl(getEtsyUrl());
         }

@@ -5,6 +5,7 @@ import handler from './util/handler';
 import dynamodb from './util/dynamodb';
 import environment from './util/environment';
 import { SaveData } from "./render/saveData";
+import { PosterItem } from "./util/posterItem";
 
 export const main = handler(async (event) => {
     const unparsedPosterId = event.queryStringParameters?.['posterId'];
@@ -76,11 +77,4 @@ async function getRenderUrls(saveData: SaveData, renderKeys: RenderKeys) {
         serverThumbnailUrl: await previewUrl,
         clientThumbnailUrl: await clientThumbnailUrl,
     }
-}
-
-interface PosterItem {
-    id: string,
-    posterJson: string,
-    fullRenderKey?: string,
-    previewRenderKey?: string,
 }

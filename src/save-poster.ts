@@ -6,11 +6,12 @@ import dynamodb from './util/dynamodb';
 import environment from './util/environment';
 
 export const main = handler(async (event) => {
+	const posterId = event.queryStringParameters?.['posterId'] as string|null|undefined;
 	const posterJson = event.body as string;
 
 	const thumbnailUrl = getThumbnailUrl(posterJson);
 	
-	const id = await getId(posterJson);
+	const id = posterId || await getId(posterJson);
 	await savePoster(id, posterJson);
 
 	return {

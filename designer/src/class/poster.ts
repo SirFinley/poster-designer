@@ -2,11 +2,12 @@ import { isMobile } from "react-device-detect";
 import { fabric } from "fabric";
 import PosterImage from "./image";
 import Overlay from "./overlay";
-import PosterSettings, { SizeOptions, sizes } from "./settings";
+import PosterSettings, { OrientationOptions, SizeOptions, sizes } from "./settings";
 import Border from "./border";
 import axios from "axios";
 import { makeAutoObservable, autorun } from "mobx";
 import PreviewCanvas from "./previewCanvas";
+import { SaveData } from "./PosterExporter";
 
 // // configure axios
 axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'https://dev-api.visualinkworks.com';
@@ -25,6 +26,8 @@ export default class Poster {
         const canvas = new fabric.Canvas(document.createElement('canvas'));
         this.previewCanvas = new PreviewCanvas(this, new fabric.Canvas(document.createElement('canvas')));
         this.settings = new PosterSettings(canvas);
+        this.posterLoadStatus = 'none';
+        this.posterId = null;
         // TODO: read settings from document.referrer
         // readSettingsFromUrl(document.referrer);
         // settings.readSettingsFromUrl(window.location.toString());
@@ -37,7 +40,6 @@ export default class Poster {
         this.defaultSize = sizes[0];
         this.designMode = 'design';
         this.shopify = false;
-        this.readSettingsFromUrl();
         this.autorunPreview();
     }
 
@@ -50,6 +52,8 @@ export default class Poster {
     defaultSize: SizeOptions;
     designMode: 'design' | 'preview';
     shopify: boolean;
+    posterLoadStatus: 'none' | 'loading' | 'loaded';
+    posterId: string|null;
 
     get hasImage() {
         return this.image.uploadStatus !== 'none' || this.image.renderStatus !== 'none';
@@ -99,7 +103,73 @@ export default class Poster {
             const params = new URLSearchParams(hash);
             this.settings.configureFromSearchParams(params);
             this.shopify = params.get('shopify') === '1';
+
+            const posterId = params.get('posterId');
+            if (posterId) {
+                this.loadPoster(posterId);
+            }
         }
+    }
+
+    async loadPoster(posterId: string) {
+        this.posterLoadStatus = 'loading';
+        this.posterId = posterId;
+
+        const response = await axios.get<LoadPosterResponse>("load-poster", {
+            params: {
+                'posterId': posterId,
+            }
+        });
+
+        const poster = response.data;
+        const saveData = poster.saveData;
+        
+        // TODO:check if image in local cache/storage and load from there
+        const imgResponse = await axios.get(poster.originalImageUrl, { responseType: 'blob' });
+        const reader = new window.FileReader();
+        reader.readAsDataURL(imgResponse.data);
+        reader.onload = () => {
+            const imageDataUrl = reader.result as string;
+            this.image.imgElem!.setAttribute('src', imageDataUrl);
+
+            this.image.uploadStatus = 'uploaded';
+            this.image.renderStatus = 'rendering';
+            this.image.uploadProgress = 100;
+
+            // settings
+            this.settings.size = saveData.size as SizeOptions;
+            this.settings.orientation = saveData.orientation as OrientationOptions;
+            this.settings.originalImageKey = saveData.imageKey;
+
+            // image
+            fabric.Image.fromURL(poster.originalImageUrl, (image) => {
+                this.image.setNewImage(image);
+
+                // scale
+                const targetDims = saveData.virtualDimensions;
+                const targetRatioX = saveData.canvasImage.width * saveData.canvasImage.scaleX / targetDims.posterWidth;
+
+                const dims = this.settings.getVirtualDimensions();
+                image.scaleToWidth(dims.posterWidth * targetRatioX);
+                this.image.updateScaleSlider();
+
+                // position
+                const leftOffset = (saveData.canvasImage.left - targetDims.posterLeft ) / targetDims.posterWidth;
+                const topOffset = (saveData.canvasImage.top - targetDims.posterTop) / targetDims.posterHeight;
+                image.set({
+                    left: leftOffset * dims.posterWidth + dims.posterLeft,
+                    top: topOffset * dims.posterHeight + dims.posterTop,
+                });
+
+                // borders
+                this.settings.setBorderColor(saveData.borders.color);
+                this.border.updateBorder(saveData.borders.left);
+
+                this.posterLoadStatus = 'loaded';
+            },{
+                crossOrigin: 'anonymous'
+            });
+        };
     }
 
     setCanvas(canvas: fabric.Canvas) {
@@ -118,4 +188,9 @@ export default class Poster {
     setPreviewCanvas(canvas: fabric.Canvas) {
         this.previewCanvas.canvas = canvas;
     }
+}
+
+interface LoadPosterResponse {
+    saveData: SaveData;
+    originalImageUrl: string;
 }

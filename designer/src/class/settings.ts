@@ -30,6 +30,8 @@ export default class PosterSettings {
 
     setBorderColor(color: string) {
         this.borderColor = color;
+        this.canvas?.setBackgroundColor(color, () => undefined);
+        this.canvas?.renderAll();
     }
 
     getVirtualDimensions(): VirtualDimensions {

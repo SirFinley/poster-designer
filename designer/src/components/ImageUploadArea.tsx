@@ -69,6 +69,7 @@ const ImageUploadArea = observer(() => {
 
   useEffect(() => {
     poster.image.uploadFile = handleDrop;
+    poster.image.imgElem = previewImgRef.current;
   }, [previewImgRef, handleDrop, poster.image]);
 
   function onFileSelect(e: ChangeEvent<HTMLInputElement>) {
@@ -94,7 +95,7 @@ const ImageUploadArea = observer(() => {
 
   const uploads = (
     <DropArea onDrop={handleDrop} unstyled={true}>
-      <div>
+      <div className={!poster.hasImage ? "hidden" : ""}>
         <label>
           <input
             type="file"
@@ -142,7 +143,12 @@ const ImageUploadArea = observer(() => {
     </DropArea>
   );
 
-  return poster.hasImage ? uploads : chooseImageButton;
+  return (
+    <>
+      {poster.hasImage ? null : chooseImageButton}
+      {uploads}
+    </>
+  );
 });
 
 export default ImageUploadArea;

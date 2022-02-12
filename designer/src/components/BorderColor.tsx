@@ -7,9 +7,7 @@ const BorderColor = observer(() => {
 
     function onBorderColorInput(e: FormEvent<HTMLInputElement>) {
         const color = e.currentTarget.value;
-        poster.settings.borderColor = color;
-        poster.canvas?.setBackgroundColor(color, () => undefined);
-        poster.canvas?.renderAll();
+        poster.settings.setBorderColor(color);
     }
 
     return (
