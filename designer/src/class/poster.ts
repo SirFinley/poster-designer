@@ -112,6 +112,7 @@ export default class Poster {
     }
 
     async loadPoster(posterId: string) {
+        // TODO - while loading display unescapable loading modal, potentially with progress bar for image download
         this.posterLoadStatus = 'loading';
         this.posterId = posterId;
 

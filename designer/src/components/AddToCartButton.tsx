@@ -69,6 +69,7 @@ const AddToCartButton = observer(() => {
         return await new PosterExporter().getSaveData(poster.settings, poster.settings.canvas, poster.image, 'guid');
     }
 
+    const editing = poster.posterId;
     return (
         <>
             <button className="w-full p-2 rounded text-white bg-blue-500 hover:bg-blue-600 transition font-bold
@@ -78,7 +79,8 @@ const AddToCartButton = observer(() => {
                 title="hi there"
             >
                 <FontAwesomeIcon icon={faShoppingCart} ></FontAwesomeIcon>
-                Add To Cart {poster.image.uploadStatus === 'uploading' ? '(uploading...)' : null }
+                {editing ? 'Save Changes' : 'Add To Cart'}
+                {poster.image.uploadStatus === 'uploading' ? '(uploading...)' : null }
             </button>
 
             <Transition.Root show={saveStatus === 'saving'} as={Fragment}>
@@ -114,7 +116,7 @@ const AddToCartButton = observer(() => {
                                     <div className="sm:items-start">
                                         <div className="mt-3 text-center sm:p-4">
                                             <Dialog.Title as="h3" className="text-lg leading-6 font-medium text-gray-900">
-                                                Adding to cart
+                                                {editing ? 'Saving Changes' : 'Adding To Cart'}
                                             </Dialog.Title>
                                             <div className="mt-4"></div>
                                             <FontAwesomeIcon icon={faSpinner} size="2x" spin></FontAwesomeIcon>
