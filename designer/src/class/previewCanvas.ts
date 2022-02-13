@@ -23,7 +23,7 @@ export default class PreviewCanvas {
     needsUpdate: boolean;
     demoArea: IDemoArea;
 
-    async drawCanvas() {
+    async drawCanvas(): Promise<void> {
         this.updating = true;
         const demoArea = this.demoArea;
         if (demoArea.width <= 0 || demoArea.height <= 0) {
@@ -38,14 +38,16 @@ export default class PreviewCanvas {
         await Promise.all([
             this.setBackgroundImage(demoArea),
             this.setForegroundImage(demoArea),
-            this.addPoster(demoArea),
         ]);
+        await this.addPoster(demoArea);
+
+        canvas.renderAll();
 
         // TODO: mark done - disable loading indicator
         this.updating = false;
     }
 
-    async updatePoster() {
+    async updatePoster(): Promise<void> {
         this.updating = true;
         
         const demoArea = demo01;
@@ -73,25 +75,7 @@ export default class PreviewCanvas {
         this.updating = false;
     }
 
-    private get targetPosterWidthPx() {
-        const realDims = this.poster.settings.realPosterDimensions;
-        return realDims.width * this.demoArea.ppi * this.backgroundScale;
-    }
-
-    private get targetPosterHeightPx() {
-        const realDims = this.poster.settings.realPosterDimensions;
-        return realDims.height * this.demoArea.ppi * this.backgroundScale;
-    }
-
-    get backgroundImage() {
-        return this.canvas.backgroundImage as fabric.Image | null;
-    }
-
-    get foregroundImage() {
-        return this.canvas.overlayImage as fabric.Image | null;
-    }
-
-    resize() {
+    resize(): void {
         if (this.backgroundImage) {
             this.backgroundImage.scaleToWidth?.(this.canvas.width!);
         }
@@ -102,7 +86,29 @@ export default class PreviewCanvas {
         this.resizeImage();
     }
 
-    private resizeImage() {
+    private get targetPosterWidthPx() {
+        const realDims = this.poster.settings.realPosterDimensions;
+        return realDims.width * this.demoArea.ppi * this.backgroundScale;
+    }
+
+    private get targetPosterHeightPx() {
+        const realDims = this.poster.settings.realPosterDimensions;
+        return realDims.height * this.demoArea.ppi * this.backgroundScale;
+    }
+
+    private get backgroundImage() {
+        return this.canvas.backgroundImage as fabric.Image | null;
+    }
+
+    private get foregroundImage() {
+        return this.canvas.overlayImage as fabric.Image | null;
+    }
+
+    private get backgroundScale() {
+        return this.backgroundImage?.scaleX || 1;
+    }
+
+    private resizeImage(): void {
         if (!this.image) {
             return;
         }
@@ -121,11 +127,7 @@ export default class PreviewCanvas {
         this.canvas.renderAll();
     }
 
-    private get backgroundScale() {
-        return this.backgroundImage?.scaleX || 1;
-    }
-
-    private async addPoster(demoArea: IDemoArea, options?: fabric.IImageOptions) {
+    private async addPoster(demoArea: IDemoArea, options?: fabric.IImageOptions): Promise<void> {
         const pxWidth = this.targetPosterWidthPx;
         const pxHeight = this.targetPosterHeightPx;
         const maxSide = Math.max(pxWidth, pxHeight);
@@ -170,7 +172,7 @@ export default class PreviewCanvas {
         this.canvas.add(img);
     }
 
-    private setMovementConstraints(demoArea: IDemoArea) {
+    private setMovementConstraints(demoArea: IDemoArea): void {
         this.canvas.on('object:moving', (e) => {
             this.clampPosition(demoArea, e.target);
         });
@@ -180,7 +182,7 @@ export default class PreviewCanvas {
         });
     }
 
-    private clampPosition(demoArea: IDemoArea, obj?: fabric.Object) {
+    private clampPosition(demoArea: IDemoArea, obj?: fabric.Object): void {
         if (!obj) {
             return;
         }
@@ -197,31 +199,37 @@ export default class PreviewCanvas {
         obj.setCoords();
     }
 
-    private clamp(num: number, min: number, max: number) {
+    private clamp(num: number, min: number, max: number): number {
         return Math.min(Math.max(num, min), max);
     };
 
-    private async setBackgroundImage(demoArea: IDemoArea) {
+    private async setBackgroundImage(demoArea: IDemoArea): Promise<void> {
         // already set
         if (this.canvas.backgroundImage) {
             return;
         }
 
-        this.canvas.setBackgroundImage(await demoArea.backgroundImg, (img: fabric.Image) => {
-            img.scaleToWidth(this.canvas.width!);
-            this.canvas.renderAll();
-        });
+        const backgroundImg = await demoArea.backgroundImg;
+        return new Promise<void>((resolve) => {
+            this.canvas.setBackgroundImage(backgroundImg, (img: fabric.Image) => {
+                img.scaleToWidth(this.canvas.width!);
+                resolve();
+            });
+        })
     }
 
-    private async setForegroundImage(demoArea: IDemoArea) {
+    private async setForegroundImage(demoArea: IDemoArea): Promise<void> {
         // already set
         if (this.canvas.overlayImage) {
             return;
         }
 
-        this.canvas.setOverlayImage(await demoArea.foregroundImg, (img: fabric.Image) => {
-            img.scaleToWidth(this.canvas.width!);
-            this.canvas.renderAll();
+        const foregroundImg = await demoArea.foregroundImg;
+        return new Promise<void>((resolve) => {
+            this.canvas.setOverlayImage(foregroundImg, (img: fabric.Image) => {
+                img.scaleToWidth(this.canvas.width!);
+                resolve();
+            });
         });
     }
 
