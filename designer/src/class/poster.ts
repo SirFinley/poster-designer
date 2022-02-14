@@ -130,20 +130,21 @@ export default class Poster {
         const reader = new window.FileReader();
         reader.readAsDataURL(imgResponse.data);
         reader.onload = () => {
-            const imageDataUrl = reader.result as string;
-            this.image.imgElem!.setAttribute('src', imageDataUrl);
-
             this.image.uploadStatus = 'uploaded';
             this.image.renderStatus = 'rendering';
             this.image.uploadProgress = 100;
 
-            // settings
-            this.settings.size = saveData.size as SizeOptions;
-            this.settings.orientation = saveData.orientation as OrientationOptions;
-            this.settings.originalImageKey = saveData.imageKey;
+            const imageDataUrl = reader.result as string;
+            this.image.isSvg = /image\/svg/.test(imageDataUrl);
+            this.image.imgElem!.setAttribute('src', imageDataUrl);
+            this.image.imgElem!.onload = () => {
+                // settings
+                this.settings.size = saveData.size as SizeOptions;
+                this.settings.orientation = saveData.orientation as OrientationOptions;
+                this.settings.originalImageKey = saveData.imageKey;
 
-            // image
-            fabric.Image.fromURL(poster.originalImageUrl, (image) => {
+                // image
+                const image = new fabric.Image(this.image.imgElem!);
                 this.image.setNewImage(image);
 
                 // scale
@@ -167,9 +168,7 @@ export default class Poster {
                 this.border.updateBorder(saveData.borders.left);
 
                 this.posterLoadStatus = 'loaded';
-            },{
-                crossOrigin: 'anonymous'
-            });
+            };
         };
     }
 
