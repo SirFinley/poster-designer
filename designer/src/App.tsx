@@ -3,6 +3,7 @@ import Settings from "./components/Settings";
 import { poster, PosterContext, SettingsContext } from "./util/Context";
 import "./App.css";
 import { useEffect } from "react";
+import LoadingPosterModal from "./components/LoadingPosterModal";
 
 function App() {
   useEffect(() => {
@@ -17,6 +18,7 @@ function App() {
             <Canvas></Canvas>
             <Settings></Settings>
           </SettingsContext.Provider>
+          <LoadingPosterModal />
         </PosterContext.Provider>
       </div>
     </>
