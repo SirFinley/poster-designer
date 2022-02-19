@@ -14,6 +14,7 @@ test("Test ApiStack - stage:prod", () => {
             bucket: storageStack.bucket,
             countsTable: storageStack.countsTable,
             postersTable: storageStack.postersTable,
+            thumbnailBucket: storageStack.thumbnailBucket,
         }
     });
 
@@ -33,6 +34,7 @@ test("Test ApiStack - stage:dev", () => {
             bucket: storageStack.bucket,
             countsTable: storageStack.countsTable,
             postersTable: storageStack.postersTable,
+            thumbnailBucket: storageStack.thumbnailBucket,
         }
     });
 
