@@ -21,8 +21,18 @@ namespace PosterManager
         static async Task render()
         {
             var posterId = "YYAKEAD6";
-            var renderKeys = await new PosterRenderer().Render(posterId);
-            await new DynamoDbFacade().UpdatePoster(renderKeys);
+            var posterItem = await new DynamoDbFacade().GetPosterItem(posterId);
+
+            // already rendered
+            if (posterItem.HasRenders())
+            {
+                return;
+            }
+
+            var renderKeys = await new PosterRenderer().Render(posterItem);
+            posterItem.fullRenderKey = renderKeys.fullRenderKey;
+            posterItem.previewRenderKey = renderKeys.previewRenderKey;
+            await new DynamoDbFacade().UpdatePoster(posterItem);
         }
     }
 }

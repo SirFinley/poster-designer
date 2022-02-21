@@ -1,4 +1,5 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
+using System.Text.Json;
 
 namespace PosterManager.render
 {
@@ -18,8 +19,9 @@ namespace PosterManager.render
         
     }
 
-    class DynamoDBSaveData
+    class PosterItem
     {
+
         [DynamoDBHashKey]
         public string id { get; set; }
         [DynamoDBProperty]
@@ -28,6 +30,17 @@ namespace PosterManager.render
         public string fullRenderKey { get; set; }
         [DynamoDBProperty]
         public string previewRenderKey { get; set; }
+
+        public SaveData GetSaveData()
+        {
+            return JsonSerializer.Deserialize<SaveData>(posterJson);
+        }
+
+        public bool HasRenders()
+        {
+            return !string.IsNullOrEmpty(fullRenderKey) && !string.IsNullOrEmpty(previewRenderKey);
+        }
+
     }
 
     class SaveDataBorders

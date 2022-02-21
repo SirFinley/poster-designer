@@ -8,20 +8,17 @@ namespace PosterManager.aws
 {
     class DynamoDbFacade
     {
-        public async Task<SaveData> GetSaveData(string posterId)
+        const string tableName = "dev-sst-Posters";
+        private DynamoDBContextConfig ContextConfig => new DynamoDBContextConfig();
+        private DynamoDBOperationConfig OperationConfig => new DynamoDBOperationConfig { OverrideTableName = tableName };
+
+        public async Task<PosterItem> GetPosterItem(string posterId)
         {
             try
             {
-                const string tableName = "dev-sst-Posters";
-                var client = new AmazonDynamoDBClient(RegionEndpoint.USEast1);
-                var context = new DynamoDBContext(client, new DynamoDBContextConfig
-                {
-                    
-                });
-                var item = await context.LoadAsync<DynamoDBSaveData>(posterId, new DynamoDBOperationConfig { OverrideTableName = tableName });
-
-                var saveData = JsonSerializer.Deserialize<SaveData>(item.posterJson);
-                return saveData;
+                var context = GetContext();
+                var item = await context.LoadAsync<PosterItem>(posterId, OperationConfig);
+                return item;
             }
             catch (Exception ex)
             {
@@ -29,9 +26,24 @@ namespace PosterManager.aws
             }
         }
 
-        public async Task UpdatePoster(RenderResult renderResult)
+        public async Task UpdatePoster(PosterItem posterItem)
         {
+            try
+            {
+                var context = GetContext();
+                await context.SaveAsync(posterItem, OperationConfig);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
 
+        private IDynamoDBContext GetContext()
+        {
+            var client = new AmazonDynamoDBClient(RegionEndpoint.USEast1);
+            var context = new DynamoDBContext(client, ContextConfig);
+            return context;
         }
 
     }

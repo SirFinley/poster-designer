@@ -9,9 +9,9 @@ namespace PosterManager.render
         const int svgTargetDpi = 600;
 
         // TODO - clean up/dispose
-        public async Task<RenderResult> Render(string posterId)
+        public async Task<RenderResult> Render(PosterItem posterItem)
         {
-            var saveData = await new DynamoDbFacade().GetSaveData(posterId);
+            var saveData = posterItem.GetSaveData();
             var renderSettings = GetRenderSettings(saveData);
 
             using var surface = SKSurface.Create(new SKImageInfo(renderSettings.canvas.width, renderSettings.canvas.height));
@@ -60,11 +60,11 @@ namespace PosterManager.render
             var fullRender = fullImage.Encode();
 
             // save full render
-            var fullRenderKey = $"{posterId}/full-render.png";
+            var fullRenderKey = $"{posterItem.id}/full-render.png";
             await UploadImage(fullRender, fullRenderKey);
 
             // save preview render
-            var previewRenderKey = $"{posterId}/preview-render.png";
+            var previewRenderKey = $"{posterItem.id}/preview-render.png";
             var previewRender = GetPreview(fullImage, renderSettings);
             await UploadImage(previewRender, previewRenderKey);
 
