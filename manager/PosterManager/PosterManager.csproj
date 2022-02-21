@@ -6,6 +6,14 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+	<LangVersion>preview</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.2.20" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.7.22" />
+    <PackageReference Include="SkiaSharp" Version="2.88.0-preview.187" />
+	<PackageReference Include="Svg.Skia" Version="0.5.12" /> 
+  </ItemGroup>
 
 </Project>
