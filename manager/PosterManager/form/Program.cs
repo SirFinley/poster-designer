@@ -1,3 +1,4 @@
+using PosterManager.aws;
 using PosterManager.render;
 
 namespace PosterManager
@@ -20,9 +21,8 @@ namespace PosterManager
         static async Task render()
         {
             var posterId = "YYAKEAD6";
-
-            var asdf = await SaveData.Get(posterId);
-            await new PosterRenderer().Render(asdf);
+            var renderKeys = await new PosterRenderer().Render(posterId);
+            await new DynamoDbFacade().UpdatePoster(renderKeys);
         }
     }
 }

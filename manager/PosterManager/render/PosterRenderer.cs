@@ -9,8 +9,9 @@ namespace PosterManager.render
         const int svgTargetDpi = 600;
 
         // TODO - clean up/dispose
-        public async Task Render(SaveData saveData)
+        public async Task<RenderResult> Render(string posterId)
         {
+            var saveData = await new DynamoDbFacade().GetSaveData(posterId);
             var renderSettings = GetRenderSettings(saveData);
 
             using var surface = SKSurface.Create(new SKImageInfo(renderSettings.canvas.width, renderSettings.canvas.height));
@@ -55,15 +56,29 @@ namespace PosterManager.render
             canvas.DrawRect(0, cHeight - borders.bottomWidth, cWidth, borders.bottomWidth, paint); // bottom
             canvas.Flush();
 
-            var fullRender = surface.Snapshot().Encode();
-            FileStream target = File.OpenWrite("D:/Work/posters/test.png");
-            fullRender.SaveTo(target);
+            var fullImage = surface.Snapshot();
+            var fullRender = fullImage.Encode();
 
             // save full render
-            // TODO - implement
+            var fullRenderKey = $"{posterId}/full-render.png";
+            await UploadImage(fullRender, fullRenderKey);
 
             // save preview render
-            // TODO - implement
+            var previewRenderKey = $"{posterId}/preview-render.png";
+            var previewRender = GetPreview(fullImage, renderSettings);
+            await UploadImage(previewRender, previewRenderKey);
+
+            return new RenderResult
+            {
+                fullRenderKey = fullRenderKey,
+                previewRenderKey = previewRenderKey,
+            };
+        }
+
+        private async Task UploadImage(SKData data, string key)
+        {
+            using var stream = data.AsStream();
+            await new S3Facade().UploadImage(stream, key);
         }
 
         private RenderSettings GetRenderSettings(SaveData saveData)
@@ -133,6 +148,22 @@ namespace PosterManager.render
         private int Round(double value)
         {
             return (int)Math.Round(value);
+        }
+
+        private SKData GetPreview(SKImage image, RenderSettings renderSettings)
+        {
+            var maxSide = 300;
+            int ogWidth = renderSettings.canvas.width;
+            int ogHeight = renderSettings.canvas.height;
+            double scale = maxSide / Math.Max((double)ogWidth, ogHeight);
+
+            int smallWidth = (int)(ogWidth * scale);
+            int smallHeight = (int)(ogHeight * scale);
+            var smallSurface = SKSurface.Create(new SKImageInfo(smallWidth, smallHeight));
+            var smallCanvas = smallSurface.Canvas;
+            smallCanvas.DrawImage(image, new SKRectI(0, 0, smallWidth, smallHeight));
+            smallCanvas.Flush();
+            return smallSurface.Snapshot().Encode();
         }
 
         private async Task<SKBitmap> LoadBitmap(SaveData saveData)

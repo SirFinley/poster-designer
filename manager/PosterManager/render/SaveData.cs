@@ -1,35 +1,10 @@
-﻿using Amazon;
-using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.DataModel;
-using System.Text.Json;
+﻿using Amazon.DynamoDBv2.DataModel;
 
 namespace PosterManager.render
 {
     class SaveData
     {
 
-        public static async Task<SaveData> Get(string posterId)
-        {
-            try
-            {
-                const string tableName = "dev-sst-Posters";
-                var client = new AmazonDynamoDBClient(RegionEndpoint.USEast1);
-                var context = new DynamoDBContext(client, new DynamoDBContextConfig
-                {
-                    
-                });
-                var item = await context.LoadAsync<DynamoDBSaveData>(posterId, new DynamoDBOperationConfig { OverrideTableName = tableName });
-
-                var saveData = JsonSerializer.Deserialize<SaveData>(item.posterJson);
-                return saveData;
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
-        }
-
-        public string id { get; set; }
         public int version { get; set; }
         public string size { get; set; }
         public string orientation { get; set; }
