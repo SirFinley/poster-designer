@@ -328,6 +328,56 @@ export default class PosterImage {
         this.poster.updatePreview();
     }
 
+    getMoveOffset(): number {
+        const dims = this.settings.getVirtualDimensions();
+        const maxSide = Math.max(dims.canvasWidth, dims.canvasHeight);
+        return maxSide / 150.0;
+    }
+
+    moveLeft() {
+        if (!this.image) {
+            return;
+        }
+
+        this.moveImageTo({
+            left: this.image.left! - this.getMoveOffset(),
+        });
+        this.canvas.renderAll();
+    }
+
+    moveRight() {
+        if (!this.image) {
+            return;
+        }
+
+        this.moveImageTo({
+            left: this.image.left! + this.getMoveOffset(),
+        });
+        this.canvas.renderAll();
+    }
+
+    moveUp() {
+        if (!this.image) {
+            return;
+        }
+
+        this.moveImageTo({
+            top: this.image.top! - this.getMoveOffset(),
+        });
+        this.canvas.renderAll();
+    }
+
+    moveDown() {
+        if (!this.image) {
+            return;
+        }
+
+        this.moveImageTo({
+            top: this.image.top! + this.getMoveOffset(),
+        });
+        this.canvas.renderAll();
+    }
+
 }
 
 interface ImageCoords {
