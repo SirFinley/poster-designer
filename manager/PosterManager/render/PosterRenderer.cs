@@ -35,8 +35,8 @@ namespace PosterManager.render
             }
             else
             {
-                var bitmap = await LoadBitmap(saveData);
-                canvas.DrawBitmap(bitmap, new SKRect
+                var image = await LoadImage(saveData);
+                canvas.DrawImage(image, new SKRect
                 {
                     Left = renderSettings.image.left,
                     Top = renderSettings.image.top,
@@ -166,8 +166,10 @@ namespace PosterManager.render
             return smallSurface.Snapshot().Encode();
         }
 
-        private async Task<SKBitmap> LoadBitmap(SaveData saveData)
+        private async Task<SKImage> LoadImage(SaveData saveData)
         {
+            // Load into SKImage instead of SKBitmap so that exif orientation data is taken into account
+            // otherwise picture may be rotated incorrectly and streched
             string key = saveData.imageKey;
             using (Stream stream = await new S3Facade().GetObject(key))
             using (MemoryStream memstream = new MemoryStream())
@@ -175,8 +177,8 @@ namespace PosterManager.render
                 await stream.CopyToAsync(memstream);
                 memstream.Seek(0, SeekOrigin.Begin);
 
-                var bitmap = SKBitmap.Decode(memstream);
-                return bitmap;
+                var image = SKImage.FromEncodedData(memstream);
+                return image;
             }
         }
 
