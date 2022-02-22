@@ -101,7 +101,8 @@ export default class RasterRenderer {
         const imgBuffer = Buffer.from(response.data, 'utf-8');
         const pipeline =  sharp(imgBuffer, {
             limitInputPixels: false,
-        });
+        })
+        .rotate(); // rotate image based on exif data
         return pipeline.extract(renderSettings.extract)
             .extend(renderSettings.extend)
     }
