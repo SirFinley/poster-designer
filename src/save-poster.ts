@@ -76,6 +76,7 @@ async function savePoster(id: string, posterJson: string) {
 		Item: {
 			id: id,
 			posterJson: posterJson,
+			timeAdded: new Date().toISOString(),
 		},
 	};
 

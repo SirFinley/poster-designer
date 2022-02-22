@@ -30,6 +30,7 @@ namespace PosterManager
             }
 
             var renderKeys = await new PosterRenderer().Render(posterItem);
+            posterItem.timeRendered = DateTime.UtcNow;
             posterItem.fullRenderKey = renderKeys.fullRenderKey;
             posterItem.previewRenderKey = renderKeys.previewRenderKey;
             await new DynamoDbFacade().UpdatePoster(posterItem);

@@ -27,9 +27,13 @@ namespace PosterManager.render
         [DynamoDBProperty]
         public string posterJson { get; set; }
         [DynamoDBProperty]
-        public string fullRenderKey { get; set; }
+        public string? fullRenderKey { get; set; }
         [DynamoDBProperty]
-        public string previewRenderKey { get; set; }
+        public string? previewRenderKey { get; set; }
+        [DynamoDBProperty]
+        public DateTime? timeAdded { get; set; }
+        [DynamoDBProperty]
+        public DateTime? timeRendered { get; set; }
 
         public SaveData GetSaveData()
         {
