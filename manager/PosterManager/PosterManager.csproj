@@ -20,4 +20,10 @@
 	<PackageReference Include="Svg.Skia" Version="0.5.12" /> 
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="form/Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>

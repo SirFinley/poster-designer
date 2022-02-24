@@ -58,7 +58,6 @@
             this.posterIdInput.Name = "posterIdInput";
             this.posterIdInput.Size = new System.Drawing.Size(276, 23);
             this.posterIdInput.TabIndex = 0;
-            this.posterIdInput.Text = "5IAKKAG2";
             // 
             // renderButton
             // 
