@@ -68,7 +68,7 @@ namespace PosterManager
         private void DisaplyPosterSettings(PosterItem item)
         {
             var saveData = item.GetSaveData();
-            posterIdLabelValue.Text = saveData.size;
+            posterIdLabelValue.Text = item.id;
             sizeLabelValue.Text = saveData.size;
             orientationLabelValue.Text = saveData.orientation;
             paperLabelValue.Text = "Glossy"; // TODO - get paper type
