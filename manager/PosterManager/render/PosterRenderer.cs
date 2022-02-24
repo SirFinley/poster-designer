@@ -1,4 +1,5 @@
 ﻿using PosterManager.aws;
+using PosterManager.form;
 using SkiaSharp;
 using Svg.Skia;
 
@@ -11,8 +12,10 @@ namespace PosterManager.render
         // TODO - clean up/dispose
         public async Task<RenderResult> Render(PosterItem posterItem)
         {
+            var posterId = posterItem.id;
             var saveData = posterItem.GetSaveData();
             var renderSettings = GetRenderSettings(saveData);
+            SetUpFiles(posterId, saveData);
 
             using var surface = SKSurface.Create(new SKImageInfo(renderSettings.canvas.width, renderSettings.canvas.height));
             var canvas = surface.Canvas;
@@ -24,7 +27,7 @@ namespace PosterManager.render
             // draw image
             if (renderSettings.isSvg)
             {
-                var svg = await LoadSvg(saveData);
+                var svg = await LoadSvg(posterId, saveData);
                 SKMatrix matrix = SKMatrix.CreateScaleTranslation(
                     (float)renderSettings.svgScaledBy,
                     (float)renderSettings.svgScaledBy,
@@ -35,7 +38,7 @@ namespace PosterManager.render
             }
             else
             {
-                var image = await LoadImage(saveData);
+                var image = await LoadImage(posterId, saveData);
                 canvas.DrawImage(image, new SKRect
                 {
                     Left = renderSettings.image.left,
@@ -61,11 +64,13 @@ namespace PosterManager.render
 
             // save full render
             var fullRenderKey = $"{posterItem.id}/full-render.png";
+            await SaveImage(PosterFiles.GetFullRenderPath(posterId), fullRender);
             await UploadImage(fullRender, fullRenderKey);
 
             // save preview render
             var previewRenderKey = $"{posterItem.id}/preview-render.png";
             var previewRender = GetPreview(fullImage, renderSettings);
+            await SaveImage(PosterFiles.GetPreviewRenderPath(posterId), previewRender);
             await UploadImage(previewRender, previewRenderKey);
 
             return new RenderResult
@@ -73,6 +78,15 @@ namespace PosterManager.render
                 fullRenderKey = fullRenderKey,
                 previewRenderKey = previewRenderKey,
             };
+        }
+
+        private async Task SaveImage(string path, SKData data)
+        {
+            string? directory = Path.GetDirectoryName(path);
+            Directory.CreateDirectory(directory);
+
+            using var fileStream = File.Create(path);
+            await fileStream.WriteAsync(data.ToArray());
         }
 
         private async Task UploadImage(SKData data, string key)
@@ -161,36 +175,73 @@ namespace PosterManager.render
             int smallHeight = (int)(ogHeight * scale);
             var smallSurface = SKSurface.Create(new SKImageInfo(smallWidth, smallHeight));
             var smallCanvas = smallSurface.Canvas;
-            smallCanvas.DrawImage(image, new SKRectI(0, 0, smallWidth, smallHeight));
+            var paint = new SKPaint()
+            {
+                FilterQuality = SKFilterQuality.High,
+            };
+
+            smallCanvas.DrawImage(image, new SKRectI(0, 0, smallWidth, smallHeight), paint);
             smallCanvas.Flush();
             return smallSurface.Snapshot().Encode();
         }
 
-        private async Task<SKImage> LoadImage(SaveData saveData)
+        private async Task<SKImage> LoadImage(string posterId, SaveData saveData)
         {
             // Load into SKImage instead of SKBitmap so that exif orientation data is taken into account
             // otherwise picture may be rotated incorrectly and streched
             string key = saveData.imageKey;
-            using (Stream stream = await new S3Facade().GetObject(key))
-            using (MemoryStream memstream = new MemoryStream())
-            {
-                await stream.CopyToAsync(memstream);
-                memstream.Seek(0, SeekOrigin.Begin);
+            using Stream stream = await new S3Facade().GetObject(key);
 
-                var image = SKImage.FromEncodedData(memstream);
-                return image;
-            }
+            await SaveUpload(posterId, key, stream);
+
+            using var file = File.Open(PosterFiles.GetUpload(posterId), FileMode.Open);
+            var image = SKImage.FromEncodedData(file);
+            return image;
         }
 
-        private async Task<SKPicture> LoadSvg(SaveData saveData)
+        private async Task<SKPicture> LoadSvg(string posterId, SaveData saveData)
         {
             string key = saveData.imageKey;
             using Stream stream = await new S3Facade().GetObject(key);
-            using MemoryStream memstream = new MemoryStream();
+
+            await SaveUpload(posterId, key, stream);
+
             var svg = new SKSvg();
-            svg.Load(stream);
-            //svg.Load("D:/Work/posters/tiger2.svg");
+            svg.Load(PosterFiles.GetUpload(posterId));
             return svg.Picture;
+        }
+
+        private async Task SaveUpload(string posterId, string key, Stream stream)
+        {
+            string path = PosterFiles.GetUpload(posterId, key);
+            await SaveImage(path, stream);
+        }
+
+        private async Task SetUpFiles(string posterId, SaveData saveData)
+        {
+            // ensure directory exists
+            string path = PosterFiles.GetUpload(posterId, "upload");
+            string? directory = Path.GetDirectoryName(path);
+            Directory.CreateDirectory(directory);
+
+            // clean up old uploads
+            var uploadFiles = Directory.GetFiles(directory, "upload.*");
+            uploadFiles.ToList().ForEach(f => File.Delete(f));
+
+            // download client render
+            string key = saveData.imageThumbnailKey;
+            using Stream stream = await new S3Facade().GetObject(key);
+            await SaveImage(PosterFiles.GetThumbnail(posterId), stream);
+        }
+
+        private async Task SaveImage(string path, Stream stream)
+        {
+            using MemoryStream memstream = new MemoryStream();
+            await stream.CopyToAsync(memstream);
+            memstream.Seek(0, SeekOrigin.Begin);
+
+            using var fileStream = File.Create(path);
+            await fileStream.WriteAsync(memstream.ToArray());
         }
 
     }
