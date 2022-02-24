@@ -63,7 +63,15 @@ async function updateAndIncreaseCounter(): Promise<number> {
 		ReturnValues: "UPDATED_NEW"
 	};
 
-	const result = await dynamodb.update(params);
+	let result;
+	try {
+		result = await dynamodb.update(params);
+	} catch (error) {
+		console.log("error saving dynamodb poster item");
+		
+		console.log(error);
+	}
+
 	const count = result?.Attributes?.counts;
 	if (!count || typeof count !== 'number') {
 		throw new Error('Unable to retrieve new count value');
@@ -109,17 +117,21 @@ async function copyS3(sourceBucket: string, sourceKey: string, targetBucket: str
 		return;
 	}
 
-	const s3 = new S3();
+	const copySource = encodeURIComponent(`/${sourceBucket}/${sourceKey}`);
 	const request: S3.CopyObjectRequest = {
 		Bucket: targetBucket,
-		CopySource: `/${sourceBucket}/${sourceKey}`,
+		CopySource: copySource,
 		Key: targetKey,
 	};
 
 	try {
+		const s3 = new S3();
 		const result = await s3.copyObject(request).promise();
 		console.log(result.CopyObjectResult);
 	} catch (error) {
+		console.log(`error copying ${sourceBucket}/${sourceKey} to ${targetBucket}/${targetKey}`);
+		console.log(`error copying ${copySource}`);
+
 		console.log(error);
 		throw error;
 	}
