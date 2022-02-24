@@ -4,15 +4,18 @@ import { randomUUID } from 'crypto';
 import handler from './util/handler';
 import dynamodb from './util/dynamodb';
 import environment from './util/environment';
+import { SaveData } from './render/saveData';
 
 export const main = handler(async (event) => {
 	const posterId = event.queryStringParameters?.['posterId'] as string|null|undefined;
 	const posterJson = event.body as string;
+	const saveData = JSON.parse(posterJson) as SaveData;
 
-	const thumbnailUrl = getThumbnailUrl(posterJson);
-	
-	const id = posterId || await getId(posterJson);
-	await savePoster(id, posterJson);
+	const id = posterId || await getId(saveData);
+	const updatedImageKey = moveImage(id, saveData);
+	const thumbnailUrl = getThumbnailUrl(id, saveData);
+	saveData.imageKey = await updatedImageKey;
+	await savePoster(id, saveData);
 
 	return {
 		id,
@@ -20,8 +23,7 @@ export const main = handler(async (event) => {
 	};
 });
 
-async function getId(posterJson: string) {
-	const saveData = JSON.parse(posterJson);
+async function getId(saveData: SaveData) {
 	if (saveData.idType === 'guid') {
 		return randomUUID();
 	}
@@ -61,7 +63,15 @@ async function updateAndIncreaseCounter(): Promise<number> {
 		ReturnValues: "UPDATED_NEW"
 	};
 
-	const result = await dynamodb.update(params);
+	let result;
+	try {
+		result = await dynamodb.update(params);
+	} catch (error) {
+		console.log("error saving dynamodb poster item");
+		
+		console.log(error);
+	}
+
 	const count = result?.Attributes?.counts;
 	if (!count || typeof count !== 'number') {
 		throw new Error('Unable to retrieve new count value');
@@ -70,34 +80,60 @@ async function updateAndIncreaseCounter(): Promise<number> {
 	return count;
 }
 
-async function savePoster(id: string, posterJson: string) {
+async function savePoster(id: string, saveData: SaveData) {
 	const params = {
 		TableName: environment.postersTableName,
 		Item: {
 			id: id,
-			posterJson: posterJson,
+			posterJson: JSON.stringify(saveData),
+			timeAdded: new Date().toISOString(),
 		},
 	};
 
 	await dynamodb.put(params);
 }
-async function getThumbnailUrl(posterJson: string): Promise<string> {
-	const key = JSON.parse(posterJson).imageThumbnailKey as string;
 
-	const s3 = new S3();
+async function getThumbnailUrl(posterId: string, saveData: SaveData): Promise<string> {
+	const sourceKey = saveData.imageThumbnailKey;
+	const fileExt = sourceKey.split('.').pop();
+	const targetKey = `${posterId}/${randomUUID()}.${fileExt}`;
+
+	await copyS3(environment.bucketName, sourceKey, environment.thumbnailBucketName, targetKey);
+	return `https://${environment.thumbnailBucketName}.s3.amazonaws.com/${targetKey}`;
+}
+
+async function moveImage(posterId:string, saveData: SaveData): Promise<string> {
+	const sourceKey = saveData.imageKey;
+	const fileExt = sourceKey.split('.').pop();
+	const targetKey = `${posterId}/upload.${fileExt}`;
+	
+	await copyS3(environment.bucketName, sourceKey, environment.bucketName, targetKey);
+	return targetKey;
+}
+
+async function copyS3(sourceBucket: string, sourceKey: string, targetBucket: string, targetKey: string): Promise<void> {
+	// attempted to copy to self, can skip
+	if (sourceBucket === targetBucket && sourceKey === targetKey) {
+		return;
+	}
+
+	const copySource = encodeURIComponent(`/${sourceBucket}/${sourceKey}`);
 	const request: S3.CopyObjectRequest = {
-		Bucket: environment.thumbnailBucketName,
-		CopySource: `/${environment.bucketName}/${key}`,
-		Key: key,
+		Bucket: targetBucket,
+		CopySource: copySource,
+		Key: targetKey,
 	};
 
 	try {
+		const s3 = new S3();
 		const result = await s3.copyObject(request).promise();
 		console.log(result.CopyObjectResult);
 	} catch (error) {
-		console.log(error);
-	}
+		console.log(`error copying ${sourceBucket}/${sourceKey} to ${targetBucket}/${targetKey}`);
+		console.log(`error copying ${copySource}`);
 
-	return `https://${environment.thumbnailBucketName}.s3.amazonaws.com/${key}`;
+		console.log(error);
+		throw error;
+	}
 }
 

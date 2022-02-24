@@ -1,6 +1,7 @@
 import VirtualDimensions from "./virtualDimensions";
 
 export interface SaveData {
+    idType: 'autoinc'|'guid',
     version: number,
     size: string,
     orientation: string,

@@ -16,7 +16,7 @@ export const main = handler(async (event) => {
 	}
 
 	const fileExt = contentType.split('/').pop();
-	const key = `${randomUUID()}.${fileExt}`;
+	const key = `uploads/${randomUUID()}.${fileExt}`;
 
 	// Get signed URL from S3
 	const s3 = new S3();

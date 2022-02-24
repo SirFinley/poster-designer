@@ -1,4 +1,5 @@
 import * as sst from "@serverless-stack/resources";
+import { Duration } from "aws-cdk-lib";
 import { HttpMethods } from "aws-cdk-lib/aws-s3";
 
 export default class StorageStack extends sst.Stack {
@@ -39,6 +40,14 @@ export default class StorageStack extends sst.Stack {
                         allowedMethods: [HttpMethods.GET, HttpMethods.PUT],
                     },
                 ],
+                lifecycleRules: [
+                    {
+                        enabled: true,
+                        id: "uploads-expiration",
+                        prefix: "uploads/",
+                        expiration: Duration.days(3),
+                    }
+                ]
             },
         });
 
