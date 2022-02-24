@@ -48,7 +48,6 @@
             this.sizeLabelValue = new System.Windows.Forms.Label();
             this.posterIdLabelValue = new System.Windows.Forms.Label();
             this.posterIdSettingLabel = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.previewRender)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.clientThumbnail)).BeginInit();
             this.SuspendLayout();
@@ -150,7 +149,7 @@
             // sizeLabel
             // 
             this.sizeLabel.AutoSize = true;
-            this.sizeLabel.Location = new System.Drawing.Point(57, 109);
+            this.sizeLabel.Location = new System.Drawing.Point(57, 80);
             this.sizeLabel.Name = "sizeLabel";
             this.sizeLabel.Size = new System.Drawing.Size(27, 15);
             this.sizeLabel.TabIndex = 10;
@@ -160,7 +159,7 @@
             // orientationLabel
             // 
             this.orientationLabel.AutoSize = true;
-            this.orientationLabel.Location = new System.Drawing.Point(17, 139);
+            this.orientationLabel.Location = new System.Drawing.Point(17, 110);
             this.orientationLabel.Name = "orientationLabel";
             this.orientationLabel.Size = new System.Drawing.Size(67, 15);
             this.orientationLabel.TabIndex = 11;
@@ -170,7 +169,7 @@
             // paperLabel
             // 
             this.paperLabel.AutoSize = true;
-            this.paperLabel.Location = new System.Drawing.Point(47, 170);
+            this.paperLabel.Location = new System.Drawing.Point(47, 141);
             this.paperLabel.Name = "paperLabel";
             this.paperLabel.Size = new System.Drawing.Size(37, 15);
             this.paperLabel.TabIndex = 12;
@@ -180,7 +179,7 @@
             // borderSizeLabel
             // 
             this.borderSizeLabel.AutoSize = true;
-            this.borderSizeLabel.Location = new System.Drawing.Point(19, 206);
+            this.borderSizeLabel.Location = new System.Drawing.Point(19, 177);
             this.borderSizeLabel.Name = "borderSizeLabel";
             this.borderSizeLabel.Size = new System.Drawing.Size(65, 15);
             this.borderSizeLabel.TabIndex = 13;
@@ -190,7 +189,7 @@
             // borderLabelValue
             // 
             this.borderLabelValue.AutoSize = true;
-            this.borderLabelValue.Location = new System.Drawing.Point(90, 206);
+            this.borderLabelValue.Location = new System.Drawing.Point(90, 177);
             this.borderLabelValue.Name = "borderLabelValue";
             this.borderLabelValue.Size = new System.Drawing.Size(29, 15);
             this.borderLabelValue.TabIndex = 17;
@@ -200,7 +199,7 @@
             // paperLabelValue
             // 
             this.paperLabelValue.AutoSize = true;
-            this.paperLabelValue.Location = new System.Drawing.Point(90, 170);
+            this.paperLabelValue.Location = new System.Drawing.Point(90, 141);
             this.paperLabelValue.Name = "paperLabelValue";
             this.paperLabelValue.Size = new System.Drawing.Size(29, 15);
             this.paperLabelValue.TabIndex = 16;
@@ -210,7 +209,7 @@
             // orientationLabelValue
             // 
             this.orientationLabelValue.AutoSize = true;
-            this.orientationLabelValue.Location = new System.Drawing.Point(90, 139);
+            this.orientationLabelValue.Location = new System.Drawing.Point(90, 110);
             this.orientationLabelValue.Name = "orientationLabelValue";
             this.orientationLabelValue.Size = new System.Drawing.Size(29, 15);
             this.orientationLabelValue.TabIndex = 15;
@@ -220,7 +219,7 @@
             // sizeLabelValue
             // 
             this.sizeLabelValue.AutoSize = true;
-            this.sizeLabelValue.Location = new System.Drawing.Point(90, 109);
+            this.sizeLabelValue.Location = new System.Drawing.Point(90, 80);
             this.sizeLabelValue.Name = "sizeLabelValue";
             this.sizeLabelValue.Size = new System.Drawing.Size(29, 15);
             this.sizeLabelValue.TabIndex = 14;
@@ -230,7 +229,7 @@
             // posterIdLabelValue
             // 
             this.posterIdLabelValue.AutoSize = true;
-            this.posterIdLabelValue.Location = new System.Drawing.Point(90, 83);
+            this.posterIdLabelValue.Location = new System.Drawing.Point(90, 54);
             this.posterIdLabelValue.Name = "posterIdLabelValue";
             this.posterIdLabelValue.Size = new System.Drawing.Size(29, 15);
             this.posterIdLabelValue.TabIndex = 19;
@@ -240,28 +239,18 @@
             // posterIdSettingLabel
             // 
             this.posterIdSettingLabel.AutoSize = true;
-            this.posterIdSettingLabel.Location = new System.Drawing.Point(31, 83);
+            this.posterIdSettingLabel.Location = new System.Drawing.Point(31, 54);
             this.posterIdSettingLabel.Name = "posterIdSettingLabel";
             this.posterIdSettingLabel.Size = new System.Drawing.Size(53, 15);
             this.posterIdSettingLabel.TabIndex = 18;
             this.posterIdSettingLabel.Text = "Poster Id";
             this.posterIdSettingLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
-            // textBox1
-            // 
-            this.textBox1.Enabled = false;
-            this.textBox1.Location = new System.Drawing.Point(108, 338);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 23);
-            this.textBox1.TabIndex = 20;
-            this.textBox1.Text = "lorem ipsum";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(777, 624);
-            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.posterIdLabelValue);
             this.Controls.Add(this.posterIdSettingLabel);
             this.Controls.Add(this.borderLabelValue);
@@ -313,6 +302,5 @@
         private Label sizeLabelValue;
         private Label posterIdLabelValue;
         private Label posterIdSettingLabel;
-        private TextBox textBox1;
     }
 }

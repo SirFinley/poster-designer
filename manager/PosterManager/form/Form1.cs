@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using PosterManager.aws;
 using PosterManager.form;
 using PosterManager.render;
@@ -7,10 +8,14 @@ namespace PosterManager
 {
     public partial class Form1 : Form
     {
-        public Form1()
+
+        public Form1(IConfiguration config)
         {
             InitializeComponent();
+            Settings = new Settings(config);
         }
+
+        private Settings Settings { get; }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -25,7 +30,7 @@ namespace PosterManager
             try
             {
                 renderStatus.Text = "Retrieving poster data...";
-                var posterItem = await new DynamoDbFacade().GetPosterItem(posterId);
+                var posterItem = await new DynamoDbFacade(Settings).GetPosterItem(posterId);
                 if (posterItem == null)
                 {
                     throw new Exception("No poster with that id found");
@@ -37,11 +42,11 @@ namespace PosterManager
                 if (!posterItem.HasRenders() || !PosterFiles.HasFiles(posterId))
                 {
                     renderStatus.Text = "Rendering...";
-                    var renderKeys = await new PosterRenderer().Render(posterItem);
+                    var renderKeys = await new PosterRenderer(Settings).Render(posterItem);
                     posterItem.timeRendered = DateTime.UtcNow;
                     posterItem.fullRenderKey = renderKeys.fullRenderKey;
                     posterItem.previewRenderKey = renderKeys.previewRenderKey;
-                    await new DynamoDbFacade().UpdatePoster(posterItem);
+                    await new DynamoDbFacade(Settings).UpdatePoster(posterItem);
                 }
 
                 DisplayThumbnails(posterId);

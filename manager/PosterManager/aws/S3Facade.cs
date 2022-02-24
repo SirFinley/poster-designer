@@ -1,4 +1,5 @@
-using Amazon;
+﻿using Amazon;
+using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 
@@ -6,17 +7,22 @@ namespace PosterManager.aws
 {
     class S3Facade
     {
-        // TODO - get from config
-        const string bucketName = "TODO get from config";
+
+        public S3Facade(Settings settings)
+        {
+            Settings = settings;
+        }
+
+        public Settings Settings { get; }
 
         public async Task<Stream> GetObject(string keyName)
         {
             try
             {
-                IAmazonS3 client = new AmazonS3Client(RegionEndpoint.USEast1);
+                IAmazonS3 client = GetClient();
                 GetObjectRequest request = new GetObjectRequest
                 {
-                    BucketName = bucketName,
+                    BucketName = Settings.GetUploadsBucket(),
                     Key = keyName,
                 };
 
@@ -35,10 +41,10 @@ namespace PosterManager.aws
         {
             try
             {
-                IAmazonS3 client = new AmazonS3Client(RegionEndpoint.USEast1);
+                IAmazonS3 client = GetClient();
                 PutObjectRequest request = new PutObjectRequest
                 {
-                    BucketName = bucketName,
+                    BucketName = Settings.GetUploadsBucket(),
                     Key = keyName,
                     InputStream = stream,
                 };
@@ -55,6 +61,11 @@ namespace PosterManager.aws
                 Console.WriteLine($"Error: '{e.Message}'");
                 throw;
             }
+        }
+
+        private IAmazonS3 GetClient()
+        {
+            return new AmazonS3Client(Settings.GetCreds(), RegionEndpoint.USEast1);
         }
 
     }

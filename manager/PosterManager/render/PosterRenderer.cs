@@ -9,6 +9,13 @@ namespace PosterManager.render
     {
         const int svgTargetDpi = 600;
 
+        public PosterRenderer(Settings settings)
+        {
+            Settings = settings;
+        }
+
+        public Settings Settings { get; }
+
         // TODO - clean up/dispose
         public async Task<RenderResult> Render(PosterItem posterItem)
         {
@@ -92,7 +99,7 @@ namespace PosterManager.render
         private async Task UploadImage(SKData data, string key)
         {
             using var stream = data.AsStream();
-            await new S3Facade().UploadImage(stream, key);
+            await new S3Facade(Settings).UploadImage(stream, key);
         }
 
         private RenderSettings GetRenderSettings(SaveData saveData)
@@ -190,7 +197,7 @@ namespace PosterManager.render
             // Load into SKImage instead of SKBitmap so that exif orientation data is taken into account
             // otherwise picture may be rotated incorrectly and streched
             string key = saveData.imageKey;
-            using Stream stream = await new S3Facade().GetObject(key);
+            using Stream stream = await new S3Facade(Settings).GetObject(key);
 
             await SaveUpload(posterId, key, stream);
 
@@ -202,7 +209,7 @@ namespace PosterManager.render
         private async Task<SKPicture> LoadSvg(string posterId, SaveData saveData)
         {
             string key = saveData.imageKey;
-            using Stream stream = await new S3Facade().GetObject(key);
+            using Stream stream = await new S3Facade(Settings).GetObject(key);
 
             await SaveUpload(posterId, key, stream);
 
@@ -230,7 +237,7 @@ namespace PosterManager.render
 
             // download client render
             string key = saveData.imageThumbnailKey;
-            using Stream stream = await new S3Facade().GetObject(key);
+            using Stream stream = await new S3Facade(Settings).GetObject(key);
             await SaveImage(PosterFiles.GetThumbnail(posterId), stream);
         }
 

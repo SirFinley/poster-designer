@@ -18,7 +18,18 @@ namespace PosterManager.form
         public static string GetUpload(string posterId)
         {
             string path = GetPath(posterId);
-            return Directory.GetFiles(path, "upload.*").First();
+            if (!Directory.Exists(path))
+            {
+                return path;
+            }
+
+            string[] files = Directory.GetFiles(path, "upload.*");
+            if (files.Count() == 0)
+            {
+                return path;
+            }
+
+            return files.First();
         }
 
         public static string GetUpload(string posterId, string key)

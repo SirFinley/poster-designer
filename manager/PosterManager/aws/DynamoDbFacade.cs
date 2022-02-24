@@ -2,15 +2,21 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using PosterManager.render;
-using System.Text.Json;
 
 namespace PosterManager.aws
 {
     class DynamoDbFacade
     {
-        const string tableName = "dev-sst-Posters";
+
+        public DynamoDbFacade(Settings settings)
+        {
+            Settings = settings;
+        }
+
+        public Settings Settings { get; }
+
         private DynamoDBContextConfig ContextConfig => new DynamoDBContextConfig();
-        private DynamoDBOperationConfig OperationConfig => new DynamoDBOperationConfig { OverrideTableName = tableName };
+        private DynamoDBOperationConfig OperationConfig => new DynamoDBOperationConfig { OverrideTableName = Settings.GetPostersTable() };
 
         public async Task<PosterItem> GetPosterItem(string posterId)
         {
@@ -41,7 +47,7 @@ namespace PosterManager.aws
 
         private IDynamoDBContext GetContext()
         {
-            var client = new AmazonDynamoDBClient(RegionEndpoint.USEast1);
+            var client = new AmazonDynamoDBClient(Settings.GetCreds(), RegionEndpoint.USEast1);
             var context = new DynamoDBContext(client, ContextConfig);
             return context;
         }
