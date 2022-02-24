@@ -1,4 +1,6 @@
-﻿namespace PosterManager.form
+﻿using System.Diagnostics;
+
+namespace PosterManager.form
 {
     public class PosterFiles
     {
@@ -41,6 +43,11 @@
         public static string GetThumbnail(string posterId)
         {
             return GetPath(posterId, "thumbnail.png");
+        }
+
+        public static string GetDirectory(string posterId)
+        {
+            return GetPath(posterId);
         }
 
         private static string GetPath(string posterId)

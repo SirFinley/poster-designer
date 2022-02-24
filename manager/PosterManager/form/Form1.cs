@@ -1,6 +1,7 @@
 using PosterManager.aws;
 using PosterManager.form;
 using PosterManager.render;
+using System.Diagnostics;
 
 namespace PosterManager
 {
@@ -30,7 +31,7 @@ namespace PosterManager
                     throw new Exception("No poster with that id found");
                 }
 
-                // TODO - display poster settings
+                DisaplyPosterSettings(posterItem);
 
                 // missing renders
                 if (!posterItem.HasRenders() || !PosterFiles.HasFiles(posterId))
@@ -59,5 +60,26 @@ namespace PosterManager
             previewRender.Image = Image.FromFile(PosterFiles.GetPreviewRenderPath(posterId));
         }
 
+        private void DisaplyPosterSettings(PosterItem item)
+        {
+            var saveData = item.GetSaveData();
+            posterIdLabelValue.Text = saveData.size;
+            sizeLabelValue.Text = saveData.size;
+            orientationLabelValue.Text = saveData.orientation;
+            paperLabelValue.Text = "Glossy"; // TODO - get paper type
+            borderLabelValue.Text = saveData.borders.left + "\"";
+        }
+
+        private void browseButton_Click(object sender, EventArgs e)
+        {
+            string posterId = posterIdInput.Text;
+            string path = PosterFiles.GetDirectory(posterId);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+
+            Process.Start("explorer.exe", path);
+        }
     }
 }
