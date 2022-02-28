@@ -11,6 +11,7 @@ namespace PosterManager
 
         public Form1(IConfiguration config)
         {
+            Icon = Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
             InitializeComponent();
             Settings = new Settings(config);
         }
