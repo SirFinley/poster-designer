@@ -78,12 +78,12 @@ const Canvas = observer(() => {
         {!poster.hasImage ? (
           <label className="absolute z-10 w-full h-full flex items-center justify-center">
             <Square width="55%" maxWidth="28rem">
-              <div className="bg-gray-100 rounded-full p-5 shadow-slate-300 shadow-md text-center w-full h-full flex flex-col items-center justify-center">
+              <div className="bg-vipurple rounded-full p-5 shadow-slate-300 shadow-md text-center w-full h-full flex flex-col items-center justify-center">
                 <FontAwesomeIcon
                   icon={faUpload}
-                  className="text-blue-500 fa-5x mt-1 md:[font-size:8rem]"
+                  className="text-white fa-5x mt-1 md:[font-size:8rem]"
                 ></FontAwesomeIcon>
-                <span className="md:text-xl mt-4 self-center">
+                <span className="md:text-xl mt-4 self-center text-white">
                   Choose and upload your image here
                 </span>
                 <input

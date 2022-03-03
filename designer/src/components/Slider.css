@@ -11,7 +11,7 @@ input[type=range] {
     outline: none;
   }
   input[type=range]::-webkit-slider-runnable-track {
-    background: rgba(100, 100, 100, 0.3);
+    background: #6635CF;
     border: 0;
     border-radius: 25px;
     width: 100%;
@@ -29,7 +29,7 @@ input[type=range] {
     -webkit-appearance: none;
   }
   input[type=range]:focus::-webkit-slider-runnable-track {
-    background: #646464;
+    background: #9645FF;
   }
   input[type=range]::-moz-range-track {
     background: rgba(100, 100, 100, 0.3);

@@ -72,8 +72,8 @@ const AddToCartButton = observer(() => {
     const editing = poster.posterId;
     return (
         <>
-            <button className="w-full p-2 rounded text-white bg-blue-500 hover:bg-blue-600 transition font-bold
-                    disabled:opacity-30 disabled:hover:bg-blue-500 disabled:cursor-not-allowed"
+            <button className="w-full p-2 rounded text-white bg-vipurple hover:bg-vipurplelight transition font-bold
+                    disabled:opacity-30 disabled:hover:bg-vipurple disabled:cursor-not-allowed"
                 disabled={disabled}
                 onClick={onSave}
                 title="hi there"

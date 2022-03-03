@@ -10,8 +10,17 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply bg-charcoal;
 }
 
 #root {
   height: 100%; /* helps ensure canvas has max height */
+}
+
+select.decoration option:hover { 
+    box-shadow: 0 0 10px 100px #1882A8 inset; 
+}
+
+button {
+  @apply border-zinc-600;
 }

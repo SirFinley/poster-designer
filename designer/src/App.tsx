@@ -12,7 +12,7 @@ function App() {
 
   return (
     <>
-      <div className="app p-2">
+      <div className="app p-2 bg-charcoal text-white">
         <PosterContext.Provider value={poster}>
           <SettingsContext.Provider value={poster.settings}>
             <Canvas></Canvas>

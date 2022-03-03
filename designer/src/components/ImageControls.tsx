@@ -68,42 +68,46 @@ const Settings = observer(() => {
         </ScaleButton>
       </div>
       
-      <label>Move</label>
-      <div className="flex flex-row gap-1">
-        <MoveButton onClick={moveLeft}>
-            <SvgMoveIcon src={svgMoveLeft} />
-        </MoveButton>
-        <MoveButton onClick={moveRight}>
-            <SvgMoveIcon src={svgMoveRight} />
-        </MoveButton>
-        <MoveButton onClick={moveUp}>
-            <SvgMoveIcon src={svgMoveUp} />
-        </MoveButton>
-        <MoveButton onClick={moveDown}>
-            <SvgMoveIcon src={svgMoveDown} />
-        </MoveButton>
+      <div className="mt-6">
+        <label>Move</label>
+        <div className="flex flex-row gap-1 mt-2">
+          <MoveButton onClick={moveLeft}>
+              <SvgMoveIcon src={svgMoveLeft} />
+          </MoveButton>
+          <MoveButton onClick={moveRight}>
+              <SvgMoveIcon src={svgMoveRight} />
+          </MoveButton>
+          <MoveButton onClick={moveUp}>
+              <SvgMoveIcon src={svgMoveUp} />
+          </MoveButton>
+          <MoveButton onClick={moveDown}>
+              <SvgMoveIcon src={svgMoveDown} />
+          </MoveButton>
+        </div>
       </div>
 
-      <label>Align</label>
-      <div className="flex flex-row gap-1">
-        <MoveButton onClick={centerVertical}>
-            <SvgAlignIconBold src={svgAlignVertical} />
-        </MoveButton>
-        <MoveButton onClick={centerHorizontal}>
-            <SvgAlignIconBold src={svgAlignHorizontal} />
-        </MoveButton>
-        <MoveButton onClick={alignLeft}>
-            <SvgAlignIcon src={svgAlignLeft} />
-        </MoveButton>
-        <MoveButton onClick={alignRight}>
-            <SvgAlignIcon src={svgAlignRight} />
-        </MoveButton>
-        <MoveButton onClick={alignTop}>
-            <SvgAlignIcon src={svgAlignTop} />
-        </MoveButton>
-        <MoveButton onClick={alignBottom}>
-            <SvgAlignIcon src={svgAlignBottom} />
-        </MoveButton>
+      <div className="mt-6">
+        <label>Align</label>
+        <div className="flex flex-row gap-1 mt-2">
+          <MoveButton onClick={centerVertical}>
+              <SvgAlignIconBold src={svgAlignVertical} />
+          </MoveButton>
+          <MoveButton onClick={centerHorizontal}>
+              <SvgAlignIconBold src={svgAlignHorizontal} />
+          </MoveButton>
+          <MoveButton onClick={alignLeft}>
+              <SvgAlignIcon src={svgAlignLeft} />
+          </MoveButton>
+          <MoveButton onClick={alignRight}>
+              <SvgAlignIcon src={svgAlignRight} />
+          </MoveButton>
+          <MoveButton onClick={alignTop}>
+              <SvgAlignIcon src={svgAlignTop} />
+          </MoveButton>
+          <MoveButton onClick={alignBottom}>
+              <SvgAlignIcon src={svgAlignBottom} />
+          </MoveButton>
+        </div>
       </div>
     </div>
   );
@@ -151,7 +155,7 @@ function MoveButton(props: IButtonProps) {
 function ScaleButton(props: IButtonProps) {
   return (
     <button
-      className="w-full p-2 border-2 rounded transition font-bold bg-gray-100 hover:bg-slate-200 drop-shadow-sm cursor-pointer text-center"
+      className="w-full p-2 border-2 rounded transition font-bold bg-charcoal hover:bg-offgray drop-shadow-sm cursor-pointer text-center"
       onClick={props.onClick}
     >
       {props.children}

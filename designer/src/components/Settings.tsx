@@ -15,7 +15,7 @@ const Settings = observer(() => {
   const poster = usePoster();
 
   return (
-    <div className="settings flex flex-col gap-2 w-[24rem] md:w-[24rem] lg:min-w-[28rem] p-1">
+    <div className="settings flex flex-col gap-4 w-[24rem] md:w-[24rem] lg:min-w-[28rem] p-1">
       <SizeSelect></SizeSelect>
       <OrientationSelect></OrientationSelect>
 

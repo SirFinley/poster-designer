@@ -83,7 +83,7 @@ const ImageUploadArea = observer(() => {
 
   const chooseImageButton = (
     <label>
-      <div className="w-full p-2 border-2 rounded transition font-bold bg-gray-100 hover:bg-slate-200 cursor-pointer text-center flex">
+      <div className="w-full p-2 border-2 rounded transition font-bold border-zinc-600 bg-charcoal hover:bg-offgray cursor-pointer text-center flex">
         <FontAwesomeIcon icon={faUpload} className="text-xl"></FontAwesomeIcon>
         <span className="w-full">
           {poster.hasImage ? "Choose New Image" : "Choose Image"}
@@ -130,9 +130,9 @@ const ImageUploadArea = observer(() => {
                 <span className="text-sm font-medium">{percentage}%</span>
               )}
             </div>
-            <div className="w-full my-1 bg-gray-200 rounded-full h-4">
+            <div className="w-full my-1 bg-offgray rounded-full h-4">
               <div
-                className="bg-gray-600 h-4 rounded-full"
+                className="bg-vipurple h-4 rounded-full"
                 style={{ width: `${percentage}%` }}
               ></div>
             </div>

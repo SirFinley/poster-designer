@@ -7,7 +7,7 @@ function Select(props: IProps) {
         <div>
             <label htmlFor={id}>{props.label}</label>
             <div className="h-12">
-                <select id={id} className="rounded-md shadow-md w-full pl-3 h-full border-2 border-gray-50" value={props.value} onChange={props.onChange}>
+                <select id={id} className="decoration rounded-md shadow-md w-full pl-3 h-full border-2 border-zinc-600 bg-charcoal" value={props.value} onChange={props.onChange}>
                     {
                         props.children
                     }

@@ -78,11 +78,10 @@ const SavePosterModal = observer(() => {
 
     return (
         <Fragment>
-            <button className="w-full p-2 rounded text-white bg-green-500 hover:bg-green-600 transition font-bold
-                    disabled:opacity-30 disabled:hover:bg-green-500 disabled:cursor-not-allowed"
+            <button className="w-full p-2 rounded text-white bg-vipurple hover:bg-vipurplelight transition font-bold
+                    disabled:opacity-30 disabled:hover:bg-vipurple disabled:cursor-not-allowed"
                 disabled={disabled}
                 onClick={onSave}
-                title="hi there"
             >
                 Save Poster {poster.image.uploadStatus === 'uploading' ? '(uploading...)' : null }
             </button>

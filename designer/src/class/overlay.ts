@@ -23,8 +23,8 @@ export default class Overlay {
     }
 
     drawOverlay() {
-        const fill = 'gray';
-        const opacity = 0.8;
+        const fill = 'rgb(96,96,96)';
+        const opacity = 1;
 
         this.clearOverlay();
 

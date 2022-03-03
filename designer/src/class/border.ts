@@ -14,6 +14,7 @@ export default class Border {
         this.posterImage = image;
 
         this.borderLines = []
+        this.frameLines = []
 
         this.setupEffects();
     }
@@ -22,6 +23,7 @@ export default class Border {
     settings: Settings;
     posterImage: PosterImage;
     borderLines: fabric.Line[];
+    frameLines: fabric.Line[];
 
     get maxBorder(): number {
         const size = this.settings.realPosterDimensions;
@@ -52,6 +54,53 @@ export default class Border {
         }
 
         this.drawLines();
+        this.drawFrame();
+    }
+
+    private drawFrame() {
+        this.canvas.remove(...this.frameLines);
+        this.frameLines = [];
+
+        const dims = this.settings.getVirtualDimensions();
+
+        const invertedBackgroundColor = this.getContrastingColor(this.settings.borderColor) || 'black';
+        function createLine(points: number[]) {
+             const line = new fabric.Line(points, {
+                strokeWidth: 1.5,
+                stroke: invertedBackgroundColor,
+                opacity: 1,
+                // strokeDashArray: [6, 6],
+                selectable: false,
+                evented: false,
+                // padding: 5, // increase selectable area
+                name: 'border-line',
+                hasBorders: false,
+                hasControls: false,
+            });
+
+            return line;
+        }
+
+        const length = Math.min(dims.posterWidth, dims.posterHeight) * 0.2;
+        const padding = 30;
+        const paddedLeft = dims.posterLeft + padding;
+        const paddedRight = dims.posterRight - padding;
+        const paddedTop = dims.posterTop + padding;
+        const paddedBottom = dims.posterBottom - padding;
+
+        const leftLine1 = createLine([paddedLeft, paddedTop, paddedLeft, paddedTop+length]);
+        const leftLine2 = createLine([paddedLeft, paddedBottom, paddedLeft, paddedBottom-length]);
+        const rightLine1 = createLine([paddedRight, paddedTop, paddedRight, paddedTop+length]);
+        const rightLine2 = createLine([paddedRight, paddedBottom, paddedRight, paddedBottom-length]);
+        const topLine1 = createLine([paddedLeft, paddedTop, paddedLeft+length, paddedTop]);
+        const topLine2 = createLine([paddedRight, paddedTop, paddedRight-length, paddedTop]);
+        const bottomLine1 = createLine([paddedLeft, paddedBottom, paddedLeft+length, paddedBottom]);
+        const bottomLine2 = createLine([paddedRight, paddedBottom, paddedRight-length, paddedBottom]);
+
+        this.frameLines = [leftLine1, rightLine1, topLine1, bottomLine1, leftLine2, rightLine2, topLine2, bottomLine2];
+        this.canvas.add(...this.frameLines);
+        this.frameLines.forEach(line => this.canvas.bringToFront(line));
+        this.canvas.renderAll();
     }
 
     private drawLines() {

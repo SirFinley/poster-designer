@@ -28,8 +28,9 @@ const BorderSizes = observer(() => {
           value={settings.border}
           step={STEP_SIZE}
           onChange={onBorderChange}
+          disabled={!poster.hasImage}
         />
-        <div className="flex items-center border-2 rounded-md ml-2 text-lg">
+        <div className="flex items-center border-2 rounded-md border-zinc-600 ml-2 text-lg">
           <button className="p-2" onClick={() => addToBorder(-STEP_SIZE)}>
             <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
           </button>

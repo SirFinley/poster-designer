@@ -9,11 +9,13 @@ export default function Slider(props: Props) {
       value={props.value}
       step={props.step}
       onChange={(e) => props.onChange(parseFloat(e.target.value))}
+      disabled={!!props.disabled}
     />
   );
 }
 
 interface Props {
+    disabled?: boolean,
     min: number,
     max: number,
     value: number,
