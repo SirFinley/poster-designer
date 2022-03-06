@@ -3,12 +3,14 @@ import VirtualDimensions from "./virtualDimensions";
 
 const defaultSize = '18x24';
 const defaultOrientation = 'portrait';
+const defaultPaper = 'glossy';
 
 export default class PosterSettings {
     canvas: fabric.Canvas;
 
     orientation: OrientationOptions;
     size: SizeOptions;
+    paper: PaperOptions;
 
     border: number;
 
@@ -23,6 +25,7 @@ export default class PosterSettings {
 
         this.orientation = defaultOrientation;
         this.size = defaultSize;
+        this.paper = defaultPaper;
         this.border = 0;
         this.borderColor = '#ffffff';
         this.originalImageKey = null;
@@ -107,12 +110,16 @@ export default class PosterSettings {
         // TODO: etsy - map from etsy variation id to option
         const orientation = url.searchParams.get('orientation');
         const size = url.searchParams.get('size');
+        const paper = url.searchParams.get('paper');
 
         if (orientation) {
             this.orientation = orientationOptionsEtsyUrlMap[orientation] || defaultOrientation;
         }
         if (size) {
             this.size = sizeOptionsEtsyUrlMap[size] || defaultSize;
+        }
+        if (paper) {
+            // this.paper = sizeOptionsEtsyUrlMap[size] || defaultSize;
         }
     }
 
@@ -121,9 +128,15 @@ export default class PosterSettings {
         if (size) {
             this.size = size;
         }
+
         const orientation = validateOrientation(params.get('orientation')?.toLowerCase());
         if (orientation) {
             this.orientation = orientation;
+        }
+
+        const paper = validatePaper(params.get('paper')?.toLowerCase());
+        if (paper) {
+            this.paper = paper;
         }
     }
 
@@ -172,6 +185,13 @@ function validateOrientation(value: string|null|undefined): OrientationOptions|n
     return null;
 }
 
+function validatePaper(value: string|null|undefined): PaperOptions|null {
+    if (papers.includes(value as PaperOptions)) {
+        return value as PaperOptions;
+    }
+    return null;
+}
+
 export const orientations = ['landscape', 'portrait'] as const;
 export type OrientationOptions = typeof orientations[number];
 // TODO: etsy - replace keys with etsy variation id
@@ -186,6 +206,24 @@ export const sizeOptionsDisplayMap = new Map<SizeOptions, string>([
     ['18x24', '18"x24"'],
     ['24x30', '24"x30"'],
     ['24x36', '24"x36"'],
+]);
+
+export const papers = ['glossy', 'matte', 'metallic'] as const;
+export type PaperOptions = typeof papers[number];
+export const paperOptionsDisplayMap = new Map<PaperOptions, string>([
+    ['glossy', 'Glossy'],
+    ['matte', 'Matte'],
+    ['metallic', 'Metallic Gloss'],
+]);
+export const paperSettingToShopify = new Map<PaperOptions, string>([
+    ['glossy', 'Glossy'],
+    ['matte', 'Matte'],
+    ['metallic', 'Metallic Gloss'],
+]);
+export const paperShopifyToSetting = new Map<string, PaperOptions>([
+    ['Glossy', 'glossy'],
+    ['Matte', 'matte'],
+    ['Metallic Gloss', 'metallic'],
 ]);
 
 // TODO: etsy - replace keys with etsy variation id

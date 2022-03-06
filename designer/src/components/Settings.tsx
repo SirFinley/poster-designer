@@ -10,6 +10,7 @@ import "./Settings.css";
 import { usePoster} from '../util/hooks';
 import AddToCartButton from "./AddToCartButton";
 import { observer } from "mobx-react-lite";
+import PaperSelect from "./PaperSelect";
 
 const Settings = observer(() => {
   const poster = usePoster();
@@ -18,6 +19,7 @@ const Settings = observer(() => {
     <div className="settings flex flex-col gap-4 w-[24rem] md:w-[24rem] lg:min-w-[28rem] p-1">
       <SizeSelect></SizeSelect>
       <OrientationSelect></OrientationSelect>
+      <PaperSelect></PaperSelect>
 
       <BorderSizes></BorderSizes>
       <BorderColor></BorderColor>
