@@ -1,6 +1,7 @@
 import { fabric } from 'fabric';
 import { autorun } from 'mobx';
 import PosterImage from './image';
+import Poster from './poster';
 import Settings from "./settings";
 const tinycolor = require('tinycolor2');
 
@@ -8,7 +9,8 @@ const STEP_SIZE = 0.125;
 export { STEP_SIZE };
 
 export default class Border {
-    constructor(canvas: fabric.Canvas, settings: Settings, image: PosterImage) {
+    constructor(poster: Poster, canvas: fabric.Canvas, settings: Settings, image: PosterImage) {
+        this.poster = poster;
         this.canvas = canvas;
         this.settings = settings;
         this.posterImage = image;
@@ -19,6 +21,7 @@ export default class Border {
         this.setupEffects();
     }
 
+    poster: Poster;
     canvas: fabric.Canvas;
     settings: Settings;
     posterImage: PosterImage;
@@ -60,6 +63,12 @@ export default class Border {
     private drawFrame() {
         this.canvas.remove(...this.frameLines);
         this.frameLines = [];
+
+        // has image, don't draw frame
+        if (this.poster.hasImage) {
+            this.canvas.renderAll();
+            return;
+        }
 
         const dims = this.settings.getVirtualDimensions();
 

@@ -34,7 +34,7 @@ export default class Poster {
 
         this.overlay = new Overlay(canvas, this.settings);
         this.image = new PosterImage(this, canvas, this.settings);
-        this.border = new Border(canvas, this.settings, this.image);
+        this.border = new Border(this, canvas, this.settings, this.image);
         // const render = new Render(image, canvas, settings);
 
         this.defaultSize = sizes[0];
