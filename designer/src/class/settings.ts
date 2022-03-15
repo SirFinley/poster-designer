@@ -123,6 +123,19 @@ export default class PosterSettings {
         }
     }
 
+    isOutOfStock(paper: PaperOptions): boolean {
+        const url = new URL(document.URL);
+        if (url.hash) {
+            const hash = url.hash.replace('#', '');
+            const params = new URLSearchParams(hash);
+            const outOfStockParam  = params.get('outOfStock') ?? '';
+            const outOfStockPaper = outOfStockParam.split(',').map(validatePaper) as PaperOptions[];
+            return outOfStockPaper.includes(paper);
+        }
+
+        return false;
+    }
+
     configureFromSearchParams(params: URLSearchParams) {
         const size = validateSize(params.get('size')?.replaceAll('"', ''));
         if (size) {
@@ -134,7 +147,7 @@ export default class PosterSettings {
             this.orientation = orientation;
         }
 
-        const paper = validatePaper(params.get('paper')?.toLowerCase());
+        const paper = validatePaper(params.get('paper'));
         if (paper) {
             this.paper = paper;
         }
@@ -186,6 +199,7 @@ function validateOrientation(value: string|null|undefined): OrientationOptions|n
 }
 
 function validatePaper(value: string|null|undefined): PaperOptions|null {
+    value = paperShopifyToSetting.get(value ?? '');
     if (papers.includes(value as PaperOptions)) {
         return value as PaperOptions;
     }

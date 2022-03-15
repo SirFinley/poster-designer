@@ -1,14 +1,17 @@
 import Canvas from "./components/Canvas";
 import Settings from "./components/Settings";
-import { poster, PosterContext, SettingsContext } from "./util/Context";
+import { PosterContext, SettingsContext } from "./util/Context";
 import "./App.css";
 import { useEffect } from "react";
 import LoadingPosterModal from "./components/LoadingPosterModal";
+import { usePoster } from "./util/hooks";
 
 function App() {
+  const poster = usePoster();
+
   useEffect(() => {
     poster.readSettingsFromUrl();
-  });
+  }, [poster]);
 
   return (
     <>

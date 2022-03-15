@@ -1,6 +1,10 @@
 import { observer } from "mobx-react-lite";
 import { ChangeEvent } from "react";
-import { PaperOptions, paperOptionsDisplayMap, paperSettingToShopify } from "../class/settings";
+import {
+  PaperOptions,
+  paperOptionsDisplayMap,
+  paperSettingToShopify,
+} from "../class/settings";
 import { usePoster } from "../util/hooks";
 import Select from "./Select";
 import { postMessage } from "../util";
@@ -26,13 +30,27 @@ const PaperSelect = observer(() => {
 
   return (
     <Select value={poster.settings.paper} onChange={onPaperInput} label="Paper">
-      {Array.from(paperOptionsDisplayMap).map(([key, value]) => (
-        <option key={key} value={key}>
-          {value}
-        </option>
-      ))}
+      <PaperOption paper="glossy" />
+      <PaperOption paper="matte" />
+      <PaperOption paper="metallic" />
     </Select>
   );
 });
+
+function PaperOption({ paper }: IPaperOptionProps) {
+  const poster = usePoster();
+  const outOfStock = poster.settings.isOutOfStock(paper);
+  const name = paperOptionsDisplayMap.get(paper);
+  
+  return (
+    <option key={paper} value={paper} disabled={outOfStock}>
+      {name} {outOfStock ? '(Out of Stock)' : null}
+    </option>
+  );
+}
+
+interface IPaperOptionProps {
+  paper: PaperOptions,
+}
 
 export default PaperSelect;
