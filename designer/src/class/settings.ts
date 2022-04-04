@@ -166,7 +166,7 @@ export default class PosterSettings {
     getEtsyUrl(): string {
         const etsyUrl = new URL('https://www.etsy.com/listing/1142787916/custom-poster-prints-glossy-paper-high');
         etsyUrl.searchParams.set('variation0', getEtsySizeId(this.paper, this.size));
-        etsyUrl.searchParams.set('variation1', getEtsyOrientationId(this.paper, this.orientation));
+        etsyUrl.searchParams.set('variation1', getEtsyPaperId(this.paper));
         return etsyUrl.toString();
     }
 }
@@ -201,6 +201,10 @@ function getEtsyOrientationId(paper: PaperOptions, orientation: OrientationOptio
     return orientationOptionToEtsyId.get(orientation) || '';
 }
 
+function getEtsyPaperId(paper: PaperOptions): string {
+    return paperOptionToEtsyId.get(paper) || '';
+}
+
 export const orientations = ['landscape', 'portrait'] as const;
 export type OrientationOptions = typeof orientations[number];
 
@@ -217,11 +221,15 @@ export const sizeOptionToEtsyId = new Map<SizeOptions, string>([
     ["24x30", "2428358951"],
     ["24x36", "2403501790"],
 ]);
-
 export const orientationOptionToEtsyId = new Map<OrientationOptions, string>([
     ["portrait", "2403501776"],
     ["landscape", "2403501780"],
 ]);
+export const paperOptionToEtsyId = new Map<PaperOptions, string>([
+    ["glossy", "2573987015"],
+    ["matte", "2573987017"],
+]);
+
 export const papers = ['glossy', 'matte', 'metallic'] as const;
 export type PaperOptions = typeof papers[number];
 export const paperOptionsDisplayMap = new Map<PaperOptions, string>([
