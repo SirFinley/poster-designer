@@ -103,26 +103,6 @@ export default class PosterSettings {
         };
     }
 
-    readSettingsFromUrl(urlStr: string) {
-        const url = new URL(urlStr);
-
-        // TODO - validate orientation and size are set, display warning if they are not
-        // TODO: etsy - map from etsy variation id to option
-        const orientation = url.searchParams.get('orientation');
-        const size = url.searchParams.get('size');
-        const paper = url.searchParams.get('paper');
-
-        if (orientation) {
-            this.orientation = orientationOptionsEtsyUrlMap[orientation] || defaultOrientation;
-        }
-        if (size) {
-            this.size = sizeOptionsEtsyUrlMap[size] || defaultSize;
-        }
-        if (paper) {
-            // this.paper = sizeOptionsEtsyUrlMap[size] || defaultSize;
-        }
-    }
-
     isOutOfStock(paper: PaperOptions): boolean {
         const url = new URL(document.URL);
         if (url.hash) {
@@ -182,6 +162,13 @@ export default class PosterSettings {
             return height / width;
         }
     }
+
+    getEtsyUrl(): string {
+        const etsyUrl = new URL('https://www.etsy.com/listing/1142787916/custom-poster-prints-glossy-paper-high');
+        etsyUrl.searchParams.set('variation0', getEtsySizeId(this.paper, this.size));
+        etsyUrl.searchParams.set('variation1', getEtsyOrientationId(this.paper, this.orientation));
+        return etsyUrl.toString();
+    }
 }
 
 function validateSize(value: string|null|undefined): SizeOptions|null {
@@ -206,13 +193,16 @@ function validatePaper(value: string|null|undefined): PaperOptions|null {
     return null;
 }
 
+function getEtsySizeId(paper: PaperOptions, size: SizeOptions): string {
+    return sizeOptionToEtsyId.get(size) || '';
+}
+
+function getEtsyOrientationId(paper: PaperOptions, orientation: OrientationOptions): string {
+    return orientationOptionToEtsyId.get(orientation) || '';
+}
+
 export const orientations = ['landscape', 'portrait'] as const;
 export type OrientationOptions = typeof orientations[number];
-// TODO: etsy - replace keys with etsy variation id
-const orientationOptionsEtsyUrlMap: Record<string, OrientationOptions> = {
-    'landscape': 'landscape',
-    'portrait': 'portrait',
-}
 
 export const sizes = ['18x24', '24x30', '24x36'] as const;
 export type SizeOptions = typeof sizes[number];
@@ -222,6 +212,16 @@ export const sizeOptionsDisplayMap = new Map<SizeOptions, string>([
     ['24x36', '24"x36"'],
 ]);
 
+export const sizeOptionToEtsyId = new Map<SizeOptions, string>([
+    ["18x24", "2403501782"],
+    ["24x30", "2428358951"],
+    ["24x36", "2403501790"],
+]);
+
+export const orientationOptionToEtsyId = new Map<OrientationOptions, string>([
+    ["portrait", "2403501776"],
+    ["landscape", "2403501780"],
+]);
 export const papers = ['glossy', 'matte', 'metallic'] as const;
 export type PaperOptions = typeof papers[number];
 export const paperOptionsDisplayMap = new Map<PaperOptions, string>([
@@ -240,21 +240,7 @@ export const paperShopifyToSetting = new Map<string, PaperOptions>([
     ['Metallic Gloss', 'metallic'],
 ]);
 
-// TODO: etsy - replace keys with etsy variation id
-const sizeOptionsEtsyUrlMap: Record<string, SizeOptions> = {
-    '18x24': '18x24',
-    '24x30': '24x30',
-    '24x36': '24x36',
-};
-
 interface RealPosterDimensions {
     width: number,
     height: number,
 }
-
-// validation
-(function validateSizeOptions() {
-    if (Object.keys(sizeOptionsEtsyUrlMap).length !== sizeOptionsDisplayMap.size) {
-        console.error('etsy size options mismatch');
-    }
-})();

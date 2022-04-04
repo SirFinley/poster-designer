@@ -63,8 +63,7 @@ const SavePosterModal = observer(() => {
     }
 
     function getEtsyUrl() {
-        // TODO: get etsy url configured with settings
-        return etsyUrl;
+        return poster.settings.getEtsyUrl();
     }
 
     async function getPostData() {
@@ -142,7 +141,10 @@ const SavePosterModal = observer(() => {
                                                         </Tooltip>
 
                                                         <p id="save-modal-instructions" className="pt-4">
-                                                            Copy your poster Id above and paste it in the personalization field back in the <a href={etsyUrl} target="_blank" rel="noreferrer noopener" >Etsy listing</a>
+                                                            Copy your poster Id above and paste it in the personalization field back in the 
+                                                            <a href={etsyUrl} target="_blank" rel="noreferrer noopener" 
+                                                                className="underline text-blue-600 hover:text-blue-800 visited:text-purple-600"
+                                                            > Etsy listing here.</a>
                                                         </p>
                                                     </div>
                                                     :

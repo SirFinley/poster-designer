@@ -32,7 +32,7 @@ const PaperSelect = observer(() => {
     <Select value={poster.settings.paper} onChange={onPaperInput} label="Paper">
       <PaperOption paper="glossy" />
       <PaperOption paper="matte" />
-      <PaperOption paper="metallic" />
+      {poster.shopify ? <PaperOption paper="metallic" /> : null}
     </Select>
   );
 });
@@ -41,16 +41,16 @@ function PaperOption({ paper }: IPaperOptionProps) {
   const poster = usePoster();
   const outOfStock = poster.settings.isOutOfStock(paper);
   const name = paperOptionsDisplayMap.get(paper);
-  
+
   return (
     <option key={paper} value={paper} disabled={outOfStock}>
-      {name} {outOfStock ? '(Out of Stock)' : null}
+      {name} {outOfStock ? "(Out of Stock)" : null}
     </option>
   );
 }
 
 interface IPaperOptionProps {
-  paper: PaperOptions,
+  paper: PaperOptions;
 }
 
 export default PaperSelect;

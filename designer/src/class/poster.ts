@@ -28,14 +28,10 @@ export default class Poster {
         this.settings = new PosterSettings(canvas);
         this.posterLoadStatus = 'none';
         this.posterId = null;
-        // TODO: read settings from document.referrer
-        // readSettingsFromUrl(document.referrer);
-        // settings.readSettingsFromUrl(window.location.toString());
 
         this.overlay = new Overlay(canvas, this.settings);
         this.image = new PosterImage(this, canvas, this.settings);
         this.border = new Border(this, canvas, this.settings, this.image);
-        // const render = new Render(image, canvas, settings);
 
         this.defaultSize = sizes[0];
         this.designMode = 'design';
