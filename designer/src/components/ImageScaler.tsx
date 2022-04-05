@@ -1,4 +1,4 @@
-import { usePoster} from '../util/hooks';
+import { usePoster } from "../util/hooks";
 import { observer } from "mobx-react-lite";
 import Slider from "./Slider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -36,10 +36,11 @@ const ImageScaler = observer(() => {
 
   return (
     <div className="w-full">
-      <label>
-        Scale Image: <DpiText dpi={poster.image.dpi}></DpiText>
-      </label>
+      <div>Scale Image</div>
+      <div className="text-center">
+        Print Quality: <DpiText dpi={poster.image.dpi}></DpiText>
       {/* TODO: display info tooltip if svg, info icon, text: "SVG images will be printed at 600 dpi" */}
+      </div>
       <div className="flex flex-row items-center gap-2 text-lg">
         <button className="p-2" onClick={() => addToScale(-BUTTON_STEP)}>
           <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
@@ -64,17 +65,28 @@ function DpiText({ dpi }: DpiTextProps) {
     return null;
   }
 
+  let quality = "";
   let color = "";
-  if (dpi <= 30) {
+  if (dpi <= 80) {
     color = "text-red-500";
-  } else if (dpi <= 100) {
+    quality = "Poor";
+  } else if (dpi <= 150) {
     color = "text-yellow-500";
+    quality = "Average";
+  } else if (dpi <= 300) {
+    color = "text-green-500";
+    quality = "Good";
+  } else if (dpi <= 600) {
+    color = "text-green-500";
+    quality = "Great";
   } else {
     color = "text-green-500";
+    quality = "Fantastic";
   }
 
-  const dpiText = `${dpi.toFixed(0)} DPI`;
-  return <span className={`font-semibold ${color}`}>{dpiText}</span>;
+  const boundedDpi = Math.min(dpi, 1200);
+  const dpiText = `${boundedDpi.toFixed(0)} DPI`;
+  return <span className={`font-semibold ${color}`}>{quality} - {dpiText}</span>;
 }
 
 interface DpiTextProps {
