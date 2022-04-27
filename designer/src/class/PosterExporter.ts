@@ -20,6 +20,7 @@ export default class PosterExporter {
             version: 1,
             size: settings.size,
             orientation: settings.orientation,
+            paper: settings.paper,
             virtualDimensions: settings.getVirtualDimensions(),
             borders: {
                 top: settings.border,
@@ -119,6 +120,7 @@ export interface SaveData {
     version: number,
     size: string,
     orientation: string,
+    paper: string,
     virtualDimensions: VirtualDimensions
     borders: {
         top: number,

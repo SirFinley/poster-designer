@@ -5,6 +5,7 @@ export interface SaveData {
     version: number,
     size: string,
     orientation: string,
+    paper: string,
     virtualDimensions: VirtualDimensions
     borders: {
         top: number,

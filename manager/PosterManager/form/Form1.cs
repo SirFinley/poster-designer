@@ -11,7 +11,13 @@ namespace PosterManager
 
         public Form1(IConfiguration config)
         {
-            Icon = Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            try
+            {
+                Icon = Icon.ExtractAssociatedIcon(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            }
+            catch (Exception)
+            {
+            }
             InitializeComponent();
             Settings = new Settings(config);
         }
@@ -72,7 +78,7 @@ namespace PosterManager
             posterIdLabelValue.Text = item.id;
             sizeLabelValue.Text = saveData.size;
             orientationLabelValue.Text = saveData.orientation;
-            paperLabelValue.Text = "Glossy"; // TODO - get paper type
+            paperLabelValue.Text = saveData.paper;
             borderLabelValue.Text = saveData.borders.left + "\"";
         }
 

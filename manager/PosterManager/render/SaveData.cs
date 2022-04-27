@@ -9,6 +9,7 @@ namespace PosterManager.render
         public int version { get; set; }
         public string size { get; set; }
         public string orientation { get; set; }
+        public string paper { get; set; }
         public VirtualDimensions virtualDimensions { get; set; }
         public SaveDataBorders borders { get; set; }
         public object canvasJson { get; set; }
