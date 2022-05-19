@@ -208,15 +208,17 @@ function getEtsyPaperId(paper: PaperOptions): string {
 export const orientations = ['landscape', 'portrait'] as const;
 export type OrientationOptions = typeof orientations[number];
 
-export const sizes = ['18x24', '24x30', '24x36'] as const;
+export const sizes = ['16x24', '18x24', '24x30', '24x36'] as const;
 export type SizeOptions = typeof sizes[number];
 export const sizeOptionsDisplayMap = new Map<SizeOptions, string>([
+    ['16x24', '16"x24"'],
     ['18x24', '18"x24"'],
     ['24x30', '24"x30"'],
     ['24x36', '24"x36"'],
 ]);
 
 export const sizeOptionToEtsyId = new Map<SizeOptions, string>([
+    ["16x24", "2647061987"],
     ["18x24", "2403501782"],
     ["24x30", "2428358951"],
     ["24x36", "2403501790"],
