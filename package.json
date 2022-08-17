@@ -23,12 +23,13 @@
     "@tsconfig/node14": "^1.0.1",
     "@types/aws-lambda": "^8.10.70",
     "@types/node": "<15.0.0",
-    "@types/sharp": "^0.29.5"
+    "@types/sharp": "^0.29.5",
+    "vitest": "^0.22.0"
   },
   "dependencies": {
-    "@serverless-stack/cli": "1.0.2",
-    "@serverless-stack/resources": "1.0.2",
-    "aws-cdk-lib": "2.20.0",
+    "@serverless-stack/cli": "1.2.25",
+    "@serverless-stack/resources": "1.2.25",
+    "aws-cdk-lib": "2.24.0",
     "axios": "^0.25.0",
     "hi-base32": "^0.5.1",
     "sharp": "^0.29.3"
