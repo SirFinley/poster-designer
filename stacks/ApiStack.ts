@@ -1,77 +1,79 @@
-import * as sst from "@serverless-stack/resources";
-import { LayerVersion } from 'aws-cdk-lib/aws-lambda';
+import { Api, StackContext, use } from "@serverless-stack/resources";
+import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
-import { rootCertArn } from './Constants';
+import { rootCertArn } from "./Constants";
+import StorageStack from "./StorageStack";
 
-const sharpLayerArn = 'arn:aws:lambda:us-east-1:606735259578:layer:sharp:1';
+const sharpLayerArn = "arn:aws:lambda:us-east-1:606735259578:layer:sharp:1";
 
-export default class ApiStack extends sst.Stack {
-    // Public reference to the API
-    api: sst.Api;
+export default function ApiStack({ stack, app }: StackContext) {
+  const { countsTable, postersTable, uploadsBucket, thumbnailBucket } =
+    use(StorageStack);
+  const canvasLayer = LayerVersion.fromLayerVersionArn(
+    stack,
+    "SharpLayer",
+    sharpLayerArn
+  );
+  const certificate = Certificate.fromCertificateArn(
+    stack,
+    "rootCert",
+    rootCertArn
+  );
 
-    constructor(scope: sst.App, id: string, props: ApiProps) {
-        super(scope, id, props);
+  const apiDomain = "api.visualinkworks.com";
 
-        const { countsTable, postersTable, bucket, thumbnailBucket } = props.config;
-        const canvasLayer = LayerVersion.fromLayerVersionArn(this, "SharpLayer", sharpLayerArn);
-        const certificate = Certificate.fromCertificateArn(this, "rootCert", rootCertArn);
-
-        const apiDomain = 'api.visualinkworks.com';
-
-        // Create the API
-        this.api = new sst.Api(this, "Api", {
-            cors: true,
-            customDomain: {
-                domainName: scope.stage === 'prod' ? apiDomain : `${scope.stage}-${apiDomain}`,
-                hostedZone: 'visualinkworks.com',
-                certificate,
-            },
-            defaultFunctionProps: {
-                environment: {
-                    COUNTS_TABLE_NAME: countsTable.tableName,
-                    POSTERS_TABLE_NAME: postersTable.tableName,
-                    BUCKET_NAME: bucket.bucketName,
-                    THUMBNAIL_BUCKET_NAME: thumbnailBucket.bucketName,
-                    THUMBNAIL_BUCKET_REGION: this.region,
-                    REGION: this.region,
-                },
-            },
-            routes: {
-                "GET    /upload-image": "src/upload-image.main",
-                "GET    /load-poster": "src/load-poster.main",
-                "POST   /save-poster": "src/save-poster.main",
-                "GET    /render-poster": {
-                    function: {
-                        handler: "src/render-poster.main",
-                        timeout: 5 * 60,
-                        bundle: { externalModules: ['sharp'] },
-                        layers: [canvasLayer],
-                        memorySize: 10240,
-                    },
-                },
-            },
-        });
-
-        // Allow the API to access the table
-        this.api.attachPermissions([countsTable]);
-        this.api.attachPermissions([postersTable]);
-        this.api.attachPermissions([bucket]);
-        this.api.attachPermissions([thumbnailBucket]);
-
-        // Show the API endpoint in the output
-        this.addOutputs({
-            ApiEndpoint: this.api.url,
-            CustomDomainUrl: this.api.customDomainUrl || 'N/A',
-        });
-    }
-}
-
-interface ApiProps extends sst.StackProps {
-    config: {
-        countsTable: sst.Table,
-        postersTable: sst.Table,
-        bucket: sst.Bucket,
-        thumbnailBucket: sst.Bucket,
+  // Create the API
+  const api = new Api(stack, "Api", {
+    cors: true,
+    customDomain: {
+      domainName:
+        app.stage === "prod" ? apiDomain : `${app.stage}-${apiDomain}`,
+      hostedZone: "visualinkworks.com",
+      cdk: {
+        certificate,
+      },
     },
+
+    defaults: {
+      function: {
+        environment: {
+          COUNTS_TABLE_NAME: countsTable.tableName,
+          POSTERS_TABLE_NAME: postersTable.tableName,
+          BUCKET_NAME: uploadsBucket.bucketName,
+          THUMBNAIL_BUCKET_NAME: thumbnailBucket.bucketName,
+          THUMBNAIL_BUCKET_REGION: stack.region,
+          REGION: stack.region,
+        },
+      },
+    },
+    routes: {
+      "GET    /upload-image": "src/upload-image.main",
+      "GET    /load-poster": "src/load-poster.main",
+      "POST   /save-poster": "src/save-poster.main",
+      "GET    /render-poster": {
+        function: {
+          handler: "src/render-poster.main",
+          timeout: 5 * 60,
+          bundle: { externalModules: ["sharp"] },
+          layers: [canvasLayer],
+          memorySize: 10240,
+        },
+      },
+    },
+  });
+
+  // Allow the API to access the table
+  api.attachPermissions([countsTable]);
+  api.attachPermissions([postersTable]);
+  api.attachPermissions([uploadsBucket]);
+  api.attachPermissions([thumbnailBucket]);
+
+  // Show the API endpoint in the output
+  stack.addOutputs({
+    ApiEndpoint: api.url,
+    CustomDomainUrl: api.customDomainUrl || "N/A",
+  });
+
+  return { api };
 }

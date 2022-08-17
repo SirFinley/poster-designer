@@ -26,9 +26,9 @@
     "@types/sharp": "^0.29.5"
   },
   "dependencies": {
-    "@serverless-stack/cli": "0.69.3",
-    "@serverless-stack/resources": "0.69.3",
-    "aws-cdk-lib": "2.15.0",
+    "@serverless-stack/cli": "1.0.2",
+    "@serverless-stack/resources": "1.0.2",
+    "aws-cdk-lib": "2.20.0",
     "axios": "^0.25.0",
     "hi-base32": "^0.5.1",
     "sharp": "^0.29.3"

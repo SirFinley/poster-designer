@@ -6,22 +6,11 @@ import SiteStack from "./SiteStack";
 export default function main(app: sst.App): void {
   // Set default runtime for all functions
   app.setDefaultFunctionProps({
-    runtime: "nodejs14.x"
+    runtime: "nodejs14.x",
   });
 
-  const storageStack = new StorageStack(app, "storage");
-  const apiStack = new ApiStack(app, "designer-api", {
-    config: {
-      countsTable: storageStack.countsTable,
-      postersTable: storageStack.postersTable,
-      bucket: storageStack.bucket,
-      thumbnailBucket: storageStack.thumbnailBucket,
-    },
-  });
-
-  new SiteStack(app, "designer-site", {
-    config_appApiUrl: apiStack.api.customDomainUrl || apiStack.api.url,
-  });
-
-  // Add more stacks
+  app
+    .stack(StorageStack)
+    .stack(ApiStack)
+    .stack(SiteStack);
 }

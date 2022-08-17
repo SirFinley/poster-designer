@@ -1,36 +1,44 @@
-import * as sst from "@serverless-stack/resources";
+import {
+  use,
+  ReactStaticSite,
+  StackContext,
+} from "@serverless-stack/resources";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
-import { rootCertArn } from './Constants';
+import ApiStack from "./ApiStack";
+import { rootCertArn } from "./Constants";
 
-export default class SiteStack extends sst.Stack {
-  designerSite: sst.StaticSite;
+export default function SiteStack({ stack, app }: StackContext) {
+  const { api } = use(ApiStack);
 
-  constructor(scope: sst.App, id: string, props: SiteProps) {
-    super(scope, id, props);
+  const certificate = Certificate.fromCertificateArn(
+    stack,
+    "rootCert",
+    rootCertArn
+  );
 
-    const certificate = Certificate.fromCertificateArn(this, "rootCert", rootCertArn);
-
-    this.designerSite = new sst.ReactStaticSite(this, "designer-site", {
-      path: "designer",
-      buildCommand: "npm ci && npm run build",
-      environment: {
-        REACT_APP_API_URL: props.config_appApiUrl,
-      },
-      customDomain: {
-        domainName: scope.stage === 'prod' ? "designer.visualinkworks.com" : `${scope.stage}-designer.visualinkworks.com`,
-        hostedZone: 'visualinkworks.com',
+  const designerSite = new ReactStaticSite(stack, "designer-site", {
+    path: "designer",
+    buildCommand: "npm ci && npm run build",
+    environment: {
+      REACT_APP_API_URL: api.customDomainUrl || api.url,
+    },
+    customDomain: {
+      domainName:
+        app.stage === "prod"
+          ? "designer.visualinkworks.com"
+          : `${app.stage}-designer.visualinkworks.com`,
+      hostedZone: "visualinkworks.com",
+      cdk: {
         certificate: certificate,
       },
-    });
+    },
+  });
 
-    this.addOutputs({
-      SiteUrl: this.designerSite.url,
-      CustomDomainUrl: this.designerSite.customDomainUrl || 'N/A',
-    })
-  }
-}
+  stack.addOutputs({
+    SiteUrl: designerSite.url,
+    CustomDomainUrl: designerSite.customDomainUrl || "N/A",
+  });
 
-interface SiteProps extends sst.StackProps {
-  config_appApiUrl: string,
+  return { designerSite };
 }

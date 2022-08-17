@@ -1,61 +1,60 @@
-import * as sst from "@serverless-stack/resources";
+import { Bucket, StackContext, Table } from "@serverless-stack/resources";
 import { Duration } from "aws-cdk-lib";
 import { HttpMethods } from "aws-cdk-lib/aws-s3";
 
-export default class StorageStack extends sst.Stack {
-    // Public reference to the table
-    countsTable: sst.Table;
-    postersTable: sst.Table;
-    bucket: sst.Bucket;
-    thumbnailBucket: sst.Bucket;
+export default function StorageStack({ stack }: StackContext) {
+  const countsTable = new Table(stack, "Counts", {
+    fields: {
+      name: "string",
+      counts: "number",
+    },
+    primaryIndex: { partitionKey: "name" },
+  });
 
-    constructor(scope: sst.App, id: string, props?: sst.StackProps) {
-        super(scope, id, props);
+  const postersTable = new Table(stack, "Posters", {
+    fields: {
+      id: "string",
+      posterJson: "number",
+    },
+    primaryIndex: { partitionKey: "id" },
+  });
 
-        // Create the DynamoDB table
-        this.countsTable = new sst.Table(this, "Counts", {
-            fields: {
-                name: sst.TableFieldType.STRING,
-                counts: sst.TableFieldType.NUMBER,
-            },
-            primaryIndex: { partitionKey: "name" },
-        });
+  const uploadsBucket = new Bucket(stack, "Uploads", {
+    cdk: {
+      bucket: {
+        cors: [
+          {
+            maxAge: 3000,
+            allowedOrigins: ["*"],
+            allowedHeaders: ["*"],
+            allowedMethods: [HttpMethods.GET, HttpMethods.PUT],
+          },
+        ],
+        lifecycleRules: [
+          {
+            enabled: true,
+            id: "uploads-expiration",
+            prefix: "uploads/",
+            expiration: Duration.days(3),
+          },
+        ],
+      },
+    },
+  });
 
-        // Create the DynamoDB table
-        this.postersTable = new sst.Table(this, "Posters", {
-            fields: {
-                id: sst.TableFieldType.STRING,
-                posterJson: sst.TableFieldType.NUMBER,
-            },
-            primaryIndex: { partitionKey: "id" },
-        });
+  const thumbnailBucket = new Bucket(stack, "Thumbnails", {
+    cdk: {
+      bucket: {
+        publicReadAccess: true,
+        websiteIndexDocument: "index.html",
+      },
+    },
+  });
 
-        this.bucket = new sst.Bucket(this, "Uploads", {
-            s3Bucket: {
-                cors: [
-                    {
-                        maxAge: 3000,
-                        allowedOrigins: ["*"],
-                        allowedHeaders: ["*"],
-                        allowedMethods: [HttpMethods.GET, HttpMethods.PUT],
-                    },
-                ],
-                lifecycleRules: [
-                    {
-                        enabled: true,
-                        id: "uploads-expiration",
-                        prefix: "uploads/",
-                        expiration: Duration.days(3),
-                    }
-                ]
-            },
-        });
-
-        this.thumbnailBucket = new sst.Bucket(this, "Thumbnails", {
-            s3Bucket: {
-                publicReadAccess: true,
-                websiteIndexDocument: 'index.html',
-            },
-        });
-    }
+  return {
+    countsTable,
+    postersTable,
+    uploadsBucket,
+    thumbnailBucket,
+  };
 }
