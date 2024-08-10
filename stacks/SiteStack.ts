@@ -1,6 +1,6 @@
 import {
   use,
-  ReactStaticSite,
+  StaticSite,
   StackContext,
 } from "@serverless-stack/resources";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
@@ -17,9 +17,10 @@ export default function SiteStack({ stack, app }: StackContext) {
     rootCertArn
   );
 
-  const designerSite = new ReactStaticSite(stack, "designer-site", {
+  const designerSite = new StaticSite(stack, "designer-site", {
     path: "designer",
     buildCommand: "npm ci && npm run build",
+    buildOutput: "build",
     environment: {
       REACT_APP_API_URL: api.customDomainUrl || api.url,
     },
