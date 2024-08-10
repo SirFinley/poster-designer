@@ -1,11 +1,9 @@
-import { Api, StackContext, use } from "@serverless-stack/resources";
+import { Api, StackContext, use } from "sst/constructs";
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
-import { rootCertArn } from "./Constants";
+import { rootCertArn, sharpLayerArn } from "./Constants";
 import StorageStack from "./StorageStack";
-
-const sharpLayerArn = "arn:aws:lambda:us-east-1:606735259578:layer:sharp:1";
 
 export default function ApiStack({ stack, app }: StackContext) {
   const { countsTable, postersTable, uploadsBucket, thumbnailBucket } =

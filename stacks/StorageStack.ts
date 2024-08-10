@@ -1,4 +1,4 @@
-import { Bucket, StackContext, Table } from "@serverless-stack/resources";
+import { Bucket, StackContext, Table } from "sst/constructs";
 import { Duration } from "aws-cdk-lib";
 import { HttpMethods } from "aws-cdk-lib/aws-s3";
 

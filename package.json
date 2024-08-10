@@ -24,11 +24,11 @@
     "@types/aws-lambda": "^8.10.70",
     "@types/node": "<15.0.0",
     "@types/sharp": "^0.29.5",
+    "sst": "2.0",
+    "constructs": "10.1.156",
     "vitest": "^0.22.0"
   },
   "dependencies": {
-    "@serverless-stack/cli": "1.18",
-    "@serverless-stack/resources": "1.18",
     "aws-cdk-lib": "2.24.0",
     "axios": "^0.25.0",
     "hi-base32": "^0.5.1",

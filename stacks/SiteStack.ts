@@ -2,7 +2,7 @@ import {
   use,
   StaticSite,
   StackContext,
-} from "@serverless-stack/resources";
+} from "sst/constructs";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
 import ApiStack from "./ApiStack";
