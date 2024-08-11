@@ -20,9 +20,9 @@ export default function SiteStack({ stack, app }: StackContext) {
   const designerSite = new StaticSite(stack, "designer-site", {
     path: "designer",
     buildCommand: "npm ci && npm run build",
-    buildOutput: "build",
+    buildOutput: "dist",
     environment: {
-      REACT_APP_API_URL: api.customDomainUrl || api.url,
+      VITE_APP_API_URL: api.customDomainUrl || api.url,
     },
     customDomain: {
       domainName:

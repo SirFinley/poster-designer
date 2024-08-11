@@ -1,5 +1,5 @@
 import { fabric } from 'fabric';
-import FastAverageColor from 'fast-average-color';
+import { FastAverageColor } from 'fast-average-color';
 import { action, autorun, makeAutoObservable } from 'mobx';
 import Poster from './poster';
 import Settings from './settings';

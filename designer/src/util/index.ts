@@ -7,8 +7,10 @@ export function postMessage(message: IMessage) {
     console.log("post message:");
     console.log(message);
     
-    window.top?.postMessage(
-        JSON.stringify(message), 
-        document.referrer,
-    );
+    if (window.top && document.referrer){
+        window.top?.postMessage(
+            JSON.stringify(message), 
+            document.referrer,
+        );
+    }
 }
