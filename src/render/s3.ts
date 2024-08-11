@@ -1,14 +1,16 @@
-import AWS from "aws-sdk";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { GetObjectCommand, S3 } from "@aws-sdk/client-s3";
 import environment from "../util/environment";
 
 const URL_EXPIRATION_SECONDS = 24 * 60 * 60; // 24 hours
 
-const s3 = new AWS.S3();
+const s3 = new S3();
 export async function getDownloadUrl(key: string) {
-    const url = await s3.getSignedUrlPromise('getObject', {
+    const url = await getSignedUrl(s3, new GetObjectCommand({
         Bucket: environment.bucketName,
         Key: key,
-        Expires: URL_EXPIRATION_SECONDS,
+    }), {
+        expiresIn: URL_EXPIRATION_SECONDS,
     });
 
     return url;
@@ -23,7 +25,7 @@ export async function uploadImage(buffer: Buffer, key: string) {
     };
 
     try {
-        await s3.putObject(object).promise();
+        await s3.putObject(object);
         return key;
     } catch (err) {
         console.error("Failed to store image: " + err);

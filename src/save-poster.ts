@@ -1,4 +1,4 @@
-import { S3 } from 'aws-sdk';
+import { CopyObjectCommandInput, S3 } from '@aws-sdk/client-s3';
 import * as base32 from 'hi-base32';
 import { randomUUID } from 'crypto';
 import handler from './util/handler';
@@ -11,7 +11,7 @@ export const main = handler(async (event) => {
 	const posterJson = event.body as string;
 	const saveData = JSON.parse(posterJson) as SaveData;
 
-	const id = posterId || await getId(saveData);
+	const id = posterId || (await getId(saveData));
 	const updatedImageKey = moveImage(id, saveData);
 	const thumbnailUrl = getThumbnailUrl(id, saveData);
 	saveData.imageKey = await updatedImageKey;
@@ -118,7 +118,7 @@ async function copyS3(sourceBucket: string, sourceKey: string, targetBucket: str
 	}
 
 	const copySource = encodeURIComponent(`/${sourceBucket}/${sourceKey}`);
-	const request: S3.CopyObjectRequest = {
+	const request: CopyObjectCommandInput = {
 		Bucket: targetBucket,
 		CopySource: copySource,
 		Key: targetKey,
@@ -126,7 +126,7 @@ async function copyS3(sourceBucket: string, sourceKey: string, targetBucket: str
 
 	try {
 		const s3 = new S3();
-		const result = await s3.copyObject(request).promise();
+		const result = await s3.copyObject(request);
 		console.log(result.CopyObjectResult);
 	} catch (error) {
 		console.log(`error copying ${sourceBucket}/${sourceKey} to ${targetBucket}/${targetKey}`);

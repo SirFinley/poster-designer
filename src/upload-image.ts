@@ -1,4 +1,5 @@
-import { S3 } from 'aws-sdk';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
 import handler from './util/handler';
 import environment from './util/environment';
@@ -20,19 +21,19 @@ export const main = handler(async (event) => {
 
 	// Get signed URL from S3
 	const s3 = new S3();
-	const s3Params = {
+	const uploadUrl = await getSignedUrl(s3, new PutObjectCommand({
 		Bucket: environment.bucketName,
 		Key: key,
-		Expires: URL_EXPIRATION_SECONDS,
 		ContentType: contentType,
+
 
 		// This ACL makes the uploaded object publicly readable. You must also uncomment
 		// the extra permission for the Lambda function in the SAM template.
 
 		// ACL: 'public-read'
-	}
-
-	const uploadUrl = await s3.getSignedUrlPromise('putObject', s3Params);
+	}), {
+		expiresIn: URL_EXPIRATION_SECONDS,
+	});
 	return {
 		uploadUrl,
 		key,
