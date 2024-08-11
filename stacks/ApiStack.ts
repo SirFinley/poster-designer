@@ -41,12 +41,12 @@ export default function ApiStack({ stack, app }: StackContext) {
       },
     },
     routes: {
-      "GET    /upload-image": "src/upload-image.main",
-      "GET    /load-poster": "src/load-poster.main",
-      "POST   /save-poster": "src/save-poster.main",
+      "GET    /upload-image": "packages/functions/src/upload-image.main",
+      "GET    /load-poster": "packages/functions/src/load-poster.main",
+      "POST   /save-poster": "packages/functions/src/save-poster.main",
       "GET    /render-poster": {
         function: {
-          handler: "src/render-poster.main",
+          handler: "packages/functions/src/render-poster.main",
           timeout: 5 * 60,
           bundle: { externalModules: ["sharp"] },
           layers: [
