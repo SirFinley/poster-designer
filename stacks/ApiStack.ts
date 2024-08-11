@@ -1,18 +1,13 @@
 import { Api, StackContext, use } from "sst/constructs";
-import { LayerVersion } from "aws-cdk-lib/aws-lambda";
+import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
-import { rootCertArn, sharpLayerArn } from "./Constants";
+import { rootCertArn } from "./Constants";
 import StorageStack from "./StorageStack";
 
 export default function ApiStack({ stack, app }: StackContext) {
   const { countsTable, postersTable, uploadsBucket, thumbnailBucket } =
     use(StorageStack);
-  const canvasLayer = LayerVersion.fromLayerVersionArn(
-    stack,
-    "SharpLayer",
-    sharpLayerArn
-  );
   const certificate = Certificate.fromCertificateArn(
     stack,
     "rootCert",
@@ -54,7 +49,11 @@ export default function ApiStack({ stack, app }: StackContext) {
           handler: "src/render-poster.main",
           timeout: 5 * 60,
           bundle: { externalModules: ["sharp"] },
-          layers: [canvasLayer],
+          layers: [
+            new lambda.LayerVersion(stack, "SharpLayer", {
+              code: lambda.Code.fromAsset("layers/sharp"),
+            })
+          ],
           memorySize: 10240,
         },
       },

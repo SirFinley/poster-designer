@@ -8,6 +8,10 @@ Start by installing the dependencies.
 $ npm install
 ```
 
+## Setup
+
+Set up sharp layer for lambda - https://docs.sst.dev/advanced/lambda-layers
+
 ## Commands
 
 ### `npm run start`
