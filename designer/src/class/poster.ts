@@ -10,7 +10,7 @@ import PreviewCanvas from "./previewCanvas";
 import { SaveData } from "./PosterExporter";
 
 // // configure axios
-axios.defaults.baseURL = import.meta.env.VITE_APP_API_URL || 'https://dev-api.visualinkworks.com';
+axios.defaults.baseURL = import.meta.env.VITE_APP_API_URL;
 
 export default class Poster {
     constructor() {

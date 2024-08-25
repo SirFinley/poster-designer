@@ -1,20 +1,14 @@
 import { Api, StackContext, use } from "sst/constructs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
 
-import { rootCertArn } from "./Constants";
+import { rootDomain } from "./Constants";
 import StorageStack from "./StorageStack";
 
 export default function ApiStack({ stack, app }: StackContext) {
   const { countsTable, postersTable, uploadsBucket, thumbnailBucket } =
     use(StorageStack);
-  const certificate = Certificate.fromCertificateArn(
-    stack,
-    "rootCert",
-    rootCertArn
-  );
 
-  const apiDomain = "api.visualinkworks.com";
+  const apiDomain = `api.${rootDomain}`;
 
   // Create the API
   const api = new Api(stack, "Api", {
@@ -22,10 +16,7 @@ export default function ApiStack({ stack, app }: StackContext) {
     customDomain: {
       domainName:
         app.stage === "prod" ? apiDomain : `${app.stage}-${apiDomain}`,
-      hostedZone: "visualinkworks.com",
-      cdk: {
-        certificate,
-      },
+      hostedZone: rootDomain,
     },
 
     defaults: {
