@@ -2,38 +2,32 @@
   "name": "designer",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.36",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@fortawesome/react-fontawesome": "^0.1.16",
     "@headlessui/react": "^1.4.2",
     "@heroicons/react": "^1.0.5",
-    "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
-    "@types/jest": "^26.0.24",
-    "@types/node": "^12.20.37",
-    "@types/react": "^17.0.37",
-    "@types/react-dom": "^17.0.11",
-    "axios": "^0.24.0",
-    "fabric": "^4.6.0",
-    "fast-average-color": "^7.0.1",
+    "@vitejs/plugin-react": "^4.3.1",
+    "axios": "^1.7.0",
+    "fabric": "^5.4.0",
+    "fast-average-color": "^9.4.0",
     "mobx": "^6.3.10",
     "mobx-react-lite": "^3.2.3",
-    "react": "^17.0.2",
-    "react-device-detect": "^2.1.2",
-    "react-dom": "^17.0.2",
-    "react-scripts": "^5.0.0-next.58",
-    "tinycolor2": "^1.4.2",
-    "typescript": "^4.5.3",
-    "web-vitals": "^1.1.2"
+    "react": "^18.3.0",
+    "react-device-detect": "^2.2.0",
+    "react-dom": "^18.3.0",
+    "tinycolor2": "^1.4.6",
+    "typescript": "^5.5.0",
+    "vite": "^5.4.0",
+    "vite-tsconfig-paths": "^5.0.1"
   },
   "scripts": {
-    "dev": "sst-env -- react-scripts start",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "sst-env -- vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "eslintConfig": {
     "extends": [
@@ -56,10 +50,14 @@
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/plugin-proposal-decorators": "^7.16.7",
-    "@serverless-stack/static-site-env": "^0.56.0",
-    "@types/fabric": "^4.5.6",
+    "@serverless-stack/static-site-env": "^1.18.0",
+    "@types/fabric": "^5.3.8",
+    "@types/node": "^18.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@types/tinycolor2": "^1.4.6",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.5",
-    "tailwindcss": "^3.0.2"
+    "tailwindcss": "^3.4.9"
   }
 }

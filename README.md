@@ -8,6 +8,10 @@ Start by installing the dependencies.
 $ npm install
 ```
 
+## Setup
+
+Set up sharp layer for lambda - https://docs.sst.dev/advanced/lambda-layers
+
 ## Commands
 
 ### `npm run start`
@@ -37,8 +41,6 @@ Runs your tests using Jest. Takes all the [Jest CLI options](https://jestjs.io/d
 Learn more about the Serverless Stack.
 
 - [Docs](https://docs.serverless-stack.com)
-- [@serverless-stack/cli](https://docs.serverless-stack.com/packages/cli)
-- [@serverless-stack/resources](https://docs.serverless-stack.com/packages/resources)
 
 ## Community
 

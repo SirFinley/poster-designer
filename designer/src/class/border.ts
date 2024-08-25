@@ -3,7 +3,7 @@ import { autorun } from 'mobx';
 import PosterImage from './image';
 import Poster from './poster';
 import Settings from "./settings";
-const tinycolor = require('tinycolor2');
+import tinycolor from 'tinycolor2';
 
 const STEP_SIZE = 0.125;
 export { STEP_SIZE };

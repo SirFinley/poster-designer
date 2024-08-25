@@ -1,37 +1,28 @@
 import {
   use,
-  ReactStaticSite,
+  StaticSite,
   StackContext,
-} from "@serverless-stack/resources";
-import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
+} from "sst/constructs";
 
 import ApiStack from "./ApiStack";
-import { rootCertArn } from "./Constants";
+import { rootDomain } from "./Constants";
 
 export default function SiteStack({ stack, app }: StackContext) {
   const { api } = use(ApiStack);
 
-  const certificate = Certificate.fromCertificateArn(
-    stack,
-    "rootCert",
-    rootCertArn
-  );
-
-  const designerSite = new ReactStaticSite(stack, "designer-site", {
+  const designerSite = new StaticSite(stack, "designer-site", {
     path: "designer",
     buildCommand: "npm ci && npm run build",
+    buildOutput: "dist",
     environment: {
-      REACT_APP_API_URL: api.customDomainUrl || api.url,
+      VITE_APP_API_URL: api.customDomainUrl || api.url,
     },
     customDomain: {
       domainName:
         app.stage === "prod"
-          ? "designer.visualinkworks.com"
-          : `${app.stage}-designer.visualinkworks.com`,
-      hostedZone: "visualinkworks.com",
-      cdk: {
-        certificate: certificate,
-      },
+          ? `designer.${rootDomain}`
+          : `${app.stage}-designer.${rootDomain}`,
+      hostedZone: rootDomain,
     },
   });
 

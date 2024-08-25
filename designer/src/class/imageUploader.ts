@@ -77,6 +77,9 @@ export default class ImageUploader {
                 'Content-Type': file.type,
             },
             onUploadProgress: (progressEvent) => {
+                if (!progressEvent.total) {
+                    return;
+                }
                 const percent = Math.round(progressEvent.loaded / progressEvent.total * 100);
                 this.updateProgress(percent)
             },

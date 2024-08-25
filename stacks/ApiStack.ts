@@ -1,27 +1,14 @@
-import { Api, StackContext, use } from "@serverless-stack/resources";
-import { LayerVersion } from "aws-cdk-lib/aws-lambda";
-import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
+import { Api, StackContext, use } from "sst/constructs";
+import * as lambda from "aws-cdk-lib/aws-lambda";
 
-import { rootCertArn } from "./Constants";
+import { rootDomain } from "./Constants";
 import StorageStack from "./StorageStack";
-
-const sharpLayerArn = "arn:aws:lambda:us-east-1:606735259578:layer:sharp:1";
 
 export default function ApiStack({ stack, app }: StackContext) {
   const { countsTable, postersTable, uploadsBucket, thumbnailBucket } =
     use(StorageStack);
-  const canvasLayer = LayerVersion.fromLayerVersionArn(
-    stack,
-    "SharpLayer",
-    sharpLayerArn
-  );
-  const certificate = Certificate.fromCertificateArn(
-    stack,
-    "rootCert",
-    rootCertArn
-  );
 
-  const apiDomain = "api.visualinkworks.com";
+  const apiDomain = `api.${rootDomain}`;
 
   // Create the API
   const api = new Api(stack, "Api", {
@@ -29,10 +16,7 @@ export default function ApiStack({ stack, app }: StackContext) {
     customDomain: {
       domainName:
         app.stage === "prod" ? apiDomain : `${app.stage}-${apiDomain}`,
-      hostedZone: "visualinkworks.com",
-      cdk: {
-        certificate,
-      },
+      hostedZone: rootDomain,
     },
 
     defaults: {
@@ -48,15 +32,19 @@ export default function ApiStack({ stack, app }: StackContext) {
       },
     },
     routes: {
-      "GET    /upload-image": "src/upload-image.main",
-      "GET    /load-poster": "src/load-poster.main",
-      "POST   /save-poster": "src/save-poster.main",
+      "GET    /upload-image": "packages/functions/src/upload-image.main",
+      "GET    /load-poster": "packages/functions/src/load-poster.main",
+      "POST   /save-poster": "packages/functions/src/save-poster.main",
       "GET    /render-poster": {
         function: {
-          handler: "src/render-poster.main",
+          handler: "packages/functions/src/render-poster.main",
           timeout: 5 * 60,
           bundle: { externalModules: ["sharp"] },
-          layers: [canvasLayer],
+          layers: [
+            new lambda.LayerVersion(stack, "SharpLayer", {
+              code: lambda.Code.fromAsset("layers/sharp"),
+            })
+          ],
           memorySize: 10240,
         },
       },
