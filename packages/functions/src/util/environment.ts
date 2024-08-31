@@ -4,4 +4,5 @@ export default {
     bucketName: process.env.BUCKET_NAME as string,
     thumbnailBucketName: process.env.THUMBNAIL_BUCKET_NAME as string,
     thumbnailBucketRegion: process.env.THUMBNAIL_BUCKET_REGION as string,
+    corsAllowedOrigin: process.env.CORS_ALLOWED_ORIGIN as string,
 };

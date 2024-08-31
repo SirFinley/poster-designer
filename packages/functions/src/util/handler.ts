@@ -1,4 +1,5 @@
 import { APIGatewayProxyEventV2 } from "aws-lambda";
+import environment from './environment';
 
 export default function handler<T>(lambda: ApiLambda<T>) {
   return async function (event: APIGatewayProxyEventV2) {
@@ -20,7 +21,7 @@ export default function handler<T>(lambda: ApiLambda<T>) {
       statusCode,
       body: JSON.stringify(body),
       headers: {
-        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Origin": environment.corsAllowedOrigin,
         "Access-Control-Allow-Credentials": true,
       },
     };

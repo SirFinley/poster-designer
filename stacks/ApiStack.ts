@@ -1,21 +1,23 @@
 import { Api, StackContext, use } from "sst/constructs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 
-import { rootDomain } from "./Constants";
+import { rootDomain, getApiDomain, getSiteDomain } from "./Config";
 import StorageStack from "./StorageStack";
 
 export default function ApiStack({ stack, app }: StackContext) {
   const { countsTable, postersTable, uploadsBucket, thumbnailBucket } =
     use(StorageStack);
 
-  const apiDomain = `api.${rootDomain}`;
+  const siteDomain = getSiteDomain(app.stage);
+  const corsAllowedOrigin = `https://${siteDomain}`; 
 
   // Create the API
   const api = new Api(stack, "Api", {
-    cors: true,
+    cors: {
+      allowOrigins: [corsAllowedOrigin],
+    },
     customDomain: {
-      domainName:
-        app.stage === "prod" ? apiDomain : `${app.stage}-${apiDomain}`,
+      domainName: getApiDomain(app.stage),
       hostedZone: rootDomain,
     },
 
@@ -27,6 +29,7 @@ export default function ApiStack({ stack, app }: StackContext) {
           BUCKET_NAME: uploadsBucket.bucketName,
           THUMBNAIL_BUCKET_NAME: thumbnailBucket.bucketName,
           THUMBNAIL_BUCKET_REGION: stack.region,
+          CORS_ALLOWED_ORIGIN: corsAllowedOrigin, 
           REGION: stack.region,
         },
       },

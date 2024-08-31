@@ -5,7 +5,7 @@ import {
 } from "sst/constructs";
 
 import ApiStack from "./ApiStack";
-import { rootDomain } from "./Constants";
+import { rootDomain, getSiteDomain } from "./Config";
 
 export default function SiteStack({ stack, app }: StackContext) {
   const { api } = use(ApiStack);
@@ -18,10 +18,7 @@ export default function SiteStack({ stack, app }: StackContext) {
       VITE_APP_API_URL: api.customDomainUrl || api.url,
     },
     customDomain: {
-      domainName:
-        app.stage === "prod"
-          ? `designer.${rootDomain}`
-          : `${app.stage}-designer.${rootDomain}`,
+      domainName: getSiteDomain(app.stage),
       hostedZone: rootDomain,
     },
   });
