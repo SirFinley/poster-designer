@@ -19,6 +19,7 @@ namespace PosterManager
             {
             }
             InitializeComponent();
+            Text = "Poster Manager";
             Settings = new Settings(config);
         }
 
