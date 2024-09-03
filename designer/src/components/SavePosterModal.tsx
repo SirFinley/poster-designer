@@ -1,4 +1,4 @@
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSpinner } from '@fortawesome/free-solid-svg-icons'
 import { Dialog, Transition } from '@headlessui/react';
@@ -19,12 +19,18 @@ const SavePosterModal = observer(() => {
     const poster = usePoster();
     const [open, setOpen] = useState(false)
     const [saved, setSaved] = useState(true);
-    const [posterId, setPosterId] = useState('AAAGGGH');
+    const [posterId, setPosterId] = useState<string|null>(null);
     const [etsyUrl, setEtsyUrl] = useState('https://etsy.com/');
     const [copiedId, setCopiedId] = useState(false);
 
     const cancelButtonRef = useRef(null)
     const disabled = poster.image.uploadStatus !== 'uploaded';
+
+    useEffect(() => {
+        if (posterId !== null) {
+            window.location.hash = `posterId=${posterId}`
+        }
+    }, [posterId])
 
     function onSave() {
         setOpen(true);
@@ -71,6 +77,8 @@ const SavePosterModal = observer(() => {
     }
 
     function copyId() {
+        if (posterId == null) return;
+
         navigator.clipboard.writeText(posterId);
         setCopiedId(true);
     }
